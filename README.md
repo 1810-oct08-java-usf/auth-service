@@ -1,2 +1,2 @@
 # auth-service
-Auth microservice for the MSE supporting PLOP
+Auth microservice for the MSE supporting P3
