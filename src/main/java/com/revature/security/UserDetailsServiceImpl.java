@@ -17,11 +17,11 @@ import com.revature.models.AppUser;
 import com.revature.repository.UserRepository;
 
 /**
-* An implementation of Spring Security's UserDetailService which can be used
-* for loading a user by username and other user-related service
-* functionalities.
-*
-*/
+ * An implementation of Spring Security's UserDetailService which can be used
+ * for loading a user by username and other user-related service
+ * functionalities.
+ *
+ */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
@@ -58,19 +58,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		 * TODO This method should be refactored to actually pull a user from the embedded 
 		 * DB based upon their user name. The current implementation is not efficient.
 		 */
-		
-		// hard coding the users. All passwords must be encoded.
 		List<AppUser> users = new ArrayList<AppUser>();
 		userRepo.findAll().forEach(user -> users.add(user));
 		
-		for(AppUser appUser: users) {
-			appUser.setPassword(encoder.encode(appUser.getPassword()));
-		}
-
-		/*
-		 * TODO This needs to be refactored into a method which invokes a repository
-		 * method
-		 */
 		for (AppUser appUser : users) {
 			if (appUser.getUsername().equals(username)) {
 
