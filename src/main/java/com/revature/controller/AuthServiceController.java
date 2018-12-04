@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping
 public class AuthServiceController {
 	
-	@GetMapping("/")
+	@GetMapping("/test")
 	public String home() {
 		return "HELLLLOOO!";
 	}
