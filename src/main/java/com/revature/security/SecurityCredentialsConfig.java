@@ -70,6 +70,13 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 			
 				// Allow all POST requests to the "/auth" endpoint
 				.antMatchers(HttpMethod.POST, jwtConfig.getUri()).permitAll()
+				
+				/*
+				 * TODO This needs to be refactored to restrict access to the H2 console to only admins
+				 */
+				// Anyone can access the H2 console for the auth-service (for now)
+            	.antMatchers(HttpMethod.GET, "/auth/h2-console/**").permitAll()
+            	.antMatchers(HttpMethod.POST, "/auth/h2-console/**").permitAll()
 
 				// All other requests must be authenticated
 				.anyRequest().authenticated();

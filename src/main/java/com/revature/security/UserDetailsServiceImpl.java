@@ -61,6 +61,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		List<AppUser> users = new ArrayList<AppUser>();
 		userRepo.findAll().forEach(user -> users.add(user));
 		
+		for(AppUser appUser : users) {
+			appUser.setPassword(encoder.encode(appUser.getPassword()));
+		}
+		
 		for (AppUser appUser : users) {
 			if (appUser.getUsername().equals(username)) {
 
