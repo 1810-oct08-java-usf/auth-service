@@ -1,25 +1,29 @@
 package com.revature.models;
 
+/**
+ * Used to store user credentials recieved from request body of an
+ * authentication request.
+ */
 public class UserCredentials {
-	
-    private String username;
-    private String password;
 
-    public String getUsername() {
-        return username;
-    }
+	private String username;
+	private String password;
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+	public String getUsername() {
+		return username;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
 	@Override
 	public int hashCode() {
@@ -56,5 +60,5 @@ public class UserCredentials {
 	public String toString() {
 		return "UserCredentials [username=" + username + ", password=" + password + "]";
 	}
-   
+
 }
