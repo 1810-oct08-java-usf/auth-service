@@ -1,5 +1,3 @@
-FROM openjdk:8-jdk-alpine
-ADD . /auth-service
-WORKDIR /auth-service
-EXPOSE 10001
-CMD ["java", "-jar", "target/rpm-auth-service-0.0.1-SNAPSHOT.jar"]
+FROM java:8
+COPY target/rpm-auth-service-0.0.1-SNAPSHOT.jar /tmp/rpm-auth-service-0.0.1-SNAPSHOT.jar
+CMD ["java", "-jar", "/tmp/rpm-auth-service-0.0.1-SNAPSHOT.jar","--server.servlet.context-path=/rpm-auth","&"]
