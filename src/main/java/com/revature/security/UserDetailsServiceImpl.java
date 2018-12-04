@@ -1,6 +1,6 @@
 package com.revature.security;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,22 +14,41 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.revature.models.AppUser;
+import com.revature.repository.LoginRepository;
 
 @Service   // It has to be annotated with @Service.
 public class UserDetailsServiceImpl implements UserDetailsService  {
 	
 	@Autowired
+	private LoginRepository repo;
+	
+	@Autowired
 	private BCryptPasswordEncoder encoder;
-
+	
+	public UserDetailsServiceImpl() {
+		super();
+	}
+	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		
 		// hard coding the users. All passwords must be encoded.
-		final List<AppUser> users = Arrays.asList(
-			new AppUser(1, "admin", encoder.encode("p4ssw0rd"), "ADMIN"),
-			new AppUser(2, "test-user", encoder.encode("test"), "USER")
-		);
+		List<AppUser> users = new ArrayList<AppUser>();
+		repo.findAll().forEach(user -> users.add(user));
 		
+		for(AppUser appUser: users) {
+			appUser.setPassword(encoder.encode(appUser.getPassword()));
+		}
+//				Arrays.asList(
+//				new AppUser(1, "wsingleton", encoder.encode("p4ssw0rd"), "USER"),
+//				new AppUser(2, "admin", encoder.encode("b3tt3rp4ssw0rd"), "ADMIN")
+//			);
+//				
+//				
+//				new ArrayList<AppUser>();
+//				repo.findAll().forEach(user -> users.add(user));
+
+		System.out.println("USERS LIST: " + users);
 
 		for(AppUser appUser: users) {
 			if(appUser.getUsername().equals(username)) {
@@ -44,6 +63,8 @@ public class UserDetailsServiceImpl implements UserDetailsService  {
 				return new User(appUser.getUsername(), appUser.getPassword(), grantedAuthorities);
 			}
 		}
+		
+		
 		
 		// If user not found. Throw this exception.
 		throw new UsernameNotFoundException("Username: " + username + " not found");

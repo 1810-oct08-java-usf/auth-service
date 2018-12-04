@@ -1,11 +1,22 @@
 package com.revature.models;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity
 public class AppUser {
 	
+	@Id
+	@GeneratedValue
 	private Integer id;
 	private String username;
 	private String password;
 	private String role;
+	
+	public AppUser() {
+		super();
+	}
 
 	public AppUser(Integer id, String username, String password, String role) {
 		this.id = id;
