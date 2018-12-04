@@ -4,8 +4,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/*
+ * TODO Implement registration functionality/endpoints
+ */
 @RestController
-@RequestMapping
+@RequestMapping("/auth/register")
 public class AuthServiceController {
 	
 	@GetMapping("/test")

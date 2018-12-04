@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.revature.models.AppUser;
 
 @Repository
-public interface LoginRepository extends CrudRepository<AppUser, Integer>{
+public interface UserRepository extends CrudRepository<AppUser, Integer>{
 
 }

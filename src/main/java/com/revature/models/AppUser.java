@@ -1,20 +1,40 @@
 package com.revature.models;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
+/**
+ * Represents an authenticated user with all of their core information.
+ */
 @Entity
+@Table(name="RPM_USERS")
 public class AppUser {
 	
 	@Id
-	@GeneratedValue
+	@Column(name="RPM_USER_ID")
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
+	
+	@Column(name="RPM_USER_FN")
 	private String firstName;
+	
+	@Column(name="RPM_USER_LN")
 	private String lastName;
+	
+	@Column(name="RPM_USER_EMAIL")
 	private String email;
+	
+	@Column(name="RPM_USER_USERNAME")
 	private String username;
+	
+	@Column(name="RPM_USER_PW")
 	private String password;
+	
+	@Column(name="RPM_USER_ROLE")
 	private String role;
 	
 	public AppUser() {
