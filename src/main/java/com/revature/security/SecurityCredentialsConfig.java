@@ -19,14 +19,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @EnableWebSecurity
 public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 
-	private UserDetailsService userDetailsService;
-	private JwtConfig jwtConfig;
-	
 	@Autowired
-	public SecurityCredentialsConfig(UserDetailsService userDetailsService) {
-		super();
-		this.userDetailsService = userDetailsService;
-	}
+	private UserDetailsService userDetailsService;
+	
+	private JwtConfig jwtConfig;
 
 	/**
 	 * Allows configuring web based security for specific http requests. By default it will be applied 
@@ -118,10 +114,6 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	public void setJwtConfig(JwtConfig jwtConfig) {
 		this.jwtConfig = jwtConfig;
-	}
-
-	public void setUserDetailsService(UserDetailsService userDetailsService) {
-		this.userDetailsService = userDetailsService;
 	}
 
 	@Bean
