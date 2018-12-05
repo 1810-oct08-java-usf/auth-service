@@ -39,6 +39,12 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 			 */
 			.csrf().disable()
 			
+			/*
+			 * Necessary to prevent Spring Security from blocking frames that will be loaded for 
+			 * the H2 console (will be removed once a external datasource is implemented).
+			 */
+			.headers().frameOptions().disable().and()
+			
 			/* 
 			 * Ensure that a stateless session is used; session will not be used to store user 
 			 * information/state.
@@ -47,7 +53,7 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 			
 			/*
 			 * Handle any exceptions thrown during authentication by sending a response status
-			 * of Authorized (401).
+			 * of unauthorized (401).
 			 */
 			.exceptionHandling()
 				.authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)).and()
@@ -69,22 +75,27 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 			.authorizeRequests()
 			
 				// Allow all POST requests to the "/auth" endpoint
-				.antMatchers(HttpMethod.POST, jwtConfig.getUri()).permitAll()
+				.antMatchers(jwtConfig.getUri()).permitAll()
 				
-				/*
-				 * TODO This needs to be refactored to restrict access to the H2 console to only admins
-				 */
-				// Anyone can access the H2 console for the auth-service (for now)
-            	.antMatchers(HttpMethod.GET, "/auth/h2-console/**").permitAll()
-            	.antMatchers(HttpMethod.POST, "/auth/h2-console/**").permitAll()
-
+				// Only admins can access the H2 console for the auth-service
+            	.antMatchers("/h2-console/**").permitAll()
+            	
+            	/* 
+            	 * Allow unrestricted access to the actuator/info endpoint. Otherwise, AWS ELB cannot
+            	 * perform a health check on the instance and it drains the instances. 
+            	 */
+            	.antMatchers(HttpMethod.GET, "/actuator/info").permitAll()
+            	
+            	// Allow unrestricted access to the actuator/mappings endpoint for debugging purposes
+            	.antMatchers(HttpMethod.GET, "/**/actuator/mappings").permitAll()
+            	
 				// All other requests must be authenticated
 				.anyRequest().authenticated();
 	}
 
 	/*
 	 * Spring has UserDetailsService interface, which can be overriden to provide
-	 * our implementation for fetching user from database (or any other source).
+	 * our implementation for fetching user from the database (or any other source).
 	 * 
 	 * The UserDetailsService object is used by the AuthenticationManager to load
 	 * the user from database. Additionally, we need to define the password encoder

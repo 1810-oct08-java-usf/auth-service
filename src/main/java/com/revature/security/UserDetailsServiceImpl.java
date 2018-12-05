@@ -74,7 +74,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 				 * granted authorities based upon the user's role.
 				 */
 				List<GrantedAuthority> grantedAuthorities = AuthorityUtils
-						.commaSeparatedStringToAuthorityList("ROLE_" + appUser.getRole());
+						.commaSeparatedStringToAuthorityList(appUser.getRole());
 
 				/*
 				 * The "User" class is provided by Spring and represents a model class for user

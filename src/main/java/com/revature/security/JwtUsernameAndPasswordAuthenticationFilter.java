@@ -80,8 +80,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 	 * 		Represents the token for an authenticated principal
 	 */
 	@Override
-	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
-			throws AuthenticationException {
+	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
 
