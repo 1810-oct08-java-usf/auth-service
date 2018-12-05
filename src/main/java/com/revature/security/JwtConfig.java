@@ -12,7 +12,7 @@ public class JwtConfig {
 	 * Used to override the default path "/login", authentication requests will be
 	 * resolved through the "/auth" endpoint.
 	 */
-	@Value("${security.jwt.uri:/auth/**}")
+	@Value("${security.jwt.uri:/auth}")
 	private String Uri;
 
 	/*
