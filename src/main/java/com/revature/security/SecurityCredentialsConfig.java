@@ -12,13 +12,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Component;
+
 
 /**
  * Provides the configuration for the Spring Security framework.
  */
 @EnableWebSecurity
-@Component
 public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
