@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
@@ -32,7 +33,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	private UserRepository userRepo;
 	
 	@Autowired
-	public UserDetailsServiceImpl(BCryptPasswordEncoder encoder, UserRepository userRepo) {
+	public UserDetailsServiceImpl(BCryptPasswordEncoder encoder, @Lazy UserRepository userRepo) {
 		super();
 		this.encoder = encoder;
 		this.userRepo = userRepo;
