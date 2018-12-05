@@ -32,7 +32,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	// Used to invoke repository methods for persisting to the DB
 	private UserRepository userRepo;
 	
-	@Autowired
+	//@Autowired
 	public UserDetailsServiceImpl(BCryptPasswordEncoder encoder, @Lazy UserRepository userRepo) {
 		super();
 		this.encoder = encoder;
