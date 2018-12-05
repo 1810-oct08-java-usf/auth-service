@@ -89,4 +89,5 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		// If no user is not found, throw a UsernameNotFoundException
 		throw new UsernameNotFoundException("Username: " + username + " not found");
 	}
+	
 }
