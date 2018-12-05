@@ -22,6 +22,7 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private UserDetailsService userDetailsService;
 	
+	@Autowired
 	private JwtConfig jwtConfig;
 
 	/**
@@ -109,11 +110,6 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-	}
-
-	@Autowired
-	public void setJwtConfig(JwtConfig jwtConfig) {
-		this.jwtConfig = jwtConfig;
 	}
 
 	@Bean
