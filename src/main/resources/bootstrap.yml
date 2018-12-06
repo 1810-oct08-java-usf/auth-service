@@ -6,7 +6,7 @@ spring:
      uri: http://rpm-elb-996808586.us-east-1.elb.amazonaws.com/rpm-config/
  eureka:
    instance:
-     hostname: ${HOSTNAME}
+     hostname: auth-service
      prefer-ip-address: false
-     #instance-id: ${spring.application.name}:${server.port}
+    
 
