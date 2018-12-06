@@ -7,4 +7,5 @@ spring:
  eureka:
    instance:
      hostname: auth-service
+     prefer-ip-address: true
 
