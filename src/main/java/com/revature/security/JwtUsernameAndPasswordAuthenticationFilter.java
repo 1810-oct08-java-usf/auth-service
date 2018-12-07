@@ -13,13 +13,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.models.UserCredentials;
+import com.revature.models.UserPrincipal;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -29,7 +29,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
  * successful authentication a JWT will be passed back to the client via a HTTP response header.
  */
 public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-
+	
 	/* Spring Security's AuthenticationManager which is used to validate the 
 	 * user credentials
 	 */
@@ -93,6 +93,17 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 			 */
 			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(creds.getUsername(),
 					creds.getPassword(), Collections.emptyList());
+			
+//			System.out.println("*****************");
+//			System.out.println("*****************");
+//			System.out.println("*****************");
+//			System.out.println(this.userService.findAllUsers());
+//			System.out.println("*****************");
+//			System.out.println("*****************");
+//			System.out.println("*****************");
+
+			
+//			response.getWriter().write(new ObjectMapper().writeValueAsString(userService.findUserByUsername(creds.getUsername())));
 
 			/*
 			 * 3. Leverage AuthenticationManager to authenticate the user, and use
@@ -169,7 +180,9 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 				// Builds the JWT and serializes it to a compact, URL-safe string
 				.compact();
 
+		response.getWriter().write(new ObjectMapper().writeValueAsString(((UserPrincipal)auth.getPrincipal()).getAppUser()));
 		// Add token to the response header
 		response.addHeader(jwtConfig.getHeader(), jwtConfig.getPrefix() + token);
-	}
+	}	
+	
 }
