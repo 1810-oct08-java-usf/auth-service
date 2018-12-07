@@ -81,6 +81,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 				 * to be returned by UserDetailsService, and used by AuthenticationManager to
 				 * verify and check user authentication.
 				 */
+				/**
+				 * This method will return the entire AppUser object for use in the response body
+				 * by encapsulating the default Spring User inside our custom UserPrincipal class that extends User. 
+				 */
 				return new UserPrincipal(appUser, appUser.getUsername(), appUser.getPassword(), grantedAuthorities);
 			}
 		}

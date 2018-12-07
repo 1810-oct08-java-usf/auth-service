@@ -94,17 +94,6 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(creds.getUsername(),
 					creds.getPassword(), Collections.emptyList());
 			
-//			System.out.println("*****************");
-//			System.out.println("*****************");
-//			System.out.println("*****************");
-//			System.out.println(this.userService.findAllUsers());
-//			System.out.println("*****************");
-//			System.out.println("*****************");
-//			System.out.println("*****************");
-
-			
-//			response.getWriter().write(new ObjectMapper().writeValueAsString(userService.findUserByUsername(creds.getUsername())));
-
 			/*
 			 * 3. Leverage AuthenticationManager to authenticate the user, and use
 			 * UserDetailsServiceImpl::loadUserByUsername() method to load the user.
@@ -180,7 +169,10 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 				// Builds the JWT and serializes it to a compact, URL-safe string
 				.compact();
 
+		// Add AppUser object as JSON to the response body upon successful login by getting the print writer
+		// of HttpServletResponse response
 		response.getWriter().write(new ObjectMapper().writeValueAsString(((UserPrincipal)auth.getPrincipal()).getAppUser()));
+		
 		// Add token to the response header
 		response.addHeader(jwtConfig.getHeader(), jwtConfig.getPrefix() + token);
 	}	
