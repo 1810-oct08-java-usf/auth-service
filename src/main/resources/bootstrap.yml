@@ -7,6 +7,6 @@ spring:
 
 eureka:
    instance:
-      hostname: http://rpm-elb-996808586.us-east-1.elb.amazonaws.com/rpm-auth/
-      instance-id: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
+      hostname: ${eureka.client.hostname}
+      instance-id: ${spring.application.name}:${server.port}
       preferIpAddress: false
