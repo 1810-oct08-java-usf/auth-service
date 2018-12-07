@@ -37,25 +37,18 @@ public class AuthServiceController {
 		this.userService = userService;
 	}
 	
-	@PostMapping(value="/login", consumes=MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
-	@ResponseStatus(HttpStatus.OK)
-	public AppUser loginUser(@RequestBody AppUser user) {
-		if(userService.findUserByUsername(user.getUsername()) == null) throw new UserCreationException("Invalid Login Credentials");
-		return userService.findUserByUsername(user.getUsername());	
-	}
-	
 	@GetMapping(produces=MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public List<AppUser> findAllUsers(){
 		return userService.findAllUsers();
 	}
 	
-//	@PostMapping(value="/update", consumes=MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
-//	@ResponseStatus(HttpStatus.CREATED)
-//	public AppUser registerUser(@RequestBody AppUser user) {
-//		if(userService.addUser(user) == null) throw new UserCreationException("That username or email already exists.");
-//		return user;
-//	}
+	@PostMapping(consumes=MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.CREATED)
+	public AppUser registerUser(@RequestBody AppUser user) {
+		if(userService.addUser(user) == null) throw new UserCreationException("That username or email already exists.");
+		return user;
+	}
 	
 	@PutMapping(consumes=MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
