@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,7 +15,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 /**
  * Provides the configuration for the Spring Security framework.
@@ -24,83 +28,100 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	@Lazy
 	private UserDetailsService userDetailsService;
-	
+
 	@Autowired
 	private JwtConfig jwtConfig;
 
 	/**
-	 * Allows configuring web based security for specific http requests. By default it will be applied 
-	 * to all requests, but can be restricted using requestMatcher(RequestMatcher) or other similar 
-	 * methods.
+	 * Allows configuring web based security for specific http requests. By default
+	 * it will be applied to all requests, but can be restricted using
+	 * requestMatcher(RequestMatcher) or other similar methods.
 	 * 
-	 * @param http
-	 * 		Used to configure Spring Security with regard to HTTP requests
+	 * @param http Used to configure Spring Security with regard to HTTP requests
 	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
-			/*
-			 * Disables the protection against Cross-Site Request Forgery (CSRF), otherwise requests
-			 * cannot be made to this request from the zuul-service.
-			 */
-			.csrf().disable()
-			
-			/*
-			 * Necessary to prevent Spring Security from blocking frames that will be loaded for 
-			 * the H2 console (will be removed once a external datasource is implemented).
-			 */
-			.headers().frameOptions().disable().and()
-			
-			/* 
-			 * Ensure that a stateless session is used; session will not be used to store user 
-			 * information/state.
-			 */
-			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-			
-			/*
-			 * Handle any exceptions thrown during authentication by sending a response status
-			 * of unauthorized (401).
-			 */
-			.exceptionHandling()
+				/*
+				 * Disables the protection against Cross-Site Request Forgery (CSRF), otherwise
+				 * requests cannot be made to this request from the zuul-service.
+				 */
+				.csrf().disable()
+
+				/*
+				 * Necessary to prevent Spring Security from blocking frames that will be loaded
+				 * for the H2 console (will be removed once a external datasource is
+				 * implemented).
+				 */
+				.headers().frameOptions().disable().and()
+
+				/*
+				 * Ensure that a stateless session is used; session will not be used to store
+				 * user information/state.
+				 */
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+
+				/*
+				 * Handle any exceptions thrown during authentication by sending a response
+				 * status of unauthorized (401).
+				 */
+				.exceptionHandling()
 				.authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)).and()
 
-			/*
-			 * We need to add a filter to validate user credentials and add token in the
-			 * response header. This filter will take in an AuthenticationManager object and
-			 * a JwtConfig object.
-			 * 
-			 * AuthenticationManager is an object provided by WebSecurityConfigurerAdapter,
-			 * used to authenticate the user using the provided credentials
-			 */
-			.addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig))
+				/*
+				 * We need to add a filter to validate user credentials and add token in the
+				 * response header. This filter will take in an AuthenticationManager object and
+				 * a JwtConfig object.
+				 * 
+				 * AuthenticationManager is an object provided by WebSecurityConfigurerAdapter,
+				 * used to authenticate the user using the provided credentials
+				 */
+				.addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig))
 
-			/*
-			 *  Allows for the access to specific endpoints to be restricted and for others
-			 * to be unrestricted
-			 */
-			.authorizeRequests()
-			
+				/*
+				 * Allows for the access to specific endpoints to be restricted and for others
+				 * to be unrestricted
+				 */
+				.authorizeRequests()
+
 				// Allow all requests to the "/auth" endpoint
 				.antMatchers(jwtConfig.getUri()).permitAll()
 				.antMatchers("/auth/users/**").permitAll()
-				
+
 				/**
 				 * TODO Restrict access to the H2 console, so that only admins can access it
 				 */
 				// Allow unrestricted access to h2-console (for now)
-            	.antMatchers("/h2-console/**").permitAll()
-            	
-            	/* 
-            	 * Allow unrestricted access to the actuator/info endpoint. Otherwise, AWS ELB cannot
-            	 * perform a health check on the instance and it drains the instances. 
-            	 */
-            	.antMatchers(HttpMethod.GET, "/actuator/info").permitAll()
-            	
-            	// Allow unrestricted access to the actuator/mappings endpoint for debugging purposes
-            	.antMatchers(HttpMethod.GET, "/**/actuator/mappings").permitAll()
-            	
+				.antMatchers("/h2-console/**").permitAll()
+
+				/*
+				 * Allow unrestricted access to the actuator/info endpoint. Otherwise, AWS ELB
+				 * cannot perform a health check on the instance and it drains the instances.
+				 */
+				.antMatchers(HttpMethod.GET, "/actuator/info").permitAll()
+
+				// Allow unrestricted access to the actuator/mappings endpoint for debugging
+				// purposes
+				.antMatchers(HttpMethod.GET, "/**/actuator/mappings").permitAll()
+
 				// All other requests must be authenticated
 				.anyRequest().authenticated();
+	}
+
+	@Bean
+	public CorsFilter corsFilter() {
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		CorsConfiguration config = new CorsConfiguration();
+		config.setAllowCredentials(true);
+		config.addAllowedOrigin("*");
+		config.addAllowedHeader("*");
+		config.addAllowedMethod("OPTIONS");
+		config.addAllowedMethod("GET");
+		config.addAllowedMethod("POST");
+		config.addAllowedMethod("PUT");
+		config.addAllowedMethod("DELETE");
+		source.registerCorsConfiguration("/**", config);
+		return new CorsFilter(source);
 	}
 
 	/*

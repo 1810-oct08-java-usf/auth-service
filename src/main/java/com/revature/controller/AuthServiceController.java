@@ -2,9 +2,12 @@ package com.revature.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,11 +24,8 @@ import com.revature.models.AppUser;
 import com.revature.models.UserErrorResponse;
 import com.revature.service.UserService;
 
-/*
- * TODO Implement registration functionality/endpoints
- */
 @RestController
-@RequestMapping("/auth/users")
+@RequestMapping("/auth")
 public class AuthServiceController {
 	
 	private UserService userService;
@@ -37,9 +37,11 @@ public class AuthServiceController {
 		this.userService = userService;
 	}
 	
-	@GetMapping("/test")
-	public String home() {
-		return "HELLLLOOO!";
+	@PostMapping(value="/login", consumes=MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public AppUser loginUser(@RequestBody AppUser user) {
+		if(userService.findUserByUsername(user.getUsername()) == null) throw new UserCreationException("Invalid Login Credentials");
+		return userService.findUserByUsername(user.getUsername());	
 	}
 	
 	@GetMapping(produces=MediaType.APPLICATION_JSON_VALUE)
@@ -48,12 +50,12 @@ public class AuthServiceController {
 		return userService.findAllUsers();
 	}
 	
-	@PostMapping(consumes=MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
-	@ResponseStatus(HttpStatus.CREATED)
-	public AppUser registerUser(@RequestBody AppUser user) {
-		if(userService.addUser(user) == null) throw new UserCreationException("That username or email already exists.");
-		return user;
-	}
+//	@PostMapping(value="/update", consumes=MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
+//	@ResponseStatus(HttpStatus.CREATED)
+//	public AppUser registerUser(@RequestBody AppUser user) {
+//		if(userService.addUser(user) == null) throw new UserCreationException("That username or email already exists.");
+//		return user;
+//	}
 	
 	@PutMapping(consumes=MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)

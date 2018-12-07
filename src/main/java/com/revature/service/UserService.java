@@ -39,7 +39,8 @@ public class UserService {
 	
 	@Transactional(readOnly=true, isolation=Isolation.READ_COMMITTED)
 	public AppUser findUserByUsername(String username) {
-		return repo.findUserByUsername(username);
+		if(repo.findUserByUsername(username) == null) return null;
+		else return repo.findUserByUsername(username);
 	}
 	
 	@Transactional(readOnly=true, isolation=Isolation.READ_COMMITTED)
