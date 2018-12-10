@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -77,32 +76,32 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 				 * used to authenticate the user using the provided credentials
 				 */
 				.addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig))
-
+				.addFilterAfter(new JwtTokenAuthenticationFilter(jwtConfig), UsernamePasswordAuthenticationFilter.class)
 				/*
 				 * Allows for the access to specific endpoints to be restricted and for others
 				 * to be unrestricted
 				 */
 				.authorizeRequests()
 
-				// Allow all requests to the "/auth" endpoint
-				.antMatchers(jwtConfig.getUri()).permitAll()
-				.antMatchers("/auth/users/**").permitAll()
+				// Allow POST requests to the "/auth" and "/auth/users" endpoints
+				.mvcMatchers(HttpMethod.POST, "/auth").permitAll()
+				.mvcMatchers(HttpMethod.POST, "/users").permitAll()
 
-				/**
-				 * TODO Restrict access to the H2 console, so that only admins can access it
-				 */
-				// Allow unrestricted access to h2-console (for now)
-				.antMatchers("/h2-console/**").permitAll()
-
+				// Allow only admins to access the h2-console
+				.mvcMatchers("/h2-console/**").hasRole("ADMIN")
+				
+				// Allow only admins to access the "/auth/users/**" GET endpoints
+				.mvcMatchers(HttpMethod.GET, "/users/**").hasRole("ADMIN")
+				
+				// Allow only admins to access the "/auth/users/admin" POST endpoint
+				.mvcMatchers(HttpMethod.POST, "/users/admin").hasRole("ADMIN")
+				
 				/*
 				 * Allow unrestricted access to the actuator/info endpoint. Otherwise, AWS ELB
 				 * cannot perform a health check on the instance and it drains the instances.
 				 */
 				.antMatchers(HttpMethod.GET, "/actuator/info").permitAll()
-
-				// Allow unrestricted access to the actuator/mappings endpoint for debugging
-				// purposes
-				.antMatchers(HttpMethod.GET, "/**/actuator/mappings").permitAll()
+				.antMatchers(HttpMethod.GET, "/actuator/routes").permitAll()
 
 				// All other requests must be authenticated
 				.anyRequest().authenticated();

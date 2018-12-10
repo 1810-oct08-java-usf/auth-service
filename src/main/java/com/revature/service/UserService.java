@@ -54,7 +54,7 @@ public class UserService {
 		if(tempUser != null) return null;
 		tempUser = findUserByEmail(newUser.getEmail());
 		if(tempUser != null) return null;
-		
+		newUser.setRole("ROLE_USER");
 		return repo.save(newUser);
 	}
 

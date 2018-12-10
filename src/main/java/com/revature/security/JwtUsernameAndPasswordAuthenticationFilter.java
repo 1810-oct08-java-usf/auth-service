@@ -60,7 +60,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 		 * necessary to override the defaults using the URI defined within the JwtConfig
 		 * class.
 		 */
-		this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(jwtConfig.getUri(), "POST"));
+		this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/", "POST"));
 	}
 
 	/**

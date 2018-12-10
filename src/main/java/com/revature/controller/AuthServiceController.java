@@ -25,7 +25,7 @@ import com.revature.models.UserErrorResponse;
 import com.revature.service.UserService;
 
 @RestController
-@RequestMapping("/auth/users")
+@RequestMapping("/users")
 public class AuthServiceController {
 	
 	private UserService userService;
