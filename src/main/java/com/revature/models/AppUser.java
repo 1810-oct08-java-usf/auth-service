@@ -5,18 +5,21 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 
 /**
  * Represents an authenticated user with all of their core information.
  */
 @Entity
 @Table(name="RPM_USERS")
+@SequenceGenerator(name="my_seq",sequenceName="MY_SEQ", initialValue=3, allocationSize=1)
 public class AppUser {
 	
 	@Id
 	@Column(name="RPM_USER_ID")
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(generator="my_seq")
 	private Integer id;
 	
 	@Column(name="RPM_USER_FN")
