@@ -31,7 +31,7 @@ public class JwtConfig {
 	 * TODO This should be refactored to use an environment variable
 	 */
 	// Used as a key with the encryption algorithm to generate JWTs
-	@Value("${security.jwt.secret")
+	@Value("${security.jwt.secret}")
 	private String secret;
 
 	public String getHeader() {
