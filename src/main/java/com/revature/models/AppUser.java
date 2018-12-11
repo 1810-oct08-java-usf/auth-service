@@ -1,38 +1,48 @@
 package com.revature.models;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.TableGenerator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 /**
  * Represents an authenticated user with all of their core information.
  */
 @Entity
 @Table(name="RPM_USERS")
-public class AppUser {
-	
+public class AppUser implements Serializable{
+
+	private static final long serialVersionUID = -2361806217291440694L;
+
 	@Id
 	@Column(name="RPM_USER_ID")
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
 	
+	@NotNull
 	@Column(name="RPM_USER_FN")
 	private String firstName;
 	
+	@NotNull
 	@Column(name="RPM_USER_LN")
 	private String lastName;
 	
+	@NotNull
+	@Pattern(regexp="^[a-zA-Z0-9_.+-]+(?:(?:[a-zA-Z0-9-]+\\.)?[a-zA-Z]+\\.)?@(revature)\\.com$")
 	@Column(name="RPM_USER_EMAIL")
 	private String email;
 	
+	@NotNull
 	@Column(name="RPM_USER_USERNAME")
 	private String username;
 	
+	@NotNull
 	@Column(name="RPM_USER_PW")
 	private String password;
 	

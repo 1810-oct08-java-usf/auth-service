@@ -1,6 +1,10 @@
 package com.revature.models;
 
-public class UserErrorResponse {
+import java.io.Serializable;
+
+public class UserErrorResponse implements Serializable {
+
+	private static final long serialVersionUID = -780898122370684787L;
 	
 	private int status;
 	private String message;
