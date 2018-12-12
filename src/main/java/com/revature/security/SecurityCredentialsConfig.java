@@ -40,7 +40,7 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 		http
 				/*
 				 * Disables the protection against Cross-Site Request Forgery (CSRF), otherwise
-				 * requests cannot be made to this request from the zuul-service.
+				 * requests cannot be made to this business service from the zuul-service.
 				 */
 				.csrf().disable()
 

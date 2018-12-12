@@ -44,6 +44,9 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 	 * Constructor for the JwtUsernameAndPasswordAuthenticationFilter that
 	 * instantiates the AuthenticationManager and the JwtConfig fields.
 	 * 
+	 * The default endpoint is being leveraged. All authentication (login)
+	 * requests should be POST requests made to /login
+	 * 
 	 * @param authManager
 	 *      Used to process authentication requests.
 	 * 
@@ -53,14 +56,6 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 	public JwtUsernameAndPasswordAuthenticationFilter(AuthenticationManager authManager, JwtConfig jwtConfig) {
 		this.authManager = authManager;
 		this.jwtConfig = jwtConfig;
-
-		/*
-		 * By default, UsernamePasswordAuthenticationFilter listens to "/login" path.
-		 * This application will use the "/auth" path instead. To do this, it is
-		 * necessary to override the defaults using the URI defined within the JwtConfig
-		 * class.
-		 */
-		this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/", "POST"));
 	}
 
 	/**
