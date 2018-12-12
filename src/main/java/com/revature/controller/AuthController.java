@@ -26,9 +26,15 @@ import com.revature.models.UserErrorResponse;
 import com.revature.service.UserService;
 
 /*
- * TODO Currently, users can edit any other user from postman.
- * There needs to be a way to check the id of the user who is
- * attempting the update.
+ * TODO 
+ * 
+ * 		1) Currently, users can edit any other user if using Postman or curl.
+ * 		   There needs to be a way to ensure that a user record can only be 
+ * 		   updated by a user a matching id, or an admin.
+ * 
+ * 		2) Should we implement method-level security, instead of using the 
+ * 		   HttpSecurity object in the SecurityCredentialsConfig.class? Delete
+ * 		   mapping for this controller already uses it.
  */
 @RestController
 @RequestMapping("/users")
@@ -36,9 +42,6 @@ import com.revature.service.UserService;
 public class AuthController {
 
 	private UserService userService;
-
-	public AuthController() {
-	}
 
 	@Autowired
 	public void setUserService(UserService userService) {
@@ -51,18 +54,22 @@ public class AuthController {
 		return userService.findAllUsers();
 	}
 
+	
+	//TODO We should throw a UserNotFoundException is there is no user with the given id 
 	@GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public AppUser getProjectById(@PathVariable int id) {
 		return userService.findById(id);
 	}
 	
+	//TODO We should throw a UserNotFoundException is there is no user with the given username
 	@GetMapping(value="/username/{username}", produces=MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public AppUser getUserByUsername(@PathVariable String username) {
         return userService.findUserByUsername(username);
     }
 	
+	//TODO We should throw a UserNotFoundException is there is no user with the given email
 	@GetMapping(value="/email/{email}", produces=MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public AppUser getUserByEmail(@PathVariable String email) {
