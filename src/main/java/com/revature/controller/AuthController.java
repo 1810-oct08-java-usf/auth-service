@@ -36,6 +36,12 @@ import com.revature.service.UserService;
  * 		   HttpSecurity object in the SecurityCredentialsConfig.class? Delete
  * 		   mapping for this controller already uses it.
  */
+
+/**
+ * This class contains all CRUD functionality for the users
+ * @author Caleb
+ *
+ */
 @RestController
 @RequestMapping("/users")
 @EnableGlobalMethodSecurity(prePostEnabled=true)
@@ -48,34 +54,61 @@ public class AuthController {
 		this.userService = userService;
 	}
 
+	/**
+	 * This method will get all users
+	 * @return All users
+	 */
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public List<AppUser> getAllUsers() {
 		return userService.findAllUsers();
 	}
 
-	
-	//TODO We should throw a UserNotFoundException is there is no user with the given id 
+	/**
+	 * This method will get the user with the specified id
+	 * @param id
+	 * @return The user with specified id
+	 * @throws UserNotFoundException
+	 */
 	@GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public AppUser getProjectById(@PathVariable int id) {
+	public AppUser getUserById(@PathVariable int id) {
+		if(userService.findById(id) == null) throw new UserNotFoundException("There is no user with that ID.");
 		return userService.findById(id);
 	}
 	
-	//TODO We should throw a UserNotFoundException is there is no user with the given username
+	/**
+	 * This method will get the user with the specified username
+	 * @param username
+	 * @return The user with specified username
+	 * @throws UserNotFoundException
+	 */
 	@GetMapping(value="/username/{username}", produces=MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public AppUser getUserByUsername(@PathVariable String username) {
+        if(userService.findUserByUsername(username) == null) throw new UserNotFoundException("There is no user with that username.");
         return userService.findUserByUsername(username);
     }
 	
-	//TODO We should throw a UserNotFoundException is there is no user with the given email
+	/**
+	 * This method will return the user with the specified email
+	 * @param email
+	 * @return The user with the specified email
+	 * @throws UserNotFoundException
+	 */
 	@GetMapping(value="/email/{email}", produces=MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public AppUser getUserByEmail(@PathVariable String email) {
+        if(userService.findUserByEmail(email) == null) throw new UserNotFoundException("There is no user with that email address.");
         return userService.findUserByEmail(email);
     }
 
+	/**
+	 * This is the method for registering a new user
+	 * @param user
+	 * @return The user who was just registered
+	 * @throws UserCreationException
+	 */
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
 	public AppUser registerUser(@RequestBody AppUser user) {
@@ -84,6 +117,14 @@ public class AuthController {
 		return user;
 	}
 
+	/**
+	 * This method will update a user with the newly provided information
+	 * @param user
+	 * @param auth
+	 * @return The newly updated user
+	 * @return null if any of the fields are blank
+	 * @throws UserNotFoundException
+	 */
 	/*
 	 * TODO This needs to be cleaned up. There is likely a more efficient way to
 	 * check if passed in values are null.
@@ -111,6 +152,11 @@ public class AuthController {
 		return user;
 	}
 
+	/**
+	 * This method will delete a user given that user's id. This method is only accessible to users with the ADMIN role
+	 * @param id
+	 * @throws UserNotFoundException
+	 */
 	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping(value="/id/{id}",consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
@@ -124,6 +170,11 @@ public class AuthController {
 			throw new UserNotFoundException("User with id: " + user.getId() + " does not exist.");
 	}
 
+	/**
+	 * This handles any UserNotFoundException thrown in the AuthController.
+	 * @param unfe
+	 * @return This method will return an error of type UserErrorResponse
+	 */
 	@ExceptionHandler
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public UserErrorResponse handleUserNotFoundException(UserNotFoundException unfe) {
@@ -134,6 +185,11 @@ public class AuthController {
 		return error;
 	}
 
+	/**
+	 * This handles any UserCreationException thrown in the AuthController.
+	 * @param uce
+	 * @return This method will return an error of type UserErrorResponse
+	 */
 	@ExceptionHandler
 	@ResponseStatus(HttpStatus.CONFLICT)
 	public UserErrorResponse handleUserCreationException(UserCreationException uce) {
