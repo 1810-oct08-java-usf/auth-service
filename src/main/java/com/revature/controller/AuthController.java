@@ -68,6 +68,7 @@ public class AuthController {
 	 * This method will get the user with the specified id
 	 * @param id
 	 * @return The user with specified id
+	 * @throws UserNotFoundException
 	 */
 	@GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
@@ -80,6 +81,7 @@ public class AuthController {
 	 * This method will get the user with the specified username
 	 * @param username
 	 * @return The user with specified username
+	 * @throws UserNotFoundException
 	 */
 	@GetMapping(value="/username/{username}", produces=MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -92,6 +94,7 @@ public class AuthController {
 	 * This method will return the user with the specified email
 	 * @param email
 	 * @return The user with the specified email
+	 * @throws UserNotFoundException
 	 */
 	@GetMapping(value="/email/{email}", produces=MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -104,6 +107,7 @@ public class AuthController {
 	 * This is the method for registering a new user
 	 * @param user
 	 * @return The user who was just registered
+	 * @throws UserCreationException
 	 */
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
@@ -118,6 +122,8 @@ public class AuthController {
 	 * @param user
 	 * @param auth
 	 * @return The newly updated user
+	 * @return null if any of the fields are blank
+	 * @throws UserNotFoundException
 	 */
 	/*
 	 * TODO This needs to be cleaned up. There is likely a more efficient way to
@@ -149,6 +155,7 @@ public class AuthController {
 	/**
 	 * This method will delete a user given that user's id. This method is only accessible to users with the ADMIN role
 	 * @param id
+	 * @throws UserNotFoundException
 	 */
 	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping(value="/id/{id}",consumes = MediaType.APPLICATION_JSON_VALUE)
