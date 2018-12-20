@@ -39,12 +39,13 @@ import com.revature.service.UserService;
 
 /**
  * This class contains all CRUD functionality for the users
+ * 
  * @author Caleb
  *
  */
 @RestController
 @RequestMapping("/users")
-@EnableGlobalMethodSecurity(prePostEnabled=true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AuthController {
 
 	private UserService userService;
@@ -56,6 +57,7 @@ public class AuthController {
 
 	/**
 	 * This method will get all users
+	 * 
 	 * @return All users
 	 */
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -66,6 +68,7 @@ public class AuthController {
 
 	/**
 	 * This method will get the user with the specified id
+	 * 
 	 * @param id
 	 * @return The user with specified id
 	 * @throws UserNotFoundException
@@ -73,38 +76,44 @@ public class AuthController {
 	@GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public AppUser getUserById(@PathVariable int id) {
-		if(userService.findById(id) == null) throw new UserNotFoundException("There is no user with that ID.");
+		if (userService.findById(id) == null)
+			throw new UserNotFoundException("There is no user with that ID.");
 		return userService.findById(id);
 	}
-	
+
 	/**
 	 * This method will get the user with the specified username
+	 * 
 	 * @param username
 	 * @return The user with specified username
 	 * @throws UserNotFoundException
 	 */
-	@GetMapping(value="/username/{username}", produces=MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public AppUser getUserByUsername(@PathVariable String username) {
-        if(userService.findUserByUsername(username) == null) throw new UserNotFoundException("There is no user with that username.");
-        return userService.findUserByUsername(username);
-    }
-	
+	@GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public AppUser getUserByUsername(@PathVariable String username) {
+		if (userService.findUserByUsername(username) == null)
+			throw new UserNotFoundException("There is no user with that username.");
+		return userService.findUserByUsername(username);
+	}
+
 	/**
 	 * This method will return the user with the specified email
+	 * 
 	 * @param email
 	 * @return The user with the specified email
 	 * @throws UserNotFoundException
 	 */
-	@GetMapping(value="/email/{email}", produces=MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public AppUser getUserByEmail(@PathVariable String email) {
-        if(userService.findUserByEmail(email) == null) throw new UserNotFoundException("There is no user with that email address.");
-        return userService.findUserByEmail(email);
-    }
+	@GetMapping(value = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public AppUser getUserByEmail(@PathVariable String email) {
+		if (userService.findUserByEmail(email) == null)
+			throw new UserNotFoundException("There is no user with that email address.");
+		return userService.findUserByEmail(email);
+	}
 
 	/**
 	 * This is the method for registering a new user
+	 * 
 	 * @param user
 	 * @return The user who was just registered
 	 * @throws UserCreationException
@@ -119,9 +128,10 @@ public class AuthController {
 
 	/**
 	 * This method will update a user with the newly provided information
-	 * @param user
+	 * 
+	 * @param frontEndUser This is the user information that is taken from the front end.
 	 * @param auth
-	 * @return The newly updated user
+	 * @return frontEndUser This is the updated frontEndUser with information filled in from the back
 	 * @return null if any of the fields are blank
 	 * @throws UserNotFoundException
 	 */
@@ -131,34 +141,50 @@ public class AuthController {
 	 */
 	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public AppUser updateUser(@RequestBody AppUser user, Authentication auth) {
-		AppUser tempUser = userService.findUserByUsername(auth.getPrincipal().toString());
-		if (!tempUser.getUsername().equals(user.getUsername()))
+	public AppUser updateUser(@RequestBody AppUser frontEndUser, Authentication auth) {
+		AppUser backEndUser = userService.findUserByUsername(auth.getPrincipal().toString());
+		if (!backEndUser.getUsername().equals(frontEndUser.getUsername())) {
 			throw new UserNotFoundException("Username cannot be changed.");
-		if(user.getEmail() == null)
-			user.setEmail(tempUser.getEmail());
-		if(user.getFirstName() == null)
-			user.setFirstName(tempUser.getFirstName());
-		if(user.getLastName() == null)
-			user.setLastName(tempUser.getLastName());
-		if(user.getPassword() == null)
-			user.setPassword(tempUser.getPassword());
-		if (user.getId() == null)
+		}
+		if (!backEndUser.getPassword().equals(frontEndUser.getPassword())) {
+			throw new UserNotFoundException("Password is not the same.");
+		}
+		if (frontEndUser.getEmail() == null) {
+			frontEndUser.setEmail(backEndUser.getEmail());
+		}
+		if (frontEndUser.getFirstName() == null) {
+			frontEndUser.setFirstName(backEndUser.getFirstName());
+		}
+		if (frontEndUser.getLastName() == null) {
+			frontEndUser.setLastName(backEndUser.getLastName());
+		}
+		/*	This function will be used when updating password for the separate form to just update passwords.
+		 * if (frontEndUser.getPassword() == null) {
+			frontEndUser.setPassword(backEndUser.getPassword());
+		}*/
+		if (frontEndUser.getId() == null) {
 			throw new UserNotFoundException("Id cannot be null!");
-		if (userService.findById(user.getId()) == null)
-			throw new UserNotFoundException("User with id: " + user.getId() + " not found");
-		if (!userService.updateUser(user))
-			throw new UserNotFoundException("User with id: " + user.getId() + "not found");
-		return user;
+		}
+		if (userService.findById(frontEndUser.getId()) == null) {
+			throw new UserNotFoundException("User with id: " + frontEndUser.getId() + " not found");
+		}
+		if (!userService.updateUser(frontEndUser)) {
+			throw new UserNotFoundException("User with id: " + frontEndUser.getId() + "not found");
+		}
+		return frontEndUser;
 	}
+	
+	
 
 	/**
-	 * This method will delete a user given that user's id. This method is only accessible to users with the ADMIN role
+	 * This method will delete a user given that user's id. This method is only
+	 * accessible to users with the ADMIN role
+	 * 
 	 * @param id
 	 * @throws UserNotFoundException
 	 */
 	@PreAuthorize("hasRole('ADMIN')")
-	@DeleteMapping(value="/id/{id}",consumes = MediaType.APPLICATION_JSON_VALUE)
+	@DeleteMapping(value = "/id/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteUser(@PathVariable int id) {
 		AppUser user = userService.findById(id);
@@ -172,6 +198,7 @@ public class AuthController {
 
 	/**
 	 * This handles any UserNotFoundException thrown in the AuthController.
+	 * 
 	 * @param unfe
 	 * @return This method will return an error of type UserErrorResponse
 	 */
@@ -187,6 +214,7 @@ public class AuthController {
 
 	/**
 	 * This handles any UserCreationException thrown in the AuthController.
+	 * 
 	 * @param uce
 	 * @return This method will return an error of type UserErrorResponse
 	 */
