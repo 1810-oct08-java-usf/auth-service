@@ -112,6 +112,20 @@ public class AuthController {
 	}
 
 	/**
+	 * Used in checking if email is already in use
+	 * 
+	 * @param email
+	 * @return
+	 */
+	@GetMapping(value="/emailInUse/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public String checkIfEmailIsInUse(@PathVariable String email) {
+		if (userService.findUserByEmail(email) == null)
+			return "{\"emailIsInUse\": false}";
+		return "{\"emailIsInUse\": true}";
+	}
+
+	/**
 	 * This is the method for registering a new user
 	 * 
 	 * @param user
