@@ -125,6 +125,14 @@ public class AuthController {
 		return "{\"emailIsInUse\": true}";
 	}
 
+	@GetMapping(value="/usernameAvailable/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public String checkIfUsernameIsAvailable(@PathVariable String username) {
+		if (userService.findUserByUsername(username) == null)
+			return "{\"usernameIsAvailable\": true}";
+		return "{\"usernameIsAvailable\":false}";
+	}
+
 	/**
 	 * This is the method for registering a new user
 	 * 
