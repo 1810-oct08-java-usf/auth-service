@@ -3,5 +3,8 @@ spring:
    name: auth-service
  cloud:
    config:
-     uri: http://rpm-elb-996808586.us-east-1.elb.amazonaws.com/rpm-config/
+     uri: ${CONFIG_SERVICE_URL}
 
+security:
+  jwt:
+    secret: ${RPM_JWT_SECRET}
