@@ -84,6 +84,11 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 				.mvcMatchers(HttpMethod.POST, "/auth").permitAll()
 				.mvcMatchers(HttpMethod.POST, "/users").permitAll()
 
+				//Used in checking if email is already in use
+				.mvcMatchers(HttpMethod.GET, "/users/emailInUse/**").permitAll()
+				//Used in checking if username is available
+				.mvcMatchers(HttpMethod.GET, "/users/usernameAvailable/**").permitAll()
+
 				// Allow only admins to access the h2-console
 				.mvcMatchers("/h2-console/**").hasRole("ADMIN")
 				
