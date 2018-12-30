@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -163,21 +161,11 @@ public class AuthController {
 	 * TODO This needs to be cleaned up. There is likely a more efficient way to
 	 * check if passed in values are null.
 	 */
-	@PutMapping(value="/update/",consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-
-	public AppUser updateUser(@RequestBody AppUser user, Authentication auth) {
-
-		AppUser tempUser = userService.findUserByUsername(auth.getPrincipal().toString());
-		
-		String[] passwords = user.getPassword().split(" "); //"\\s+"
-		if(passwords[0].equals(tempUser.getPassword())) {
-			user.setPassword(passwords[1]);
-		} else {
-			throw new UserNotFoundException("Password is wrong");
-		}
-
-		if (!tempUser.getUsername().equals(user.getUsername()))
+	public AppUser updateUser(@RequestBody AppUser frontEndUser, Authentication auth) {
+		AppUser backEndUser = userService.findUserByUsername(auth.getPrincipal().toString());
+		if (!backEndUser.getUsername().equals(frontEndUser.getUsername())) {
 			throw new UserNotFoundException("Username cannot be changed.");
 		}
 		if (!backEndUser.getPassword().equals(frontEndUser.getPassword())) {
