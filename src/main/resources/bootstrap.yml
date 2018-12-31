@@ -1,0 +1,10 @@
+#spring:
+# application:
+#   name: auth-service
+# cloud:
+#   config:
+#     uri: ${CONFIG_SERVICE_URL}
+#
+#security:
+#  jwt:
+#    secret: ${RPM_JWT_SECRET}
