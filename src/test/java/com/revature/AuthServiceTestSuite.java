@@ -35,7 +35,7 @@ public class AuthServiceTestSuite {
 	private UserRepository testRepo;
 	
 	/**
-	 * A simulated List<Project>; this can also be accomplished using a spy.
+	 * A simulated List<AppUser>; this can also be accomplished using a spy.
 	 */
 	@Mock
 	private List<AppUser> dummyList;
@@ -63,7 +63,6 @@ public class AuthServiceTestSuite {
 		//*Mockito.when(dummyUser.getUsername()).thenReturn("tchester");
 		//*Mockito.when(dummyUser.getEmail()).thenReturn("tchester@revature.com");
 		//*Mockito.when(dummyUser.getRole()).thenReturn("admin");
-		//Mockito.when(dummyUser.getId()).thenReturn(2);
 	}
 	
 	/**
@@ -129,16 +128,5 @@ public class AuthServiceTestSuite {
 		assertThat(classUnderTest.updateUser(null)).isEqualTo(Boolean.FALSE);
 	}
 	
-	/**
-	 * Assertion should verify that method returns a AppUser instance
-	 */
-	/*@Test
-	public void shouldReturnUserOnGoodIdSearch() {
-		dummyUser.setId(2);
-		classUnderTest.addUser(dummyUser);
-		assertThat(classUnderTest.findById(2)).isInstanceOf(AppUser.class);
-	}*/
-	
 	// TODO: Add additional test methods to improve coverage of the test suite as needed.
 }
-
