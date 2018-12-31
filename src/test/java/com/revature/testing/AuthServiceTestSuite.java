@@ -19,7 +19,6 @@ import com.revature.service.UserService;
 
 
 /**
- * 
  * @author Phillip Pride
  */
 @SpringBootTest
