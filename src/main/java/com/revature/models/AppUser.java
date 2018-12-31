@@ -11,6 +11,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Represents an authenticated user with all of their core information.
  */
@@ -44,6 +46,7 @@ public class AppUser implements Serializable{
 	
 	@NotNull
 	@Column(name="RPM_USER_PW")
+	@JsonIgnore
 	private String password;
 	
 	@Column(name="RPM_USER_ROLE")
