@@ -9,7 +9,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 @SpringBootApplication
-@EnableEurekaClient
+//@EnableEurekaClient
 public class RpmAuthServiceApplication {
 
 	public static void main(String[] args) {
