@@ -141,3 +141,4 @@ public class AuthServiceTestSuite {
 	
 	// TODO: Add additional test methods to improve coverage of the test suite as needed.
 }
+
