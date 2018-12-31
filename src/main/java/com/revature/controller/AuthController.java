@@ -164,12 +164,18 @@ public class AuthController {
 	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public AppUser updateUser(@RequestBody AppUser frontEndUser, Authentication auth) {
+		
 		AppUser backEndUser = userService.findUserByUsername(auth.getPrincipal().toString());
+		
+		String[] passwords = frontEndUser.getPassword().split(" ");
+		if(passwords[0].equals(backEndUser.getPassword())) {
+			frontEndUser.setPassword(passwords[1]);
+		} else {
+			throw new UserNotFoundException("Password is wrong");
+		}
+		
 		if (!backEndUser.getUsername().equals(frontEndUser.getUsername())) {
 			throw new UserNotFoundException("Username cannot be changed.");
-		}
-		if (!backEndUser.getPassword().equals(frontEndUser.getPassword())) {
-			throw new UserNotFoundException("Password is not the same.");
 		}
 		if (frontEndUser.getEmail() == null) {
 			frontEndUser.setEmail(backEndUser.getEmail());
