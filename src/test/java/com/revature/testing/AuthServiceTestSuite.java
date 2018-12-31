@@ -64,27 +64,31 @@ public class AuthServiceTestSuite {
 		//*Mockito.when(dummyUser.getUsername()).thenReturn("tchester");
 		//*Mockito.when(dummyUser.getEmail()).thenReturn("tchester@revature.com");
 		//*Mockito.when(dummyUser.getRole()).thenReturn("admin");
+		//Mockito.when(dummyUser.getId()).thenReturn(2);
 	}
 	
 	/**
-	 * Assertion to verify that findUserByUsername returns a User instance
+	 * Assertion to verify that findUserByUsername returns an AppUser instance
 	 */
+	// findUserbyUsername()
 	@Test
 	public void shouldReturnUserOnGoodUsernameSearch() {
 		assertThat(classUnderTest.findUserByUsername("tchester")).isInstanceOf(AppUser.class);
 	}
 	
 	/**
-	 * Assertion to verify that findUserByUsername returns a User instance
+	 * Assertion to verify that findUserByUsername returns an AppUser instance
 	 */
+	// findUserbyUsername()
 	@Test
 	public void shouldReturnNullOnBadUsernameSearch() {
 		assertThat(classUnderTest.findUserByUsername("test")).isNull();
 	}
 	
 	/**
-	 * Assertion should verify that method returns a User instance
+	 * Assertion should verify that method returns an AppUser instance
 	 */
+	// findUserByEmail()
 	@Test
 	public void shouldReturnUserOnGoodEmailSearch() {
 		assertThat(classUnderTest.findUserByEmail("tchester@revature.com")).isInstanceOf(AppUser.class);
@@ -93,6 +97,7 @@ public class AuthServiceTestSuite {
 	/**
 	 * Assertion should verify that searching with a bad email returns null
 	 */
+	// findUserByEmail()
 	@Test
 	public void shouldReturnNullOnFailedEmailSearch() {
 		assertThat(classUnderTest.findUserByEmail("test")).isNull();
@@ -124,6 +129,16 @@ public class AuthServiceTestSuite {
 	public void shouldReturnFalseOnInvalidUpdate() {
 		assertThat(classUnderTest.updateUser(null)).isEqualTo(Boolean.FALSE);
 	}
+	
+	/**
+	 * Assertion should verify that method returns a AppUser instance
+	 */
+	/*@Test
+	public void shouldReturnUserOnGoodIdSearch() {
+		dummyUser.setId(2);
+		classUnderTest.addUser(dummyUser);
+		assertThat(classUnderTest.findById(2)).isInstanceOf(AppUser.class);
+	}*/
 	
 	// TODO: Add additional test methods to improve coverage of the test suite as needed.
 }
