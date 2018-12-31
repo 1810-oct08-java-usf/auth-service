@@ -104,6 +104,9 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 				 */
 				.antMatchers(HttpMethod.GET, "/actuator/info").permitAll()
 				.antMatchers(HttpMethod.GET, "/actuator/routes").permitAll()
+				
+				// Allow unrestricted access to swagger's documentation
+				.antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security", "/swagger-ui.html", "/webjars/**").permitAll()
 
 				// All other requests must be authenticated
 				.anyRequest().authenticated();
