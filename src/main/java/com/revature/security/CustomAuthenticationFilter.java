@@ -68,7 +68,7 @@ public class CustomAuthenticationFilter extends GenericFilterBean {
 				Authentication auth = new AccessAuthenticationToken(headerZuul, "ROLE_ACTUATOR", new ArrayList<>());
 				SecurityContextHolder.getContext().setAuthentication(auth);
 			} else if (validateHeader(headerZuul)) {
-				Authentication auth = new AccessAuthenticationToken(headerZuul, "ROLE_USER", new ArrayList<>());
+				Authentication auth = new AccessAuthenticationToken(headerZuul, "ROLE_ADMIN", new ArrayList<>());
 				SecurityContextHolder.getContext().setAuthentication(auth);
 			} else if (validatePublicHeader(headerZuul)) {
 				Authentication auth = new AccessAuthenticationToken(headerZuul, "ROLE_USER", new ArrayList<>());
