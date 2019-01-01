@@ -60,17 +60,19 @@ public class CustomAuthenticationFilter extends GenericFilterBean {
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		String headerZuul = httpRequest.getHeader(zuulConfig.getHeader());
 		try {
+			//System.out.println(httpRequest.getRequestURI());
 			// This is where the main check if the actuator end point is being hit or
 			//	that the zuul header is present.
-			if (httpRequest.getRequestURI().contains("/project/actuator")) {
+			
+			if (httpRequest.getRequestURI().contains("/actuator")) {
 				Authentication auth = new AccessAuthenticationToken(headerZuul, "ROLE_ACTUATOR", new ArrayList<>());
 				SecurityContextHolder.getContext().setAuthentication(auth);
 			} else if (validateHeader(headerZuul)) {
 				Authentication auth = new AccessAuthenticationToken(headerZuul, "ROLE_USER", new ArrayList<>());
 				SecurityContextHolder.getContext().setAuthentication(auth);
 			} else if (validatePublicHeader(headerZuul)) {
-				filterChain.doFilter(request, response);
-				return;
+				Authentication auth = new AccessAuthenticationToken(headerZuul, "ROLE_USER", new ArrayList<>());
+				SecurityContextHolder.getContext().setAuthentication(auth);
 			} else {
 				/*
 				 * In case of attempted subversion around Zuul we want to invalidate the
