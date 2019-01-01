@@ -58,6 +58,7 @@ public class AuthServiceTestSuite {
 		// Define the relevant behaviors of testRepo 
 		Mockito.when(testRepo.findUserByUsername("tchester")).thenReturn(dummyUser);
 		Mockito.when(testRepo.findUserByEmail("tchester@revature.com")).thenReturn(dummyUser);
+		//Mockito.when(testRepo.findById(2)).thenReturn(dummyList);
 		
 		//Define the relevant behaviors of dummyUser
 		//*Mockito.when(dummyUser.getUsername()).thenReturn("tchester");
@@ -90,6 +91,7 @@ public class AuthServiceTestSuite {
 	@Test
 	public void shouldReturnUserOnGoodEmailSearch() {
 		assertThat(classUnderTest.findUserByEmail("tchester@revature.com")).isInstanceOf(AppUser.class);
+		assertThat(classUnderTest.findUserByEmail("tchester"+"@revature.com")).isInstanceOf(AppUser.class);
 	}
 	
 	/**
@@ -99,7 +101,13 @@ public class AuthServiceTestSuite {
 	@Test
 	public void shouldReturnNullOnFailedEmailSearch() {
 		assertThat(classUnderTest.findUserByEmail("test")).isNull();
+		assertThat(classUnderTest.findUserByEmail("test@revature.com")).isNull();
+		assertThat(classUnderTest.findUserByEmail("tchester.revature@com")).isNull();
+		assertThat(classUnderTest.findUserByEmail("tchester@revatre.com")).isNull();
+		assertThat(classUnderTest.findUserByEmail("tchester"+" @revature.com")).isNull();
 	}
+	
+	
 	
 	/**
 	 * Assert that findAllUsers returns a List
@@ -108,6 +116,15 @@ public class AuthServiceTestSuite {
 	@Test
 	public void shouldReturnAList() {
 		assertThat(classUnderTest.findAllUsers()).isInstanceOf(List.class);
+	}
+	
+	/**
+	 * Assert that addUser should return null when given a pre-existing user
+	 */
+	// addUser()
+	@Test
+	public void shouldReturnNullGivenAnExistingUser() {
+		assertThat(classUnderTest.addUser(dummyUser)).isNull();
 	}
 	
 	/**
