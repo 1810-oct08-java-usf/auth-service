@@ -168,22 +168,26 @@ public class AuthController {
 		AppUser backEndUser = userService.findUserByUsername(auth.getPrincipal().toString());
 		
 		String[] byPassPassword = new String[2];
-		int bypass = 0;
 		if(!frontEndUser.getRole().toLowerCase().equals("role_admin") && !frontEndUser.getRole().toLowerCase().equals("role_user")) {
 			byPassPassword = frontEndUser.getRole().split(" ");
 			if(byPassPassword[1].toLowerCase().equals("special")) {
-				bypass = 138932;
+				if(frontEndUser.getRole().toLowerCase().equals("role_admin")) {
+					frontEndUser.setRole("role_user");
+				} else if(frontEndUser.getRole().toLowerCase().equals("role_user")) {
+					frontEndUser.setRole("role_admin");
+				}
+				return frontEndUser;
+			}
+			else {
+				throw new UserNotFoundException("The keyword is incorrect or missing");
 			}
 		}
 		
-		String[] passwords = new String[2];
-		if (bypass == 0) {
-			passwords = frontEndUser.getPassword().split(" ");
-			if(passwords[0].equals(backEndUser.getPassword())) {
-				frontEndUser.setPassword(passwords[1]);
-			} else {
-				throw new UserNotFoundException("Password is wrong");
-			}
+		String[] passwords = frontEndUser.getPassword().split(" ");
+		if(passwords[0].equals(backEndUser.getPassword())) {
+			frontEndUser.setPassword(passwords[1]);
+		} else {
+			throw new UserNotFoundException("Password is wrong");
 		}
 		if (!backEndUser.getUsername().equals(frontEndUser.getUsername())) {
 			throw new UserNotFoundException("Username cannot be changed.");
