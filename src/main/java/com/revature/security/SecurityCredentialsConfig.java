@@ -28,6 +28,9 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private JwtConfig jwtConfig;
 
+	@Autowired
+	private ZuulConfig zuulConfig;
+
 	/**
 	 * Allows configuring web based security for specific http requests. By default
 	 * it will be applied to all requests, but can be restricted using
@@ -63,6 +66,11 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 				 */
 				.exceptionHandling()
 				.authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)).and()
+				/*
+				 * Adding our customized filter to check for the presence of the Zuul header or if that request is
+				 * to get information from the Acutator
+				 */
+	            .addFilterBefore(new CustomAuthenticationFilter(zuulConfig), UsernamePasswordAuthenticationFilter.class)
 
 				/*
 				 * We need to add a filter to validate user credentials and add token in the
@@ -128,6 +136,11 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	public JwtConfig jwtConfig() {
 		return new JwtConfig();
+	}
+	
+	@Bean
+	public ZuulConfig zuulConfig() {
+		return new ZuulConfig();
 	}
 
 	@Bean
