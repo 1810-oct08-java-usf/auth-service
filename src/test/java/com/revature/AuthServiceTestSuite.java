@@ -19,7 +19,6 @@ import com.revature.service.UserService;
 
 
 /**
- * 
  * @author Phillip Pride
  */
 @SpringBootTest
@@ -36,7 +35,7 @@ public class AuthServiceTestSuite {
 	private UserRepository testRepo;
 	
 	/**
-	 * A simulated List<Project>; this can also be accomplished using a spy.
+	 * A simulated List<AppUser>; this can also be accomplished using a spy.
 	 */
 	@Mock
 	private List<AppUser> dummyList;
@@ -59,12 +58,12 @@ public class AuthServiceTestSuite {
 		// Define the relevant behaviors of testRepo 
 		Mockito.when(testRepo.findUserByUsername("tchester")).thenReturn(dummyUser);
 		Mockito.when(testRepo.findUserByEmail("tchester@revature.com")).thenReturn(dummyUser);
+		//Mockito.when(testRepo.findById(2)).thenReturn(dummyList);
 		
 		//Define the relevant behaviors of dummyUser
 		//*Mockito.when(dummyUser.getUsername()).thenReturn("tchester");
 		//*Mockito.when(dummyUser.getEmail()).thenReturn("tchester@revature.com");
 		//*Mockito.when(dummyUser.getRole()).thenReturn("admin");
-		//Mockito.when(dummyUser.getId()).thenReturn(2);
 	}
 	
 	/**
@@ -92,6 +91,7 @@ public class AuthServiceTestSuite {
 	@Test
 	public void shouldReturnUserOnGoodEmailSearch() {
 		assertThat(classUnderTest.findUserByEmail("tchester@revature.com")).isInstanceOf(AppUser.class);
+		assertThat(classUnderTest.findUserByEmail("tchester"+"@revature.com")).isInstanceOf(AppUser.class);
 	}
 	
 	/**
@@ -101,7 +101,13 @@ public class AuthServiceTestSuite {
 	@Test
 	public void shouldReturnNullOnFailedEmailSearch() {
 		assertThat(classUnderTest.findUserByEmail("test")).isNull();
+		assertThat(classUnderTest.findUserByEmail("test@revature.com")).isNull();
+		assertThat(classUnderTest.findUserByEmail("tchester.revature@com")).isNull();
+		assertThat(classUnderTest.findUserByEmail("tchester@revatre.com")).isNull();
+		assertThat(classUnderTest.findUserByEmail("tchester"+" @revature.com")).isNull();
 	}
+	
+	
 	
 	/**
 	 * Assert that findAllUsers returns a List
@@ -110,6 +116,15 @@ public class AuthServiceTestSuite {
 	@Test
 	public void shouldReturnAList() {
 		assertThat(classUnderTest.findAllUsers()).isInstanceOf(List.class);
+	}
+	
+	/**
+	 * Assert that addUser should return null when given a pre-existing user
+	 */
+	// addUser()
+	@Test
+	public void shouldReturnNullGivenAnExistingUser() {
+		assertThat(classUnderTest.addUser(dummyUser)).isNull();
 	}
 	
 	/**
@@ -130,16 +145,5 @@ public class AuthServiceTestSuite {
 		assertThat(classUnderTest.updateUser(null)).isEqualTo(Boolean.FALSE);
 	}
 	
-	/**
-	 * Assertion should verify that method returns a AppUser instance
-	 */
-	/*@Test
-	public void shouldReturnUserOnGoodIdSearch() {
-		dummyUser.setId(2);
-		classUnderTest.addUser(dummyUser);
-		assertThat(classUnderTest.findById(2)).isInstanceOf(AppUser.class);
-	}*/
-	
 	// TODO: Add additional test methods to improve coverage of the test suite as needed.
 }
-
