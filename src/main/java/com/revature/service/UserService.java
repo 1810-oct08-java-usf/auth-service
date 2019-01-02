@@ -97,7 +97,6 @@ public class UserService {
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public boolean updateUser(AppUser user) {
 		if(user == null) return false;
-		user.setRole("ROLE_USER");
 		repo.save(user);
 		return true;
 	}

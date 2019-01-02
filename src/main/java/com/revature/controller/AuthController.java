@@ -164,17 +164,20 @@ public class AuthController {
 	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public AppUser updateUser(@RequestBody AppUser frontEndUser, Authentication auth) {
-		
+
 		AppUser backEndUser = userService.findUserByUsername(auth.getPrincipal().toString());
-		
+
 		String[] byPassPassword = new String[2];
 		if(!frontEndUser.getRole().toLowerCase().equals("role_admin") && !frontEndUser.getRole().toLowerCase().equals("role_user")) {
 			byPassPassword = frontEndUser.getRole().split(" ");
 			if(byPassPassword[1].toLowerCase().equals("special")) {
-				if(frontEndUser.getRole().toLowerCase().equals("role_admin")) {
-					frontEndUser.setRole("role_user");
-				} else if(frontEndUser.getRole().toLowerCase().equals("role_user")) {
-					frontEndUser.setRole("role_admin");
+				if(byPassPassword[0].toLowerCase().equals("role_admin")) {
+					frontEndUser.setRole("ROLE_ADMIN");
+				} else if(byPassPassword[0].toLowerCase().equals("role_user")) {
+					frontEndUser.setRole("ROLE_USER");
+				}
+				if (!userService.updateUser(frontEndUser)) {
+					throw new UserNotFoundException("User with id: " + frontEndUser.getId() + "not found");
 				}
 				return frontEndUser;
 			}
