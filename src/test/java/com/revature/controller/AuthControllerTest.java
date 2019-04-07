@@ -135,5 +135,55 @@ public class AuthControllerTest {
 	
 	// test if some fields are empty.
 	
+	@Test(expected = UserNotFoundException.class)
+	public void testUpdateUserWithDifferentBackEndPassword() {
+		mockAuth.setAuthenticated(true);
+		
+		when(mockAuth.getPrincipal()).thenReturn("sally");
+		
+		when(uService.findUserByUsername(mockAuth.getPrincipal().toString())).thenReturn(backUser);
+		
+		when(mockUser.getRole()).thenReturn(roleAdmin);
+		when(mockUser.getPassword()).thenReturn("seashore newPass");
+		when(mockUser.getUsername()).thenReturn("sally");
+		when(mockUser.getFirstName()).thenReturn("salleo");
+		when(mockUser.getLastName()).thenReturn("pealle");
+		when(mockUser.getId()).thenReturn(1001);
+		
+		when(backUser.getPassword()).thenReturn("newPass");
+		
+		when(uService.findById(mockUser.getId())).thenReturn(backUser);
+		when(uService.updateUser(mockUser)).thenReturn(true);
+		
+		aControl.updateUser(mockUser, mockAuth);
+		verify(uService, times(1)).updateUser(mockUser);
+		
+	}
+	
+	//Pretty sure this is impossible in actual implementation
+	//backend user is fetched from the DB by the username there's no reason to check if they have the same username
+	@Test(expected = UserNotFoundException.class)
+	public void testUpdateUserWithDifferentUsername() {
+		mockAuth.setAuthenticated(true);
+		
+		when(mockAuth.getPrincipal()).thenReturn("sally");
+		
+		when(uService.findUserByUsername(mockAuth.getPrincipal().toString())).thenReturn(backUser);
+		
+		when(mockUser.getRole()).thenReturn(roleAdmin);
+		when(mockUser.getPassword()).thenReturn("seashore newPass");
+		when(mockUser.getUsername()).thenReturn("sally");
+		when(mockUser.getFirstName()).thenReturn("salleo");
+		when(mockUser.getLastName()).thenReturn("pealle");
+		when(mockUser.getId()).thenReturn(1001);
+		
+		when(backUser.getPassword()).thenReturn("seashore");
+		when(backUser.getUsername()).thenReturn("NotSally");
+		
+		aControl.updateUser(mockUser, mockAuth);
+		verify(uService, times(1)).updateUser(mockUser);
+		
+	}
+	
 	
 }
