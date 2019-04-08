@@ -42,9 +42,6 @@ public class AuthControllerTestJoseChris {
 	 * This allows full control over the instantiation and initialization of
 	 * controllers and their dependencies, similar to plain unit tests while also
 	 * making it possible to test one controller at a time.
-	 * 
-	 * @author Jose Rivera
-	 * @author Christopher Shanor
 	 */
 	@Before
 	public void setup() {
@@ -58,9 +55,6 @@ public class AuthControllerTestJoseChris {
 	 * 
 	 * @throws Exception: Exception will be thrown if the container fails to
 	 *                    initialize
-	 * 
-	 * @author Jose Rivera
-	 * @author Christopher Shanor
 	 */
 	@Test
 	public void testMockMvcContainerIsNotNull() throws Exception {
@@ -73,9 +67,6 @@ public class AuthControllerTestJoseChris {
 	 * email and respond with true.
 	 * 
 	 * @throws Exception: Exception will be thrown if the test was a failure.
-	 * 
-	 * @author Jose Rivera
-	 * @author Christopher Shanor
 	 */
 	@Test
 	public void testCheckIfEmailIsInUsePassingValidEmail() throws Exception {
