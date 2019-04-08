@@ -42,17 +42,16 @@ public class AuthControllerTest {
 	
 	@Before
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
-		
+		MockitoAnnotations.initMocks(this);		
 	}
 		
 	
 	/**
-	 * Tests Delete user functionality
+	 * Tests Delete user functionality when userID is null
 	 * @throws Exception
 	 */
 	@Test(expected = UserNotFoundException.class)  
-	public void testDeleteNull(){
+	public void testDeleteWIthNullId(){
 		when(uService.findById(0)).thenReturn(mockUser);
 		when(mockUser.getId()).thenReturn(null);
 		aControl.deleteUser(0);
@@ -60,7 +59,7 @@ public class AuthControllerTest {
 	}
 	
 	/**
-	 * Test if user object doesn't exist.
+	 * Test Delete user with good values
 	 * @throws Exception 
 	 */
 	@Test
@@ -71,14 +70,15 @@ public class AuthControllerTest {
 		aControl.deleteUser(0);
 		verify(uService, times(1)).deleteUserById(0);
 	}
-	
-	// fails with null pointer exception.
-//	(expected = UserNotFoundException.class)
-	//fairly sure it's a problem with the controller trying to call getId
+		
+
 	/**
 	 * Test if user object doesn't exist.
+	 * @throws UserNotFoundException
+	 * fails with a Null Pointer Exception
 	 */
-	@Ignore
+
+	@Test(expected = UserNotFoundException.class)
 	public void testDeleteUserIfUserDoesntExist() {
 		when(uService.findById(0)).thenReturn(null);
 		aControl.deleteUser(0);
@@ -123,7 +123,10 @@ public class AuthControllerTest {
 		
 	}
 	
-	// test if some fields are empty.
+	/*
+	 * tests Update user 
+	 * where backend password is different from given password from front end 
+	 */
 	
 	@Test(expected = UserNotFoundException.class)
 	public void testUpdateUserWithDifferentBackEndPassword() {
@@ -150,8 +153,13 @@ public class AuthControllerTest {
 		
 	}
 	
-	//Pretty sure this is impossible in actual implementation
-	//backend user is fetched from the DB by the username there's no reason to check if they have the same username
+
+	/*
+	 * Test if backend user has a different username then front end user
+	 * Pretty sure this is impossible in actual implementation
+	 * backend user is fetched from the DB by the front end username 
+	 * there's no reason to check if they have the same username 
+	 */
 	@Test(expected = UserNotFoundException.class)
 	public void testUpdateUserWithDifferentUsername() {
 		mockAuth.setAuthenticated(true);
