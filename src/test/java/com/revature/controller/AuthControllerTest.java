@@ -71,7 +71,7 @@ public class AuthControllerTest {
 	}
 	
 	/**
-	 * Test if user object doesn't exist.
+	 * Test if user object exist.
 	 * @throws Exception 
 	 */
 	@Test
