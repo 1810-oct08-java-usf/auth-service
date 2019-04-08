@@ -47,7 +47,7 @@ public class AuthControllerTest {
 		
 	
 	/**
-	 * Tests Delete user functionality when userID is null
+	 * Tests Delete user functionality when userID is null.
 	 * @throws Exception
 	 */
 	@Test(expected = UserNotFoundException.class)  
@@ -60,7 +60,7 @@ public class AuthControllerTest {
 	
 	/**
 	 *
-	 * Test Delete user with good values
+	 * Test Delete user with good values.
 	 * @throws Exception 
 	 */
 	@Test
@@ -75,8 +75,8 @@ public class AuthControllerTest {
 
 	/**
 	 * Test if user object doesn't exist.
+	 * Fails with a Null Pointer Exception.
 	 * @throws UserNotFoundException
-	 * <p>fails with a Null Pointer Exception</p>
 	 */
 
 	@Test(expected = UserNotFoundException.class)
@@ -92,7 +92,7 @@ public class AuthControllerTest {
 	//
 	/**
 	 *  Tests if it updates successfully with given user.
-	 *  <p>Please refactor the controller method to use already fetched user object.</p>
+	 *  Please refactor the controller method to use already fetched user object.
 	 */
 	@Test
 	public void testUpdateUserWithValidInfo() {
@@ -126,7 +126,7 @@ public class AuthControllerTest {
 	
 	/**
 	 * Tests update user 
-	 * where backend password is different from given password from front end 
+	 * where backend password is different from given password from front end.
 	 */
 	
 	@Test(expected = UserNotFoundException.class)
@@ -157,9 +157,9 @@ public class AuthControllerTest {
 
 	/**
 	 * Test if backend user has a different username then front end user.
-	 * <p>Pretty sure this is impossible in actual implementation
+	 * Pretty sure this is impossible in actual implementation
 	 * backend user is fetched from the DB by the front end username 
-	 * there's no reason to check if they have the same username</p>
+	 * there's no reason to check if they have the same username.
 	 */
 	@Test(expected = UserNotFoundException.class)
 	public void testUpdateUserWithDifferentUsername() {
