@@ -1,28 +1,26 @@
 package com.revature.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.revature.models.AppUser;
 import com.revature.service.UserService;
 
 /**
- * This class will be used to test methods in the AuthController. Testing
- * methods will be using Junit to test different scenarios.
+ * This class will be used to test methods in the AuthController. Testing will
+ * be done using Junit to test different scenarios.
  * 
  * @RunWith(): Specifies that we will be using the MockitoJUnit runner class.
  * 
- * @author Jose Rivera
- * @author Christopher Shanor
+ * @author Jose Rivera (190107-Java-Spark-USF)
+ * @author Christopher Shanor (190107-Java-Spark-USF)
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class AuthControllerTestJoseChris {
@@ -37,20 +35,40 @@ public class AuthControllerTestJoseChris {
 	private AuthController authController;
 
 	/**
-	 * This method will test if we can check if a valid email is in use. We will
-	 * provide a valid email, and the service should attempt to find a user by that
-	 * email and respond with true.
-	 * 
-	 * @throws Exception: Exception will be thrown if the test was a failure.
+	 * This method will test if we can check if a email is in use. We will provide a
+	 * valid email, and we will us an assert to check if the controller will return
+	 * the correct value.
 	 */
 	@Test
-	public void testCheckIfEmailIsInUsePassingValidEmail() throws Exception {
+	public void testCheckIfEmailIsInUsePassingValidEmail() {
 
 		// Create a valid email to check for
-		String email = "testuser@dummyemail.com";
+		String email = "testuser@goodemail.com";
+
+		// Expected assert value
+		String expected = "{\"emailIsInUse\": true}";
 
 		when(userService.findUserByEmail(email)).thenReturn(mockAppUser);
 		when(mockAppUser.getId()).thenReturn(0);
-		authController.checkIfEmailIsInUse(email);
+		assertEquals(expected, authController.checkIfEmailIsInUse(email));
 	}
+
+	/**
+	 * This method will test if we can check if a email is in use. We will provide a
+	 * invalid email, and the service should attempt to find a user by that email
+	 * and respond with null.
+	 * 
+	 * @throws Exception: Exception will be thrown if the test was a failure.
+	 */
+//	@Test
+//	public void testCheckIfEmailIsInUsePassingInvalidEmail() throws Exception {
+//
+//		// Create a valid email to check for
+//		String email = "testuser@bademail.com";
+//
+//		when(userService.findUserByEmail(email)).thenReturn(null);
+//		when(mockAppUser.getId()).thenReturn(null);
+//		authController.checkIfEmailIsInUse(email);
+//		assertEquals("{\"emailIsInUse\": true}", authController.checkIfEmailIsInUse(email));
+//	}
 }
