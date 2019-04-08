@@ -36,31 +36,6 @@ public class AuthControllerTestJoseChris {
 	@InjectMocks
 	private AuthController authController;
 
-	private MockMvc mockMvc;
-
-	/**
-	 * This allows full control over the instantiation and initialization of
-	 * controllers and their dependencies, similar to plain unit tests while also
-	 * making it possible to test one controller at a time.
-	 */
-	@Before
-	public void setup() {
-		this.mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
-	}
-
-	/**
-	 * This method will test if the Mock Mvc container that is created is not null.
-	 * An Exception can be thrown. If an exception is thrown, the test was a
-	 * failure, otherwise it was a success.
-	 * 
-	 * @throws Exception: Exception will be thrown if the container fails to
-	 *                    initialize
-	 */
-	@Test
-	public void testMockMvcContainerIsNotNull() throws Exception {
-		assertThat(this.mockMvc).isNotNull();
-	}
-
 	/**
 	 * This method will test if we can check if a valid email is in use. We will
 	 * provide a valid email, and the service should attempt to find a user by that
