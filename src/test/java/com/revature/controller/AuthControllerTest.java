@@ -85,6 +85,7 @@ public class AuthControllerTest {
 	
 	// fails with null pointer exception.
 //	(expected = UserNotFoundException.class)
+	//fairly sure it's a problem with the controller trying to call getId
 	/**
 	 * Test if user object doesn't exist.
 	 */
