@@ -5,14 +5,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.Authentication;
-//import org.springframework.test.web.servlet.MockMvc;
-//import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.revature.exceptions.UserNotFoundException;
 import com.revature.models.AppUser;
@@ -40,6 +37,9 @@ public class AuthControllerTest {
 	
 	private String roleAdmin = "role_admin";
 	
+	/**
+	 * makes a mock auth controller for each test methods.
+	 */
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);		
@@ -76,7 +76,7 @@ public class AuthControllerTest {
 	/**
 	 * Test if user object doesn't exist.
 	 * @throws UserNotFoundException
-	 * fails with a Null Pointer Exception
+	 * <p>fails with a Null Pointer Exception</p>
 	 */
 
 	@Test(expected = UserNotFoundException.class)
@@ -89,10 +89,10 @@ public class AuthControllerTest {
 //				Test Update
 //-------------------------------------------------------------------------------------------------------
 	
-	//This test doesn't 100% follow the logic in controller method.
-	//Please refactor the controller method to use already fetched user object.
+	//
 	/**
-	 *  Supposed to test if it updates successfully with given user.
+	 *  Tests if it updates successfully with given user.
+	 *  <p>Please refactor the controller method to use already fetched user object.</p>
 	 */
 	@Test
 	public void testUpdateUserWithValidInfo() {
@@ -124,8 +124,8 @@ public class AuthControllerTest {
 		
 	}
 	
-	/*
-	 * tests Update user 
+	/**
+	 * Tests update user 
 	 * where backend password is different from given password from front end 
 	 */
 	
@@ -155,11 +155,11 @@ public class AuthControllerTest {
 	}
 	
 
-	/*
-	 * Test if backend user has a different username then front end user
-	 * Pretty sure this is impossible in actual implementation
+	/**
+	 * Test if backend user has a different username then front end user.
+	 * <p>Pretty sure this is impossible in actual implementation
 	 * backend user is fetched from the DB by the front end username 
-	 * there's no reason to check if they have the same username 
+	 * there's no reason to check if they have the same username</p>
 	 */
 	@Test(expected = UserNotFoundException.class)
 	public void testUpdateUserWithDifferentUsername() {
