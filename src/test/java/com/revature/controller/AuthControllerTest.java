@@ -17,13 +17,14 @@ import com.revature.service.UserService;
 
 /**
  * 
- * @author Ankit Patel and Jaitee Pitts
+ * @author Ankit Patel (190107-java-spark-usf)
+ * @author Jaitee Pitts (190107-java-spark-usf)
  *
  */
 public class AuthControllerTest {
 
 	@Mock
-	private UserService uService;
+	private UserService userService;
 	@Mock
 	private AppUser mockUser;
 	@Mock
@@ -32,13 +33,15 @@ public class AuthControllerTest {
 	private Authentication mockAuth;
 		
 	@InjectMocks
-	AuthController aControl;
+	AuthController authControl;
 	
 	
 	private String roleAdmin = "role_admin";
 	
 	/**
 	 * makes a mock auth controller for each test methods.
+	 * @author Ankit Patel
+	 * @author Jaitee Pitts
 	 */
 	@Before
 	public void setup() {
@@ -48,41 +51,47 @@ public class AuthControllerTest {
 	
 	/**
 	 * Tests Delete user functionality when userID is null.
+	 * @author Ankit Patel
+	 * @author Jaitee Pitts
 	 * @throws Exception
 	 */
 	@Test(expected = UserNotFoundException.class)  
 	public void testDeleteWIthNullId(){
-		when(uService.findById(0)).thenReturn(mockUser);
+		when(userService.findById(0)).thenReturn(mockUser);
 		when(mockUser.getId()).thenReturn(null);
-		aControl.deleteUser(0);
+		authControl.deleteUser(0);
 		
 	}
 	
 	/**
 	 *
 	 * Test Delete user with good values.
+	 * @author Ankit Patel
+	 * @author Jaitee Pitts
 	 * @throws Exception 
 	 */
 	@Test
 	public void testDeleteUserIfUserExist() throws Exception {
-		when(uService.findById(0)).thenReturn(mockUser);
+		when(userService.findById(0)).thenReturn(mockUser);
 		when(mockUser.getId()).thenReturn(0);
-		when(uService.deleteUserById(0)).thenReturn(true);
-		aControl.deleteUser(0);
-		verify(uService, times(1)).deleteUserById(0);
+		when(userService.deleteUserById(0)).thenReturn(true);
+		authControl.deleteUser(0);
+		verify(userService, times(1)).deleteUserById(0);
 	}
 		
 
 	/**
 	 * Test if user object doesn't exist.
 	 * Fails with a Null Pointer Exception.
+	 * @author Ankit Patel
+	 * @author Jaitee Pitts
 	 * @throws UserNotFoundException
 	 */
 
 	@Test(expected = UserNotFoundException.class)
 	public void testDeleteUserIfUserDoesntExist() {
-		when(uService.findById(0)).thenReturn(null);
-		aControl.deleteUser(0);
+		when(userService.findById(0)).thenReturn(null);
+		authControl.deleteUser(0);
 	}
 	
 //-------------------------------------------------------------------------------------------------------
@@ -93,6 +102,8 @@ public class AuthControllerTest {
 	/**
 	 *  Tests if it updates successfully with given user.
 	 *  Please refactor the controller method to use already fetched user object.
+	 *  @author Ankit Patel
+	 * 	@author Jaitee Pitts
 	 */
 	@Test
 	public void testUpdateUserWithValidInfo() {
@@ -100,7 +111,7 @@ public class AuthControllerTest {
 		
 		when(mockAuth.getPrincipal()).thenReturn("sally");
 		
-		when(uService.findUserByUsername(mockAuth.getPrincipal().toString())).thenReturn(backUser);
+		when(userService.findUserByUsername(mockAuth.getPrincipal().toString())).thenReturn(backUser);
 		
 		when(mockUser.getRole()).thenReturn(roleAdmin);
 		when(mockUser.getPassword()).thenReturn("seashore newPass");
@@ -116,17 +127,19 @@ public class AuthControllerTest {
 		when(backUser.getLastName()).thenReturn("pal");
 		when(backUser.getId()).thenReturn(1000);
 		
-		when(uService.findById(mockUser.getId())).thenReturn(backUser);
-		when(uService.updateUser(mockUser)).thenReturn(true);
+		when(userService.findById(mockUser.getId())).thenReturn(backUser);
+		when(userService.updateUser(mockUser)).thenReturn(true);
 		
-		aControl.updateUser(mockUser, mockAuth);
-		verify(uService, times(1)).updateUser(mockUser);
+		authControl.updateUser(mockUser, mockAuth);
+		verify(userService, times(1)).updateUser(mockUser);
 		
 	}
 	
 	/**
 	 * Tests update user 
 	 * where backend password is different from given password from front end.
+	 * @author Jaitee Pitts
+	 * @author Ankit Patel
 	 */
 	
 	@Test(expected = UserNotFoundException.class)
@@ -135,7 +148,7 @@ public class AuthControllerTest {
 		
 		when(mockAuth.getPrincipal()).thenReturn("sally");
 		
-		when(uService.findUserByUsername(mockAuth.getPrincipal().toString())).thenReturn(backUser);
+		when(userService.findUserByUsername(mockAuth.getPrincipal().toString())).thenReturn(backUser);
 		
 		when(mockUser.getRole()).thenReturn(roleAdmin);
 		when(mockUser.getPassword()).thenReturn("seashore newPass");
@@ -146,11 +159,11 @@ public class AuthControllerTest {
 		
 		when(backUser.getPassword()).thenReturn("newPass");
 		
-		when(uService.findById(mockUser.getId())).thenReturn(backUser);
-		when(uService.updateUser(mockUser)).thenReturn(true);
+		when(userService.findById(mockUser.getId())).thenReturn(backUser);
+		when(userService.updateUser(mockUser)).thenReturn(true);
 		
-		aControl.updateUser(mockUser, mockAuth);
-		verify(uService, times(1)).updateUser(mockUser);
+		authControl.updateUser(mockUser, mockAuth);
+		verify(userService, times(1)).updateUser(mockUser);
 		
 	}
 	
@@ -160,6 +173,8 @@ public class AuthControllerTest {
 	 * Pretty sure this is impossible in actual implementation
 	 * backend user is fetched from the DB by the front end username 
 	 * there's no reason to check if they have the same username.
+	 * @author Jaitee Pitts
+	 * @author Ankit Patel
 	 */
 	@Test(expected = UserNotFoundException.class)
 	public void testUpdateUserWithDifferentUsername() {
@@ -167,7 +182,7 @@ public class AuthControllerTest {
 		
 		when(mockAuth.getPrincipal()).thenReturn("sally");
 		
-		when(uService.findUserByUsername(mockAuth.getPrincipal().toString())).thenReturn(backUser);
+		when(userService.findUserByUsername(mockAuth.getPrincipal().toString())).thenReturn(backUser);
 		
 		when(mockUser.getRole()).thenReturn(roleAdmin);
 		when(mockUser.getPassword()).thenReturn("seashore newPass");
@@ -179,8 +194,8 @@ public class AuthControllerTest {
 		when(backUser.getPassword()).thenReturn("seashore");
 		when(backUser.getUsername()).thenReturn("NotSally");
 		
-		aControl.updateUser(mockUser, mockAuth);
-		verify(uService, times(1)).updateUser(mockUser);
+		authControl.updateUser(mockUser, mockAuth);
+		verify(userService, times(1)).updateUser(mockUser);
 		
 	}
 	
