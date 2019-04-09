@@ -6,9 +6,11 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.Authentication;
 
 import com.revature.exceptions.UserNotFoundException;
@@ -20,6 +22,7 @@ import com.revature.service.UserService;
  * @author Ankit Patel and Jaitee Pitts
  *
  */
+@RunWith(MockitoJUnitRunner.class)
 public class AuthControllerTest {
 
 	@Mock
