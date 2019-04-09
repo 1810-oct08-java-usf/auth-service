@@ -71,4 +71,42 @@ public class AuthControllerTestJoseChris {
 		when(mockAppUser.getId()).thenReturn(null);
 		assertEquals(expected, authController.checkIfEmailIsInUse(email));
 	}
+
+	/**
+	 * This method will test if we can check if a username is available. We will
+	 * provide a username that is not available, and test if the controller will
+	 * return us the proper result.
+	 */
+	@Test
+	public void testCheckIfUsernameIsAvailablePassingAnUnavailableUsername() {
+
+		// Create a username to check for
+		String username = "cshanor";
+
+		// Expected assert value, Username should not be available
+		String expected = "{\"usernameIsAvailable\":false}";
+
+		when(userService.findUserByUsername(username)).thenReturn(mockAppUser);
+		when(mockAppUser.getId()).thenReturn(0);
+		assertEquals(expected, authController.checkIfUsernameIsAvailable(username));
+	}
+
+	/**
+	 * This method will test if we can check if a username is available. We will
+	 * provide a username that is available, and test if the controller will return
+	 * us the proper result.
+	 */
+	@Test
+	public void testCheckIfUsernameIsAvailablePassingAnAvailableUsername() {
+
+		// Create a username to check for
+		String username = "cshanor";
+
+		// Expected assert value, Username should be available
+		String expected = "{\"usernameIsAvailable\": true}";
+
+		when(userService.findUserByUsername(username)).thenReturn(null);
+		when(mockAppUser.getId()).thenReturn(null);
+		assertEquals(expected, authController.checkIfUsernameIsAvailable(username));
+	}
 }
