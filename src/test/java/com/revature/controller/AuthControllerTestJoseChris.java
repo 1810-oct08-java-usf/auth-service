@@ -18,9 +18,6 @@ import com.revature.service.UserService;
  * be done using Junit to test different scenarios.
  * 
  * @RunWith(): Specifies that we will be using the MockitoJUnit runner class.
- * 
- * @author Jose Rivera (190107-Java-Spark-USF)
- * @author Christopher Shanor (190107-Java-Spark-USF)
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class AuthControllerTestJoseChris {
@@ -38,6 +35,9 @@ public class AuthControllerTestJoseChris {
 	 * This method will test if we can check if a email is in use. We will provide a
 	 * valid email, and we will us an assert to check if the controller will return
 	 * the correct value.
+	 * 
+	 * @author Jose Rivera (190107-Java-Spark-USF)
+	 * @author Christopher Shanor (190107-Java-Spark-USF)
 	 */
 	@Test
 	public void testCheckIfEmailIsInUsePassingValidEmail() {
@@ -45,7 +45,7 @@ public class AuthControllerTestJoseChris {
 		// Create a valid email to check for
 		String email = "testuser@goodemail.com";
 
-		// Expected assert value
+		// Expected assert value, result should be true
 		String expected = "{\"emailIsInUse\": true}";
 
 		when(userService.findUserByEmail(email)).thenReturn(mockAppUser);
@@ -57,14 +57,17 @@ public class AuthControllerTestJoseChris {
 	 * This method will test if we can check if a email is in use. We will provide a
 	 * invalid email, and we will use an assert to check if the controller will
 	 * return the correct value.
+	 * 
+	 * @author Jose Rivera (190107-Java-Spark-USF)
+	 * @author Christopher Shanor (190107-Java-Spark-USF)
 	 */
 	@Test
 	public void testCheckIfEmailIsInUsePassingInvalidEmail() {
 
-		// Create a valid email to check for
+		// Create a invalid email to check for
 		String email = "testuser@bademail.com";
 
-		// Expected assert value
+		// Expected assert value, result should be false
 		String expected = "{\"emailIsInUse\": false}";
 
 		when(userService.findUserByEmail(email)).thenReturn(null);
@@ -76,6 +79,9 @@ public class AuthControllerTestJoseChris {
 	 * This method will test if we can check if a username is available. We will
 	 * provide a username that is not available, and test if the controller will
 	 * return us the proper result.
+	 * 
+	 * @author Jose Rivera (190107-Java-Spark-USF)
+	 * @author Christopher Shanor (190107-Java-Spark-USF)
 	 */
 	@Test
 	public void testCheckIfUsernameIsAvailablePassingAnUnavailableUsername() {
@@ -95,6 +101,9 @@ public class AuthControllerTestJoseChris {
 	 * This method will test if we can check if a username is available. We will
 	 * provide a username that is available, and test if the controller will return
 	 * us the proper result.
+	 * 
+	 * @author Jose Rivera (190107-Java-Spark-USF)
+	 * @author Christopher Shanor (190107-Java-Spark-USF)
 	 */
 	@Test
 	public void testCheckIfUsernameIsAvailablePassingAnAvailableUsername() {
