@@ -37,10 +37,10 @@ public class EmailUsernameTest {
 	private MockMvc mockMvc;
 	
 	@MockBean
-	private Filter filter;
+	private Filter filter;  // maybe don't need
 	
 	@MockBean
-	private UserService userService;
+	private UserService userService;   // maybe don't need
 
 	/**
 	 * This method is going to test that our context loads and is not null
@@ -81,6 +81,36 @@ public class EmailUsernameTest {
 	@Test
 	public void testGetCheckIfEmailInUseWithNoEmail() throws Exception {
 		String uri = "/users/emailInUse/";
+		this.mockMvc.perform(get(uri)).andExpect(status().isNotFound());
+	}
+	
+	/**
+	 * This method will test the get mapping for checkIfUsernameIsAvailable() in the auth controller
+	 * with a username.
+	 * 
+	 * @throws Exception: Test fails if an exception is thrown
+	 * 
+	 * @author Christopher Shanor [190107-Java-Spark-USF]
+	 * @author Jose Rivera [190107-Java-Spark-USF]
+	 */
+	@Test
+	public void testGetCheckIfUsernameIsAvailable() throws Exception {
+		String uri = "/users/usernameAvailable/jrivera";
+		this.mockMvc.perform(get(uri)).andExpect(status().isOk());
+	}
+	
+	/**
+	 * This method will test the get mapping for checkIfUsernameIsAvailable() in the auth controller
+	 * with no username.
+	 * 
+	 * @throws Exception: Test fails if an exception is thrown
+	 * 
+	 * @author Christopher Shanor [190107-Java-Spark-USF]
+	 * @author Jose Rivera [190107-Java-Spark-USF]
+	 */
+	@Test
+	public void testGetCheckIfUsernameIsAvailableWithNoUsername() throws Exception {
+		String uri = "/users/usernameAvailable/";
 		this.mockMvc.perform(get(uri)).andExpect(status().isNotFound());
 	}
 }
