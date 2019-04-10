@@ -176,7 +176,8 @@ public class UserServiceTest {
 	 */
 	
 	/**
-	 * 
+	 * 	Tests behavior of UserService's findUserByEmail()
+	 * 	when the user is found in the database.  
 	 */
 	@Test
 	public void testFindUserByEmailIfEmailIsFound() {
@@ -185,7 +186,8 @@ public class UserServiceTest {
 	}
 	
 	/**
-	 * 
+	 * 	Tests behavior of UserService's findUserByEmail()
+	 *	when the user is NOT found in the database. 
 	 */
 	@Test
 	public void testFindUserByEmailIfEmailIsNotFound() {
