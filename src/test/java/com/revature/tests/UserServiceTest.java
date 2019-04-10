@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -40,6 +42,15 @@ public class UserServiceTest {
 	
 	@Mock
 	AppUser mockAppUser;
+
+	/*	NOTICE: 
+	 * 	this version of Mockito does not allow
+	 * 	for mocking of final classes such as the 
+	 * 	Optional<AppUser> mockOptUser;
+	 * 
+	 */	
+	
+	
 	
 	/* When making a test suite,
 	 *  1) Create Mock Dependencies 
@@ -65,16 +76,58 @@ public class UserServiceTest {
 	
 	/*
 	 * Tests Needed for findById()
+	 * 	1) If id found in db
+	 * 	2) If id not found in db
+	 *  
+	 *  Mocks for findById() Optional<AppUser> optUser;
+	 *  
 	 */
 	
 
-	
+	/** TODO: <strong> Not Testable with this version Mockito! </strong> <br>
+	 * 	If we want to test this method, we need to
+	 * 	create a wrapper class for the Optional
+	 * 	because the version of Mockito presently in use
+	 * 	does not support mocking of Final Classes 
+	 * 	such as Optional. 
+	 * 
+	 *  Tests the findById() in UserService
+	 *  when the id is found in the database. 
+	 *  The following is how we can test
+	 * 	when(mockUserRepo.findById(47)).thenReturn(mockUser);
+	 *	when(mockOptUser.isPresent()).thenReturn(true); 
+	 * 	when(mockOptUser.get()).thenReturn(mockAppUser);
+	 * 	assertEquals(mockAppUser, testUserService.findById(47));
+	 */
 	@Test
-	public void testFindById() {
-		fail("Not yet implemented");
+	public void testFindByIdIfIdFound() {
+		/* The following is how we can test
+		when(mockUserRepo.findById(47)).thenReturn(mockUser);
+		when(mockOptUser.isPresent()).thenReturn(true); 
+		when(mockOptUser.get()).thenReturn(mockAppUser);
+		assertEquals(mockAppUser, testUserService.findById(47));
+		*/
+		fail("Revisit this with either a new version of Mockito "
+				+ "(ie. Mockito 2) or create a wrapper class for "
+				+ "the final class named Optional.class. /n");
 	}
 	
 	
+	/**  
+	 *  TODO: <strong> Not Testable with this version Mockito! </strong> <br>
+	 * 	If we want to test this method, we need to
+	 * 	create a wrapper class for the Optional
+	 * 	because the version of Mockito presently in use
+	 * 	does not support mocking of Final Classes 
+	 * 	such as Optional. 
+	 * 
+	 * 	Tests the findById() in UserService
+	 *  when the id is not found in the database. 
+	 */
+	@Test
+	public void testFindByIdIfIdNotFound() {
+		fail("Cannot Mock Final Classes in this version of Mockito.");
+	}
 	
 	
 	//-------------------------------------------------------------------
@@ -95,8 +148,15 @@ public class UserServiceTest {
 	
 	/*
 	 * Tests Needed for findUserByEmail
+	 * 1) Found in database
+	 * 2) Not Found in database
+	 * 3) Invoked with null
+	 * 
 	 */
 	
+	/**
+	 * 
+	 */
 	@Test
 	public void testFindUserByEmail() {
 		fail("Not yet implemented");
@@ -119,8 +179,7 @@ public class UserServiceTest {
 	 *    
 	 *  Mocks for addUser(): 
 	 *  AppUser mockAppUser;
-	 *  UserService mockUserService 
-	 *  
+	 *    
 	 */
 	
 	
