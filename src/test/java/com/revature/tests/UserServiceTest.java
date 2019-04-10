@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,13 +19,13 @@ import com.revature.service.UserService;
 
 
 
-/** <h2> Test Suite for the UserService class. </h2> 
- *  May it please Zachary Marazita, the GitLord <br> and Jose Rivera,
- *  our Master of Scribes and Documentation. <br>  
- *  <strong> Special thanks </strong> to <strong> Alonzo Muncy </strong>
+/** Test Suite for the UserService class. 
+ *  May it please Zachary Marazita, the GitLord and Jose Rivera,
+ *  our Master of Documentation.  
+ *  Special thanks to Alonzo Muncy
  *	for his helpful explanations regarding the Unit Testing process.   
  *  
- * @author Brandon Morris <br> (190107 Java-Spark-USF) <br> 2019-04-09
+ * @author Brandon Morris (190107 Java-Spark-USF) 2019-04-09
  *  
  */
 @SpringBootTest
@@ -43,6 +43,10 @@ public class UserServiceTest {
 	@Mock
 	AppUser mockAppUser;
 
+	@Mock
+	List<AppUser> mockUserList;
+	
+	
 	/*	NOTICE: 
 	 * 	this version of Mockito does not allow
 	 * 	for mocking of final classes such as the 
@@ -64,12 +68,20 @@ public class UserServiceTest {
 	//-------------------------------------------------------------------
 	
 	/* Tests Needed for findAllUsers() 
-	 * 
+	 * 1) Simple check for the proper calling of the repo.findAll()
+	 *  
+	 * Mocks
+	 * List<AppUser> userList;
 	 */
 	
+	/** Simple test for UserService.findAllUsers() 
+	 * 	Test that the repo method findAll() is called and
+	 * 	returns a list of users.  	
+	 */
 	@Test
 	public void testFindAllUsers() {
-		fail("Not yet implemented");
+		when(mockUserRepo.findAll()).thenReturn(mockUserList);
+		assertEquals(testUserService.findAllUsers(), mockUserList);
 	}
 
 	//-------------------------------------------------------------------
@@ -84,7 +96,7 @@ public class UserServiceTest {
 	 */
 	
 
-	/** TODO: <strong> Not Testable with this version Mockito! </strong> <br>
+	/** TODO: Not Testable with this version Mockito!
 	 * 	If we want to test this method, we need to
 	 * 	create a wrapper class for the Optional
 	 * 	because the version of Mockito presently in use
@@ -93,7 +105,7 @@ public class UserServiceTest {
 	 * 
 	 *  Tests the findById() in UserService
 	 *  when the id is found in the database. 
-	 *  The following is how we can test
+	 *  The following is how we can test this method in the future. 
 	 * 	when(mockUserRepo.findById(47)).thenReturn(mockUser);
 	 *	when(mockOptUser.isPresent()).thenReturn(true); 
 	 * 	when(mockOptUser.get()).thenReturn(mockAppUser);
@@ -101,12 +113,7 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void testFindByIdIfIdFound() {
-		/* The following is how we can test
-		when(mockUserRepo.findById(47)).thenReturn(mockUser);
-		when(mockOptUser.isPresent()).thenReturn(true); 
-		when(mockOptUser.get()).thenReturn(mockAppUser);
-		assertEquals(mockAppUser, testUserService.findById(47));
-		*/
+		
 		fail("Revisit this with either a new version of Mockito "
 				+ "(ie. Mockito 2) or create a wrapper class for "
 				+ "the final class named Optional.class. /n");
@@ -114,7 +121,7 @@ public class UserServiceTest {
 	
 	
 	/**  
-	 *  TODO: <strong> Not Testable with this version Mockito! </strong> <br>
+	 *  TODO:  Not Testable with this version Mockito!
 	 * 	If we want to test this method, we need to
 	 * 	create a wrapper class for the Optional
 	 * 	because the version of Mockito presently in use
@@ -134,15 +141,31 @@ public class UserServiceTest {
 	
 	/*
 	 * Tests Needed for findUserByUsername()
+	 * 1) If the username is found. 
+	 * 2) If the username is not found. 
+	 * 
 	 */
 	
 	
-	
+	/**
+	 * Test for UserService.findUserByUsername()
+	 * When the given username is found in the database. 
+	 */
 	@Test
-	public void testFindUserByUsername() {
-		fail("Not yet implemented");
+	public void testFindUserByUsernameIfUsernameIsFound() {
+		when(mockUserRepo.findUserByUsername("wShatner")).thenReturn(mockAppUser);
+		assertEquals(mockAppUser, testUserService.findUserByUsername("wShatner"));
 	}
 	
+	/**
+	 * Test for UserSErvice.findUserByUsername() 
+	 * When the given username is not found in the database. 
+	 */
+	@Test
+	public void testFindUserByUsernameIfUsernameIsNotFound() {
+		when(mockUserRepo.findUserByUsername("wShatner")).thenReturn(null);
+		assertEquals(null, testUserService.findUserByUsername("wShatner"));
+	}
 	
 	//-------------------------------------------------------------------
 	
