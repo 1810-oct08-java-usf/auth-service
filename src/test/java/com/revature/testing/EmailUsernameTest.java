@@ -3,17 +3,20 @@ package com.revature.testing;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties.Filter;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.revature.controller.AuthController;
 import com.revature.service.UserService;
 
 /**
@@ -25,8 +28,9 @@ import com.revature.service.UserService;
  */
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
+//@SpringBootTest
+//@AutoConfigureMockMvc
+@WebMvcTest(AuthController.class)
 public class EmailUsernameTest {
 
 	@Autowired
@@ -46,8 +50,37 @@ public class EmailUsernameTest {
 	 * @author Christopher Shanor [190107-Java-Spark-USF]
 	 * @author Jose Rivera [190107-Java-Spark-USF]
 	 */
-//	@Test
-//	public void testContextLoads() throws Exception {
-//		assertThat(this.mockMvc).isNotNull();
-//	}
+	@Test
+	public void testContextLoads() throws Exception {
+		assertThat(this.mockMvc).isNotNull();
+	}
+	
+	/**
+	 * This method will test the get mapping for checkIfEmailIsInUse() in the auth controller
+	 * 
+	 * @throws Exception: Test fails if an exception is thrown
+	 * 
+	 * @author Christopher Shanor [190107-Java-Spark-USF]
+	 * @author Jose Rivera [190107-Java-Spark-USF]
+	 */
+	@Test
+	public void testGetCheckIfEmailInUse() throws Exception {
+		String uri = "/users/emailInUse/dummy@dummyemail.com";
+		this.mockMvc.perform(get(uri)).andExpect(status().isOk());
+	}
+	
+	/**
+	 * This method will test the get mapping for checkIfEmailIsInUse() in the auth controller
+	 * with no email address.
+	 * 
+	 * @throws Exception: Test fails if an exception is thrown
+	 * 
+	 * @author Christopher Shanor [190107-Java-Spark-USF]
+	 * @author Jose Rivera [190107-Java-Spark-USF]
+	 */
+	@Test
+	public void testGetCheckIfEmailInUseWithNoEmail() throws Exception {
+		String uri = "/users/emailInUse/";
+		this.mockMvc.perform(get(uri)).andExpect(status().isNotFound());
+	}
 }
