@@ -18,11 +18,13 @@ import com.revature.service.UserService;
 
 
 /** <h2> Test Suite for the UserService class. </h2> 
- *  May it please Zack, the GitLord <br> and Jose,
- *  our Master of Scribes and Documentation. 
+ *  May it please Zachary Marazita, the GitLord <br> and Jose Rivera,
+ *  our Master of Scribes and Documentation. <br>  
+ *  <strong> Special thanks </strong> to <strong> Alonzo Muncy </strong>
+ *	for his helpful explanations regarding the Unit Testing process.   
  *  
  * @author Brandon Morris <br> (190107 Java-Spark-USF) <br> 2019-04-09
- * 
+ *  
  */
 @SpringBootTest
 @RunWith(MockitoJUnitRunner.class)
@@ -46,9 +48,6 @@ public class UserServiceTest {
 	 */
 	@InjectMocks
 	UserService testUserService;
-	
-	
-	
 	
 	
 	//-------------------------------------------------------------------
@@ -123,6 +122,11 @@ public class UserServiceTest {
 	 *  UserService mockUserService 
 	 *  
 	 */
+	
+	
+	/**
+	 * 
+	 */
 	@Test
 	public void testAddUserIfUserIsNull() {
 		when(mockAppUser.getUsername()).thenReturn("William");
@@ -139,6 +143,15 @@ public class UserServiceTest {
 		
 	}
 	
+	
+	/**	When the UserService's addUser() is invoked, 
+	 *  the simulated method call findUserByUsername() 
+	 *  is fed an arbitrary string as the username,
+	 *  and the mocked AppUser object is returned.   
+	 * 	
+	 *  Then we simulate the mock AppUser's getUsername() 
+	 *  and return another arbitrary string.   
+	 */ 
 	@Test
 	public void testAddUserIfUsernameAlreadyExists() {
 		when(testUserService.findUserByUsername("William"))
@@ -149,14 +162,26 @@ public class UserServiceTest {
 	}
 	
 	
-	/**
-	 * 
+	/** In the addUser(), null is returned 
+	 *  if either the username already exists
+	 *  in the database, or the email already exists 
+	 *  in the database. But it will check for the Username first.
+	 *  
+	 *  So, when given that a certain username does exist,
+	 *  and when given that a certain email does exist in 
+	 *  the database, then the value returned should be
+	 *  null. (If the username is not found addUser() returns 
+	 *  a newUser object that was added to the database. 
+	 *  
+	 *  So our assertEquals statement says "we expect this to 
+	 *  return null when given a user that is already in the 
+	 *  database. 
 	 */
 	@Test
 	public void testAddUserIfEmailAlreadyExists() {
 		when(mockAppUser.getUsername()).thenReturn("William");
 		when(testUserService.findUserByUsername("William"))
-		.thenReturn(null);
+		.thenReturn(mockAppUser);
 		
 		when(mockAppUser.getEmail()).thenReturn("William@gmail.com");
 		when(testUserService.findUserByEmail("William@gmail.com"))
@@ -183,6 +208,8 @@ public class UserServiceTest {
 	/*
 	 * Tests Needed for DeleteUserById()
 	 */
+	
+	
 	@Test
 	public void testDeleteUserById() {
 		fail("Not yet implemented");
