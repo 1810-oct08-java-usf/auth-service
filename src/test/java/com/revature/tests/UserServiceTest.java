@@ -125,10 +125,13 @@ public class UserServiceTest {
 	
 	
 	/**
+	 * 	Tests the addUser() of the UserService
+	 * 	when the given user does not already exists
+	 * 	in the database. 
 	 * 
 	 */
 	@Test
-	public void testAddUserIfUserIsNull() {
+	public void testAddUserIfUserNotInDatabase() {
 		when(mockAppUser.getUsername()).thenReturn("William");
 		when(testUserService.findUserByUsername("William"))
 		.thenReturn(null);
@@ -139,12 +142,17 @@ public class UserServiceTest {
 		
 		when(mockUserRepo.save(mockAppUser)).thenReturn(mockAppUser);
 		
-		assertEquals(null, testUserService.addUser(mockAppUser));
+		assertEquals(mockAppUser, testUserService.addUser(mockAppUser));
 		
 	}
 	
 	
-	/**	When the UserService's addUser() is invoked, 
+	/**	
+	 * 	Tests the addUser() of the UserService 
+	 * 	when the given username already exists
+	 * 	in the database. 
+	 * 	
+	 * 	When the UserService's addUser() is invoked, 
 	 *  the simulated method call findUserByUsername() 
 	 *  is fed an arbitrary string as the username,
 	 *  and the mocked AppUser object is returned.   
@@ -162,7 +170,13 @@ public class UserServiceTest {
 	}
 	
 	
-	/** In the addUser(), null is returned 
+	/** 
+	 * 	Tests the addUser() of UserService
+	 * 	when the given email is already present
+	 * 	in the database. 
+	 * 
+	 * 
+	 * 	In the addUser(), null is returned 
 	 *  if either the username already exists
 	 *  in the database, or the email already exists 
 	 *  in the database. But it will check for the Username first.
