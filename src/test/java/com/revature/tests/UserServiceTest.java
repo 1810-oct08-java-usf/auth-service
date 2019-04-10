@@ -173,17 +173,27 @@ public class UserServiceTest {
 	 * Tests Needed for findUserByEmail
 	 * 1) Found in database
 	 * 2) Not Found in database
-	 * 3) Invoked with null
-	 * 
 	 */
 	
 	/**
 	 * 
 	 */
 	@Test
-	public void testFindUserByEmail() {
-		fail("Not yet implemented");
+	public void testFindUserByEmailIfEmailIsFound() {
+		when(mockUserRepo.findUserByEmail("wshatner@gmail.com")).thenReturn(mockAppUser);
+		assertEquals(mockAppUser, testUserService.findUserByEmail("wshatner@gmail.com"));
 	}
+	
+	/**
+	 * 
+	 */
+	@Test
+	public void testFindUserByEmailIfEmailIsNotFound() {
+		when(mockUserRepo.findUserByEmail("wshatner@gmail.com")).thenReturn(null);
+		assertEquals(null, testUserService.findUserByEmail("wshatner@gmail.com"));
+	}
+	
+
 	
 	//-------------------------------------------------------------------
 	
