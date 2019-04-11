@@ -303,13 +303,27 @@ public class UserServiceTest {
 	
 	/*
 	 * Tests Needed for updateUser()
+	 * 1) if the passed in user is null
+	 * 2) if the passed in user if valid
 	 */
-	
+	/**
+	 * Test UserService's updateUser()
+	 * when passed a null value. 
+	 */
 	@Test
-	public void testUpdateUser() {
-		fail("Not yet implemented");
+	public void testUpdateUserNull() {
+		assertEquals(false, testUserService.updateUser(null));
 	}
 	
+	/**
+	 * 	Test UserService's updateUser()
+	 *  when passed a valid User object. 
+	 */
+	@Test
+	public void testUpdateUserValid() {
+		when(mockUserRepo.save(mockAppUser)).thenReturn(mockAppUser);
+		assertEquals(true, testUserService.updateUser(mockAppUser));
+	}
 	
 	//-------------------------------------------------------------------
 	
