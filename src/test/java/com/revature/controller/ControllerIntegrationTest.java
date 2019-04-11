@@ -1,7 +1,6 @@
 package com.revature.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.Before;
@@ -10,16 +9,17 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import com.revature.models.AppUser;
 import com.revature.security.CustomAuthenticationFilter;
-import com.revature.security.ZuulConfig;
 import com.revature.service.UserService;
 
 /**
@@ -55,7 +55,7 @@ public class ControllerIntegrationTest {
 	@InjectMocks
 	private CustomAuthenticationFilter filter;
 	
-	
+	AppUser mockUser;
 	
 	
 	@Before
@@ -88,10 +88,11 @@ public class ControllerIntegrationTest {
 	 * @throws Exception
 	 */
 	@Test
-	@WithMockUser(roles="ADMIN")
+	@WithMockUser(roles= {"ADMIN"})
 	public void deleteUser() throws Exception{		
 		
-		this.mvc.perform(MockMvcRequestBuilders.delete(uri+"/id/0").header(this.zuulHeader, body)).andExpect(status().isOk());
+		this.mvc.perform(MockMvcRequestBuilders.delete(uri+"/id/0").contentType(MediaType.APPLICATION_JSON_VALUE).content("{\"key\":[\"value\"]}").accept(MediaType.APPLICATION_JSON_VALUE).characterEncoding("utf-8").header(this.zuulHeader, body)).andExpect(status().isOk());
+		
 	}
 	
 	
