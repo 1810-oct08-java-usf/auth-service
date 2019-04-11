@@ -84,14 +84,14 @@ public class ControllerIntegrationTest {
 	}
 	
 	/**
-	 * 
+	 * Tests delete User method
 	 * @throws Exception
 	 */
 	@Test
 	@WithMockUser(roles="ADMIN")
 	public void deleteUser() throws Exception{		
 		
-		this.mvc.perform(MockMvcRequestBuilders.delete(uri+"/id/0").header(this.zuulHeader, body)).andDo(print()).andExpect(status().isOk());
+		this.mvc.perform(MockMvcRequestBuilders.delete(uri+"/id/0").header(this.zuulHeader, body)).andExpect(status().isOk());
 	}
 	
 	
