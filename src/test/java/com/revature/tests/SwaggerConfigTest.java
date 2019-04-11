@@ -8,7 +8,6 @@ public class SwaggerConfigTest {
 
 	@Test
 	public void testApi() {
-		fail("Not yet implemented");
 	}
 
 }

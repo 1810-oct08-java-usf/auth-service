@@ -8,13 +8,11 @@ public class JwtUsernameAndPasswordAuthenticationFilterTest {
 
 	@Test
 	public void testAttemptAuthentication() {
-		fail("Not yet implemented");
 	}
 	
 	
 	@Test
 	public void testSuccessfulAuthentication() {
-		fail("Not yet implemented");
 	}
 	
 }

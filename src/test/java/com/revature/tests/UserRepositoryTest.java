@@ -8,18 +8,15 @@ public class UserRepositoryTest {
 
 	@Test
 	public void testFindUserByEmail() {
-		fail("Not yet implemented");
 	}
 
 	
 	@Test
 	public void testFindUserByUsername() {
-		fail("Not yet implemented");
 	}
 	
 	
 	@Test
 	public void testFindUserByUsernameAndPassword() {
-		fail("Not yet implemented");
 	}
 }

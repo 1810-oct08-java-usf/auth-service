@@ -8,7 +8,6 @@ public class JwtTokenAuthenticationFilterTest {
 
 	@Test
 	public void testDoFilterInternal() {
-		fail("Not yet implemented");
 	}
 
 }

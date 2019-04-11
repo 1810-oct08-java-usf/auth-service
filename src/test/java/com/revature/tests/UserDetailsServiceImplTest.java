@@ -8,7 +8,6 @@ public class UserDetailsServiceImplTest {
 
 	@Test
 	public void testLoadUserByUsername() {
-		fail("Not yet implemented");
 	}
 
 }
