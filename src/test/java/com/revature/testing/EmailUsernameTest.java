@@ -12,7 +12,6 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -39,9 +38,6 @@ public class EmailUsernameTest {
 
 	@MockBean
 	private UserService userService;
-
-	// @MockBean
-	// private ZuulConfig mockZuulConfig;
 
 	/**
 	 * This method is going to test if our context loads and is not null.
@@ -70,7 +66,6 @@ public class EmailUsernameTest {
 	 * @author Jose Rivera (190107-Java-Spark-USF)
 	 */
 	@Test
-	@WithMockUser
 	public void testGetCheckIfEmailInUseWithEmailInUse() throws Exception {
 
 		// The uri endpoint for the controller
