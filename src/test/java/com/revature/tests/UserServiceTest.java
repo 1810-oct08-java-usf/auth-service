@@ -265,10 +265,7 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void testAddUserIfEmailAlreadyExists() {
-		when(mockAppUser.getUsername()).thenReturn("William");
-		when(testUserService.findUserByUsername("William"))
-		.thenReturn(mockAppUser);
-		
+	
 		when(mockAppUser.getEmail()).thenReturn("William@gmail.com");
 		when(testUserService.findUserByEmail("William@gmail.com"))
 		.thenReturn(mockAppUser);
