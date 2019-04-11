@@ -97,9 +97,10 @@ public class AuthControllerTest {
 	 * @throws UserNotFoundException
 	 */
 
-	@Test(expected = UserNotFoundException.class)
+	@Test (expected = UserNotFoundException.class)
 	public void testDeleteUserIfUserDoesntExist() {
-		when(userService.findById(0)).thenReturn(null);
+		when(userService.findById(0)).thenReturn(mockUser);
+		when(mockUser.getId()).thenReturn(null);
 		authControl.deleteUser(0);
 	}
 	
@@ -131,11 +132,7 @@ public class AuthControllerTest {
 		
 		when(backUser.getPassword()).thenReturn("seashore");
 		when(backUser.getUsername()).thenReturn("sally");
-		when(backUser.getEmail()).thenReturn("sellsSEsasheaw@shea.shore");
-		when(backUser.getFirstName()).thenReturn("sal");
-		when(backUser.getLastName()).thenReturn("pal");
-		when(backUser.getId()).thenReturn(1000);
-		
+		when(backUser.getEmail()).thenReturn("sellsSEsasheaw@shea.shore");		
 		when(userService.findById(mockUser.getId())).thenReturn(backUser);
 		when(userService.updateUser(mockUser)).thenReturn(true);
 		
@@ -161,15 +158,9 @@ public class AuthControllerTest {
 		
 		when(mockUser.getRole()).thenReturn(roleAdmin);
 		when(mockUser.getPassword()).thenReturn("seashore newPass");
-		when(mockUser.getUsername()).thenReturn("sally");
-		when(mockUser.getFirstName()).thenReturn("salleo");
-		when(mockUser.getLastName()).thenReturn("pealle");
-		when(mockUser.getId()).thenReturn(1001);
 		
 		when(backUser.getPassword()).thenReturn("newPass");
 		
-		when(userService.findById(mockUser.getId())).thenReturn(backUser);
-		when(userService.updateUser(mockUser)).thenReturn(true);
 		
 		authControl.updateUser(mockUser, mockAuth);
 		verify(userService, times(1)).updateUser(mockUser);
@@ -196,9 +187,6 @@ public class AuthControllerTest {
 		when(mockUser.getRole()).thenReturn(roleAdmin);
 		when(mockUser.getPassword()).thenReturn("seashore newPass");
 		when(mockUser.getUsername()).thenReturn("sally");
-		when(mockUser.getFirstName()).thenReturn("salleo");
-		when(mockUser.getLastName()).thenReturn("pealle");
-		when(mockUser.getId()).thenReturn(1001);
 		
 		when(backUser.getPassword()).thenReturn("seashore");
 		when(backUser.getUsername()).thenReturn("NotSally");
@@ -232,7 +220,6 @@ public class AuthControllerTest {
 		String expected = "{\"emailIsInUse\": true}";
 
 		when(userService.findUserByEmail(email)).thenReturn(mockAppUser);
-		when(mockAppUser.getId()).thenReturn(0);
 		assertEquals(expected, authController.checkIfEmailIsInUse(email));
 	}
 
@@ -254,7 +241,6 @@ public class AuthControllerTest {
 		String expected = "{\"emailIsInUse\": false}";
 
 		when(userService.findUserByEmail(email)).thenReturn(null);
-		when(mockAppUser.getId()).thenReturn(null);
 		assertEquals(expected, authController.checkIfEmailIsInUse(email));
 	}
 
@@ -276,7 +262,6 @@ public class AuthControllerTest {
 		String expected = "{\"usernameIsAvailable\":false}";
 
 		when(userService.findUserByUsername(username)).thenReturn(mockAppUser);
-		when(mockAppUser.getId()).thenReturn(0);
 		assertEquals(expected, authController.checkIfUsernameIsAvailable(username));
 	}
 
@@ -298,7 +283,6 @@ public class AuthControllerTest {
 		String expected = "{\"usernameIsAvailable\": true}";
 
 		when(userService.findUserByUsername(username)).thenReturn(null);
-		when(mockAppUser.getId()).thenReturn(null);
 		assertEquals(expected, authController.checkIfUsernameIsAvailable(username));
 	}
 	
