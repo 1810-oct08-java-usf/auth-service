@@ -216,7 +216,6 @@ public class UserServiceTest {
 		when(mockUserRepo.save(mockAppUser)).thenReturn(mockAppUser);
 		
 		assertEquals(mockAppUser, testUserService.addUser(mockAppUser));
-		
 	}
 	
 	
