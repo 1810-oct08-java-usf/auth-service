@@ -105,36 +105,15 @@ public class UserServiceTest {
 	 * 
 	 *  Tests the findById() in UserService
 	 *  when the id is found in the database. 
-	 *  The following is how we can test this method in the future. 
+	 *  
+	 *  The following is how we can test this method in the future:
+	 *  
 	 * 	when(mockUserRepo.findById(47)).thenReturn(mockUser);
 	 *	when(mockOptUser.isPresent()).thenReturn(true); 
 	 * 	when(mockOptUser.get()).thenReturn(mockAppUser);
 	 * 	assertEquals(mockAppUser, testUserService.findById(47));
 	 */
-	@Test
-	public void testFindByIdIfIdFound() {
-		
-		fail("Revisit this with either a new version of Mockito "
-				+ "(ie. Mockito 2) or create a wrapper class for "
-				+ "the final class named Optional.class. /n");
-	}
 	
-	
-	/**  
-	 *  TODO:  Not Testable with this version Mockito!
-	 * 	If we want to test this method, we need to
-	 * 	create a wrapper class for the Optional
-	 * 	because the version of Mockito presently in use
-	 * 	does not support mocking of Final Classes 
-	 * 	such as Optional. 
-	 * 
-	 * 	Tests the findById() in UserService
-	 *  when the id is not found in the database. 
-	 */
-	@Test
-	public void testFindByIdIfIdNotFound() {
-		fail("Cannot Mock Final Classes in this version of Mockito.");
-	}
 	
 	
 	//-------------------------------------------------------------------
@@ -329,12 +308,12 @@ public class UserServiceTest {
 	
 	/*
 	 * Tests Needed for DeleteUserById()
+	 * NOTE: Optionals cannot be mocked 
+	 * in this version of Mockito. 
+	 * 
+	 * 1) If user not found in database.
+	 * 2) If user is found in database. 
 	 */
 	
-	
-	@Test
-	public void testDeleteUserById() {
-		fail("Not yet implemented");
-	}
 
 }
