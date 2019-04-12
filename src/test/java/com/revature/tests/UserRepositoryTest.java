@@ -20,8 +20,8 @@ public class UserRepositoryTest {
 	 * with @Ignore labeled on 
 	 * an empty test.
 	 * Documentation was entirely lacking, 
-	 * so the purpose of this class is presently unclear,
-	 * but before it is deleted, check that it does not impact
+	 * so the purpose of this class is presently unclear.
+	 * TODO: Before this class is deleted, check that it does not impact
 	 * code coverage metrics. 
 	 */
 	@Ignore
