@@ -35,6 +35,8 @@ public class UserServiceTest {
 	/*
 	 * Required Mocks for this class are:
 	 * 	UserRepository
+	 *  AppUser
+	 *  List<AppUser>
 	 */
 	
 	@Mock 
