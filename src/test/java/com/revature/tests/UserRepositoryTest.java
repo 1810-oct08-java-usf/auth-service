@@ -6,17 +6,25 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 
-/** 
- * @author Brandon Morris (190107-Java-Spark-usf)
+/** Note: "You cannot test Spring Data" 
+ * 	The implementation of Spring Data Methods are 
+ * 	veiled from our view. 
+ * 	@see <a href="https://stackoverflow.com/questions/23435937/how-to-test-spring-data-repositories#23442457">Discussed on StackOverflow</a>    
+ *  @author Brandon Morris (190107-Java-Spark-usf)
  */
 @SpringBootTest
 @RunWith(MockitoJUnitRunner.class)
 public class UserRepositoryTest {
 	
-	/*
-	 * 
+	/* The below code was found 
+	 * with @Ignore labeled on 
+	 * an empty test.
+	 * Documentation was entirely lacking, 
+	 * so the purpose of this class is presently unclear,
+	 * but before it is deleted, check that it does not impact
+	 * code coverage metrics. 
 	 */
-	
+	@Ignore
 	@Test
 	public void testFindUserByEmail() {
 		
