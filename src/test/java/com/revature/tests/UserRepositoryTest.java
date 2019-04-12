@@ -2,24 +2,23 @@ package com.revature.tests;
 
 import static org.junit.Assert.*;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class UserRepositoryTest {
-
+	
+	@Ignore
 	@Test
 	public void testFindUserByEmail() {
-		fail("Not yet implemented");
 	}
 
-	
+	@Ignore
 	@Test
 	public void testFindUserByUsername() {
-		fail("Not yet implemented");
 	}
 	
-	
+	@Ignore
 	@Test
 	public void testFindUserByUsernameAndPassword() {
-		fail("Not yet implemented");
 	}
 }
