@@ -1,5 +1,8 @@
 package com.revature.controller;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -17,10 +20,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import com.revature.models.AppUser;
 import com.revature.security.CustomAuthenticationFilter;
 import com.revature.service.UserService;
+import com.sun.jersey.api.client.ClientResponse.Status;
 
 /**
  * This method tests integration of the controller with MockMVC
@@ -37,6 +43,8 @@ public class ControllerIntegrationTest {
 	private String uri = "/users";
 	
 	@Autowired
+	private WebApplicationContext context;
+	
 	private MockMvc mvc;
 	
 	
@@ -57,11 +65,19 @@ public class ControllerIntegrationTest {
 	
 	AppUser mockUser;
 	
-	
+	/**
+	 * Sets up the MVC configuration with security context
+	 * @author Jaitee Pitts (190107-Java-Spark-USF)
+	 */
 	@Before
 	public void setup() {
 		//TODO 		
 		body = filter.get_SHA_512_SecureHash(salt, secret);
+		mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity()) 
+                .build();
+
 	}
 	
 	/**
@@ -76,9 +92,10 @@ public class ControllerIntegrationTest {
 	/**
 	 * Tests that delete user cannot be called without a Zuul header
 	 * @throws Exception
+	 * @author Jaitee Pitts (190107-Java-Spark-USF)
 	 */
 	@Test
-	@WithMockUser(roles="ADMIN")
+	@WithMockUser(roles= {"USER"})
 	public void SubVersionAttemptTest() throws Exception{
 		this.mvc.perform(delete("/id/0")).andExpect(status().isUnauthorized());
 	}
@@ -86,16 +103,17 @@ public class ControllerIntegrationTest {
 	/**
 	 * Tests delete User method
 	 * @throws Exception
+	 * @author Jaitee Pitts (190107-Java-Spark-USF)
 	 */
 	@Test
-	@WithMockUser(roles= {"ADMIN"})
+	@WithMockUser(roles= {"USER","ADMIN"})
 	public void deleteUser() throws Exception{		
 		
-		this.mvc.perform(MockMvcRequestBuilders.delete(uri+"/id/0").contentType(MediaType.APPLICATION_JSON_VALUE).content("{\"key\":[\"value\"]}").accept(MediaType.APPLICATION_JSON_VALUE).characterEncoding("utf-8").header(this.zuulHeader, body)).andExpect(status().isOk());
+		this.mvc.perform(delete(uri+"/id/0").with(httpBasic("user", "password"))
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.accept(MediaType.APPLICATION_JSON_VALUE).characterEncoding("utf-8")
+				.header(this.zuulHeader, body)).andExpect(status().isOk());
 		
 	}
 	
-	
-	
-
 }
