@@ -1,7 +1,7 @@
 package com.revature.tests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -203,20 +203,19 @@ public class UserServiceTest {
 	 * 	Tests the addUser() of the UserService
 	 * 	when the given user does not already exists
 	 * 	in the database. 
-	 * 
 	 */
 	@Test
 	public void testAddUserIfUserNotInDatabase() {
+//		mockup the mockAppUser's methods. 
 		when(mockAppUser.getUsername()).thenReturn("William");
-		when(testUserService.findUserByUsername("William"))
-		.thenReturn(null);
-		
+	
 		when(mockAppUser.getEmail()).thenReturn("William@gmail.com");
-		when(testUserService.findUserByEmail("William@gmail.com"))
-		.thenReturn(null);
-		
+
 		when(mockUserRepo.save(mockAppUser)).thenReturn(mockAppUser);
-		
+
+//		Now test the actual results of invocation. 
+//		Since there is no such user in the database,
+//		we should be returned the user that was added just now.  
 		assertEquals(mockAppUser, testUserService.addUser(mockAppUser));
 	}
 	
