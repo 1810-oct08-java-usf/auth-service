@@ -112,7 +112,7 @@ public class ControllerIntegrationTest {
 		this.mvc.perform(delete(uri+"/id/0").with(httpBasic("user", "password"))
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.accept(MediaType.APPLICATION_JSON_VALUE).characterEncoding("utf-8")
-				.header(this.zuulHeader, body)).andExpect(status().isOk());
+				).andExpect(status().isOk());
 		
 	}
 	
