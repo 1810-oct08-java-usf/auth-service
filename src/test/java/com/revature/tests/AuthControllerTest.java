@@ -1,9 +1,13 @@
 package com.revature.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,8 +19,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.Authentication;
 
 import com.revature.controller.AuthController;
+import com.revature.exceptions.UserCreationException;
 import com.revature.exceptions.UserNotFoundException;
 import com.revature.models.AppUser;
+import com.revature.models.UserErrorResponse;
 import com.revature.service.UserService;
 /**
  * This class will be used to test methods in the AuthController. Testing will
@@ -65,7 +71,7 @@ public class AuthControllerTest {
 	 * @throws Exception
 	 */
 	@Test(expected = UserNotFoundException.class)  
-	public void testDeleteWIthNullId(){
+	public void testDeleteWithInvalidId(){
 		when(userService.findById(0)).thenReturn(mockUser);
 		when(mockUser.getId()).thenReturn(null);
 		authControl.deleteUser(0);
@@ -286,4 +292,23 @@ public class AuthControllerTest {
 		assertEquals(expected, authController.checkIfUsernameIsAvailable(username));
 	}
 	
+	/**
+	 * This test case verifies proper functionality of the AuthController.getAllUsers() method.
+	 * A non-null ArrayList of AppUser objects with a size of one is expected to be returned.
+	 * 
+	 * @author Wezley Singleton
+	 */
+	@Test
+	public void testGetAllUsers() {
+		List<AppUser> expectedResult = new ArrayList<>();
+		AppUser mockedUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
+		expectedResult.add(mockedUser);
+		when(userService.findAllUsers()).thenReturn(expectedResult);
+		
+		List<AppUser> testResult = authController.getAllUsers();
+		assertNotNull("The ArrayList returned is expected to be not null", testResult);
+		assertEquals("The ArrayList returned is expected to have a size of one", 1, testResult.size());
+		assertEquals("The AppUser within the returned ArrayList is expected to match the mocked one", mockedUser, testResult.get(0)); 
+	}
+
 }
