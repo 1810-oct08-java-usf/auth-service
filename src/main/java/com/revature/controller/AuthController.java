@@ -76,9 +76,10 @@ public class AuthController {
 	@GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public AppUser getUserById(@PathVariable int id) {
-		if (userService.findById(id) == null)
+		AppUser user = userService.findById(id);
+		if (user == null)
 			throw new UserNotFoundException("There is no user with that ID.");
-		return userService.findById(id);
+		return user;
 	}
 
 	/**
@@ -234,8 +235,8 @@ public class AuthController {
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteUser(@PathVariable int id) {
 		AppUser user = userService.findById(id);
-		if (user.getId() == null)
-			throw new UserNotFoundException("Id cannot be null!");
+		if (user == null)
+			throw new UserNotFoundException("User with id: " +id + "not found");
 		if (userService.findById(user.getId()) == null)
 			throw new UserNotFoundException("User with id: " + user.getId() + " not found");
 		if (!userService.deleteUserById(user.getId()))
@@ -248,7 +249,7 @@ public class AuthController {
 	 * @param unfe
 	 * @return This method will return an error of type UserErrorResponse
 	 */
-	@ExceptionHandler
+	@ExceptionHandler({UserNotFoundException.class})
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public UserErrorResponse handleUserNotFoundException(UserNotFoundException unfe) {
 		UserErrorResponse error = new UserErrorResponse();
