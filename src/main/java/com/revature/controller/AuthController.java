@@ -157,10 +157,7 @@ public class AuthController {
 	 * @return null if any of the fields are blank
 	 * @throws UserNotFoundException
 	 */
-	/*
-	 * TODO This needs to be cleaned up. There is likely a more efficient way to
-	 * check if passed in values are null.
-	 */
+	// TODO This method is scheduled for complete refactoring to simplify the logic.
 	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public AppUser updateUser(@RequestBody AppUser frontEndUser, Authentication auth) {
