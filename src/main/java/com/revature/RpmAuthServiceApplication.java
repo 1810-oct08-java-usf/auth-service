@@ -7,7 +7,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-
+/**
+ * This is just a spring runner.
+ * @Author Alonzo Muncy (190107 Java-Spark-USF)
+ *
+ */
 @SpringBootApplication
 @EnableEurekaClient
 public class RpmAuthServiceApplication {

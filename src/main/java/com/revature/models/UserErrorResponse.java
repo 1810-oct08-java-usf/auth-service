@@ -2,6 +2,11 @@ package com.revature.models;
 
 import java.io.Serializable;
 
+/**
+ * This is a data object for the errors
+ * @Author Alonzo Muncy (190107 Java-Spark-USF)
+ *
+ */
 public class UserErrorResponse implements Serializable {
 
 	private static final long serialVersionUID = -780898122370684787L;

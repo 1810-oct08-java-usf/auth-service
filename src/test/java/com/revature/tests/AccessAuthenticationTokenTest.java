@@ -24,6 +24,12 @@ public class AccessAuthenticationTokenTest {
 
 	@InjectMocks
 	AccessAuthenticationToken authToken;
+	
+	/**
+	 * This tests erasing credentials
+	 * @Author Tracy Cummings (190107 Java-Spark-USF)
+	 *
+	 */
 
 	@Test
 	public void testEraseCredentials() {
@@ -33,21 +39,5 @@ public class AccessAuthenticationTokenTest {
 
 		// Runs the test and checks if credentials is pointing at nothing
 		assertEquals(null, authToken.getCredentials());
-	}
-
-	@Test
-	public void testSetAuthenticated() {
-
-		boolean thrown = true;
-		if (thrown == true) {
-			try {
-				authToken.setAuthenticated(true);
-			} catch (IllegalArgumentException e) {
-				thrown = true;
-			}
-			assertTrue(thrown);
-		}else {
-			assertFalse(thrown);
-		}
 	}
 }

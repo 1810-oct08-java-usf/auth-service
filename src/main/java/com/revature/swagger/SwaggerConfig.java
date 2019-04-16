@@ -15,7 +15,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-/*
+/**
  * The SwaggerConfig is used to show information about the auth-service.
  * Information includes swagger version, basic information, host, base path, tags,
  * what the API consumes and produces, end points, and model definitions.
@@ -36,7 +36,7 @@ public class SwaggerConfig {
 			      new HashSet<String>(Arrays.asList("application/json",
 			          "application/xml"));
 		  
-		  /*
+		  /**
 		   * When the v2/api-docs end point is hit, it will retrieve information about the project service
 		   * in relation to only the controller class,
 		   * build the JSON documentation, and display it.
