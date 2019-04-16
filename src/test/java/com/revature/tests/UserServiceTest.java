@@ -317,4 +317,20 @@ public class UserServiceTest {
 		assertEquals("The AppUser returned should match the mocked one", expectedResult, testResult);
 	}
 	
+
+	
+	/**
+	 * This test case verifies proper functionality of the AuthController.UserService.findById() method when it is given an invalid id.
+	 * A null AppUser object is expected to be returned from the service, which will cause a UserNotFoundException to be thrown.
+	 * 
+	 * @author Wezley Singleton
+	 */
+	@Test
+	public void testFindUserByIdWithInvalidId() {
+		Optional<AppUser> mockedOptional = Optional.ofNullable(null);
+		when(mockUserRepo.findById(1)).thenReturn(mockedOptional);
+	
+		AppUser testResult = testUserService.findById(1);
+		assertNull("The AppUser returned should be a null value", testResult);
+	}
 }
