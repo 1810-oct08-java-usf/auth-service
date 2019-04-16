@@ -230,7 +230,7 @@ public class AuthController {
 	 * @throws UserNotFoundException
 	 */
 	@PreAuthorize("hasRole('ADMIN')")
-	@DeleteMapping(value = "/id/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@DeleteMapping(value = "/id/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteUser(@PathVariable int id) {
 		AppUser user = userService.findById(id);
