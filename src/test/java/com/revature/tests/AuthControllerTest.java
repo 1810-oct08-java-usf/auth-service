@@ -354,5 +354,17 @@ public class AuthControllerTest {
 		assertNotNull("The AppUser returned is expected to be not null", testResult);
 		assertEquals("The AppUser returned is expected to match the mocked one", expectedResult, testResult); 
 	}
+	
+	/**
+	 * This test case verifies proper functionality of the AuthController.getUserByUsername() method.
+	 * A null AppUser object is expected to be returned from the service, which will cause a UserNotFoundException to be thrown.
+	 * 
+	 * @author Wezley Singleton
+	 */
+	@Test(expected=UserNotFoundException.class)
+	public void testGetUserByUsernameWithInvalidUsername() {
+		when(userService.findUserByUsername("mocked")).thenReturn(null);
+		authController.getUserByUsername("mocked");
+	}
 
 }
