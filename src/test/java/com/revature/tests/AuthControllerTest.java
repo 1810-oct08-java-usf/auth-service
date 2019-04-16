@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -214,7 +215,7 @@ public class AuthControllerTest {
 	 * @author Christopher Shanor (190107-Java-Spark-USF)
 	 */
 	@Test
-	public void testCheckIfUsernameIsAvailablePassingAnUnavailableUsername() {
+	public void testCheckIfUsernameIsAvailablePassingUnavailableUsername() {
 
 		// Create a username to check for
 		String username = "cshanor";
@@ -235,7 +236,7 @@ public class AuthControllerTest {
 	 * @author Christopher Shanor (190107-Java-Spark-USF)
 	 */
 	@Test
-	public void testCheckIfUsernameIsAvailablePassingAnAvailableUsername() {
+	public void testCheckIfUsernameIsAvailablePassingAvailableUsername() {
 
 		// Create a username to check for
 		String username = "cshanor";
@@ -246,6 +247,33 @@ public class AuthControllerTest {
 		when(userService.findUserByUsername(username)).thenReturn(null);
 		assertEquals(expected, authController.checkIfUsernameIsAvailable(username));
 	}
+	
+	/**
+	 * This test case verifies the proper functionality of the AuthController.updateUser() method when it
+	 * is provided a valid updated AppUser with all updateable fields. The expected result is an AppUser
+	 * object whose fields match those of the AppUser passed as a method argument.
+	 * 
+	 * @author Wezley Singleton
+	 */
+	@Ignore("AuthController.updateUser() is scheduled for refactor")
+	public void testUpdateUserValidUserValidWithAllUpdateableFields() {
+		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "ROLE_USER");
+		AppUser mockedUserForUpdate = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "ROLE_USER");
+		AppUser mockedPersistedUser = new AppUser(1, "mock", "user", "mock@email.com", "mocked", "mocked", "ROLE_USER");
+		mockAuth.setAuthenticated(true);
+		
+		when(mockAuth.getPrincipal()).thenReturn("mocked");
+		when(userService.findUserByUsername(mockAuth.getPrincipal().toString())).thenReturn(mockedPersistedUser);
+		when(userService.findById(1)).thenReturn(mockedPersistedUser);
+		when(userService.updateUser(mockUser)).thenReturn(true);
+		
+		AppUser testResult = authController.updateUser(mockedUserForUpdate, mockAuth);
+		verify(userService, times(1)).updateUser(mockUser);
+		assertNotNull("The AppUser returned is expected to be not null", testResult);
+		assertEquals("The AppUser returned is expected to match the mocked one", expectedResult, testResult);
+	}
+	
+	// TODO More test cases need to be written for AuthController.updateUser() so that the scheduled refactoring can be done.
 		
 	
 	/**
@@ -293,93 +321,6 @@ public class AuthControllerTest {
 		when(mockUser.getId()).thenReturn(null);
 		authController.deleteUser(0);
 	}
-	
-	/**
-	 *  Tests if it updates successfully with given user.
-	 *  Please refactor the controller method to use already fetched user object.
-	 *  @author Ankit Patel
-	 * 	@author Jaitee Pitts
-	 */
-	@Test
-	public void testUpdateUserWithValidInfo() {
-		mockAuth.setAuthenticated(true);
-		
-		when(mockAuth.getPrincipal()).thenReturn("sally");
-		
-		when(userService.findUserByUsername(mockAuth.getPrincipal().toString())).thenReturn(mockUser);
-		
-		when(mockUser.getRole()).thenReturn(roleAdmin);
-		when(mockUser.getPassword()).thenReturn("seashore newPass");
-		when(mockUser.getUsername()).thenReturn("sally");
-		when(mockUser.getFirstName()).thenReturn("salleo");
-		when(mockUser.getLastName()).thenReturn("pealle");
-		when(mockUser.getId()).thenReturn(1001);
-		
-		when(mockUser.getPassword()).thenReturn("seashore");
-		when(mockUser.getUsername()).thenReturn("sally");
-		when(mockUser.getEmail()).thenReturn("sellsSEsasheaw@shea.shore");		
-		when(userService.findById(mockUser.getId())).thenReturn(mockUser);
-		when(userService.updateUser(mockUser)).thenReturn(true);
-		
-		authController.updateUser(mockUser, mockAuth);
-		verify(userService, times(1)).updateUser(mockUser);
-		
-	}
-	
-	/**
-	 * Tests update user 
-	 * where backend password is different from given password from front end.
-	 * @author Jaitee Pitts
-	 * @author Ankit Patel
-	 */
-	
-	@Test(expected = UserNotFoundException.class)
-	public void testUpdateUserWithDifferentBackEndPassword() {
-		mockAuth.setAuthenticated(true);
-		
-		when(mockAuth.getPrincipal()).thenReturn("sally");
-		
-		when(userService.findUserByUsername(mockAuth.getPrincipal().toString())).thenReturn(mockUser);
-		
-		when(mockUser.getRole()).thenReturn(roleAdmin);
-		when(mockUser.getPassword()).thenReturn("seashore newPass");
-		
-		when(mockUser.getPassword()).thenReturn("newPass");
-		
-		
-		authController.updateUser(mockUser, mockAuth);
-		verify(userService, times(1)).updateUser(mockUser);
-		
-	}
-	
-
-	/**
-	 * Test if backend user has a different username then front end user.
-	 * Pretty sure this is impossible in actual implementation
-	 * backend user is fetched from the DB by the front end username 
-	 * there's no reason to check if they have the same username.
-	 * @author Jaitee Pitts
-	 * @author Ankit Patel
-	 */
-	@Test(expected = UserNotFoundException.class)
-	public void testUpdateUserWithDifferentUsername() {
-		mockAuth.setAuthenticated(true);
-		
-		when(mockAuth.getPrincipal()).thenReturn("sally");
-		
-		when(userService.findUserByUsername(mockAuth.getPrincipal().toString())).thenReturn(mockUser);
-		
-		when(mockUser.getRole()).thenReturn(roleAdmin);
-		when(mockUser.getPassword()).thenReturn("seashore newPass");
-		when(mockUser.getUsername()).thenReturn("sally");
-		
-		when(mockUser.getPassword()).thenReturn("seashore");
-		when(mockUser.getUsername()).thenReturn("NotSally");
-		
-		authController.updateUser(mockUser, mockAuth);
-		verify(userService, times(1)).updateUser(mockUser);
-		
-	}	
 	
 	/**
 	 * This test case verifies proper functionality of the AuthController.handleUserNotFoundException()
