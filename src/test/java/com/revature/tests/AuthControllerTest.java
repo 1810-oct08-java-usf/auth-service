@@ -310,5 +310,21 @@ public class AuthControllerTest {
 		assertEquals("The ArrayList returned is expected to have a size of one", 1, testResult.size());
 		assertEquals("The AppUser within the returned ArrayList is expected to match the mocked one", mockedUser, testResult.get(0)); 
 	}
+	
+	/**
+	 * This test case verifies proper functionality of the AuthController.getUserById() method.
+	 * A non-null AppUser object is expected to be returned.
+	 * 
+	 * @author Wezley Singleton
+	 */
+	@Test
+	public void testGetUserByIdWithValidId() {
+		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
+		when(userService.findById(1)).thenReturn(expectedResult);
+		
+		AppUser testResult = authController.getUserById(1);
+		assertNotNull("The AppUser returned is expected to be not null", testResult);
+		assertEquals("The AppUser returned is expected to match the mocked one", expectedResult, testResult); 
+	}
 
 }
