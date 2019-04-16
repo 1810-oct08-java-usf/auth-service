@@ -1,4 +1,4 @@
-package com.revature.testing;
+package com.revature;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
