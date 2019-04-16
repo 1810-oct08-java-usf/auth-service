@@ -25,7 +25,10 @@ public class UserErrorResponseTest {
 	
 	String testToString = "UserErrorResponse [status=38, message=A Message, timestamp=2402350928528509]";
 	Integer testHashCode = 1653425810;
-	
+	/**
+	 * Testing constructors, getters, setters, equals, hashCode, and toString.
+	 * @author Alonzo Muncy
+	 */
 	@Test
 	public void testUserErrorResponse() {
 		

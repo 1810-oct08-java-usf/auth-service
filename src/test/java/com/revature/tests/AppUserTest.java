@@ -26,7 +26,11 @@ public class AppUserTest {
 	String testrole = "ADMIN";
 	String testToString = "AppUser [id=91, firstName=Johnny, lastName=Appleseed, email=AppleTrees@GoWest.com, username=japple, password=ILikeApples, role=ADMIN]";
 	Integer testHashCode = -775241502;
-
+	
+	/**
+	 * Testing constructors, getters, setters, equals, hashCode, and toString.
+	 * @Author Alonzo Muncy 
+	 */
 	@Test
 	public void testAppUser() {
 		
