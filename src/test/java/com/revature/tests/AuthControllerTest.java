@@ -394,5 +394,21 @@ public class AuthControllerTest {
 		when(userService.findUserByEmail("mocked@email.com")).thenReturn(null);
 		authController.getUserByEmail("mocked@email.com");
 	}
+	
+	/**
+	 * This test case verifies proper functionality of the AuthController.handleUserNotFoundException()
+	 * A non-null UserErrorResponse is excepted to be returned. It should have a status of 404 and the correct message.
+	 * 
+	 * @author Wezley Singleton
+	 */
+	@Test
+	public void testHandleUserNotFoundException() {
+		UserNotFoundException mockedException = new UserNotFoundException("Mocked user not found exception");
+
+		UserErrorResponse testResult = authController.handleUserNotFoundException(mockedException);
+		assertNotNull("The UserErrorResponse returned is expected to be not null", testResult);
+		assertEquals("The UserErrorResponse.status is expected to be a 404 (Not Found)", 404 , testResult.getStatus());
+		assertEquals("The UserErrorResponse.message is expected to match the mocked message", "Mocked user not found exception", testResult.getMessage());
+	}
 
 }
