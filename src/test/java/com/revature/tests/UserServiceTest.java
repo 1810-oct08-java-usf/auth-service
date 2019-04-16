@@ -1,10 +1,10 @@
 package com.revature.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -299,17 +299,22 @@ public class UserServiceTest {
 		when(mockUserRepo.save(mockAppUser)).thenReturn(mockAppUser);
 		assertEquals(true, testUserService.updateUser(mockAppUser));
 	}
-	
-	//-------------------------------------------------------------------
-	
-	/*
-	 * Tests Needed for DeleteUserById()
-	 * NOTE: Optionals cannot be mocked 
-	 * in this version of Mockito. 
-	 * 
-	 * 1) If user not found in database.
-	 * 2) If user is found in database. 
-	 */
-	
 
+	/**
+	 * This test case verifies proper functionality of the UserService.findById() method.
+	 * A non-null AppUser object is expected to be returned.
+	 * 
+	 * @author Wezley Singleton
+	 */
+	@Test
+	public void testFindUserByIdWithValidId() {
+		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
+		Optional<AppUser> mockedOptional = Optional.of(expectedResult);
+		when(mockUserRepo.findById(1)).thenReturn(mockedOptional);
+	
+		AppUser testResult = testUserService.findById(1);
+		assertNotNull("The AppUser returned should not be a null value", testResult);
+		assertEquals("The AppUser returned should match the mocked one", expectedResult, testResult);
+	}
+	
 }
