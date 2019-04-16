@@ -22,7 +22,7 @@ public class AccessAuthenticationToken extends AbstractAuthenticationToken {
 		super(authorities);
 		this.principal = principal;
 		this.credentials = credentials;
-		super.setAuthenticated(true); // must use super, as we override
+		setAuthenticated(true);
 	}
 	
 	public AccessAuthenticationToken(Object principal, Object credentials) {
@@ -39,15 +39,6 @@ public class AccessAuthenticationToken extends AbstractAuthenticationToken {
 	@Override
 	public Object getPrincipal() {
 		return this.principal;
-	}
-
-	public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
-		if (isAuthenticated) {
-			throw new IllegalArgumentException(
-					"Cannot set this token to trusted - use constructor which takes a GrantedAuthority list instead");
-		}
-
-		super.setAuthenticated(false);
 	}
 
 	@Override
