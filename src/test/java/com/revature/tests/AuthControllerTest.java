@@ -411,4 +411,20 @@ public class AuthControllerTest {
 		assertEquals("The UserErrorResponse.message is expected to match the mocked message", "Mocked user not found exception", testResult.getMessage());
 	}
 
+	/**
+	 * This test case verifies proper functionality of the AuthController.handleUserCreationException()
+	 * A non-null UserErrorResponse is excepted to be returned. It should have a status of 409 and the correct message.
+	 * 
+	 * @author Wezley Singleton
+	 */
+	@Test
+	public void testHandleUserCreationException() {
+		UserCreationException mockedException = new UserCreationException("Mocked user creation exception");
+		
+		UserErrorResponse testResult = authController.handleUserCreationException(mockedException);
+		assertNotNull("The UserErrorResponse returned is expected to be not null", testResult);
+		assertEquals("The UserErrorResponse.status is expected to be a 409 (Conflict)", 409 , testResult.getStatus());
+		assertEquals("The UserErrorResponse.message is expected to match the mocked message", "Mocked user creation exception", testResult.getMessage());
+	}
+	
 }
