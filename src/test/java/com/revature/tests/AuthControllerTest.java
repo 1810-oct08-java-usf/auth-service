@@ -366,5 +366,21 @@ public class AuthControllerTest {
 		when(userService.findUserByUsername("mocked")).thenReturn(null);
 		authController.getUserByUsername("mocked");
 	}
+	
+	/**
+	 * This test case verifies proper functionality of the AuthController.getUserByUsername() method.
+	 * A non-null AppUser object is expected to be returned.
+	 * 
+	 * @author Wezley Singleton
+	 */
+	@Test
+	public void testGetUserByEmailWithValidEmail() {
+		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
+		when(userService.findUserByEmail("mocked@email.com")).thenReturn(expectedResult);
+		
+		AppUser testResult = authController.getUserByEmail("mocked@email.com");
+		assertNotNull("The AppUser returned is expected to be not null", testResult);
+		assertEquals("The AppUser returned is expected to match the mocked one", expectedResult, testResult); 
+	}
 
 }
