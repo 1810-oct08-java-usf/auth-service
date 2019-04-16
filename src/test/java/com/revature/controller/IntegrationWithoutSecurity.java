@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.revature;
+package com.revature.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -22,6 +22,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.revature.controller.AuthController;
+import com.revature.exceptions.UserNotFoundException;
 import com.revature.models.AppUser;
 import com.revature.service.UserService;
 
@@ -91,7 +92,7 @@ public class IntegrationWithoutSecurity {
 	public void deleteUserWhenNull() throws Exception{	
 		when(userService.findById(0)).thenReturn(null);
 		this.mockMvc.perform(delete(uri+"/id/0")
-				).andExpect(status().is4xxClientError());
+				).andExpect(status().isNotFound());
 		
 	}
 

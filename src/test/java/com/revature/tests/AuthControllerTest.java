@@ -58,19 +58,6 @@ public class AuthControllerTest {
 	}
 		
 	
-	/**
-	 * Tests Delete user functionality when userID is null.
-	 * @author Ankit Patel
-	 * @author Jaitee Pitts
-	 * @throws Exception
-	 */
-	@Test(expected = UserNotFoundException.class)  
-	public void testDeleteWIthNullId(){
-		when(userService.findById(0)).thenReturn(mockUser);
-		when(mockUser.getId()).thenReturn(null);
-		authControl.deleteUser(0);
-		
-	}
 	
 	/**
 	 *
@@ -99,8 +86,7 @@ public class AuthControllerTest {
 
 	@Test (expected = UserNotFoundException.class)
 	public void testDeleteUserIfUserDoesntExist() {
-		when(userService.findById(0)).thenReturn(mockUser);
-		when(mockUser.getId()).thenReturn(null);
+		when(userService.findById(0)).thenReturn(null);		
 		authControl.deleteUser(0);
 	}
 	
