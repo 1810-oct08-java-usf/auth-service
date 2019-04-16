@@ -107,13 +107,6 @@ public class UserServiceTest {
 	 * 
 	 *  Tests the findById() in UserService
 	 *  when the id is found in the database. 
-	 *  
-	 *  The following is how we can test this method in the future:
-	 *  
-	 * 	when(mockUserRepo.findById(47)).thenReturn(mockUser);
-	 *	when(mockOptUser.isPresent()).thenReturn(true); 
-	 * 	when(mockOptUser.get()).thenReturn(mockAppUser);
-	 * 	assertEquals(mockAppUser, testUserService.findById(47));
 	 */
 	
 	
