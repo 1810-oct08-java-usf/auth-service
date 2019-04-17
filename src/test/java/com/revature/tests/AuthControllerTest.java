@@ -42,10 +42,7 @@ public class AuthControllerTest {
 
 	@InjectMocks
 	private AuthController authController;
-	
-	
-	private String roleAdmin = "role_admin";
-	
+		
 	/**
 	 * makes a mock auth controller for each test methods.
 	 * @author Ankit Patel
