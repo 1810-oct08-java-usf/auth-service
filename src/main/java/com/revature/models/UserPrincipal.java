@@ -18,6 +18,8 @@ public class UserPrincipal extends User {
 
 	/**
 	 * Constructor UserPrincipal
+	 * Although the getters and setters aren't visible, 
+	 * you are still able to get the username and password because of the user superclass
 	 * 
 	 * @param appUser
 	 * @param username
