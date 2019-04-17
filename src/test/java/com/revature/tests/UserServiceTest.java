@@ -20,8 +20,6 @@ import com.revature.service.UserService;
 
 
 /** Test Suite for the UserService class. 
- *  May it please Zachary Marazita, the GitLord and Jose Rivera,
- *  our Master of Documentation.  
  *  Special thanks to Alonzo Muncy
  *	for his helpful explanations regarding the Unit Testing process.   
  *  

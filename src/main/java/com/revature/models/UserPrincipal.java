@@ -18,7 +18,7 @@ public class UserPrincipal extends User {
 
 	/**
 	 * Constructor UserPrincipal
-	 * @author StackOverflow
+	 * 
 	 * @param appUser
 	 * @param username
 	 * @param password

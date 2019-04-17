@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -17,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import com.revature.controller.AuthController;
 import com.revature.exceptions.UserNotFoundException;
 import com.revature.models.AppUser;
+import com.revature.models.UserPrincipal;
 import com.revature.service.UserService;
 /**
  * This class will be used to test methods in the AuthController. Testing will
@@ -37,20 +39,22 @@ public class AuthControllerTest {
 	@Mock
 	private AppUser mockUser;
 	@Mock
+	private UserPrincipal mockPrincipal;
+	@Mock
 	private AppUser backUser;
 	@Mock
 	private Authentication mockAuth;
-		
+
 	@InjectMocks
-	AuthController authControl;
+	private AuthController authController;
 	
 	
 	private String roleAdmin = "role_admin";
 	
 	/**
 	 * makes a mock auth controller for each test methods.
-	 * @author Ankit Patel
-	 * @author Jaitee Pitts
+	 * @author Ankit Patel (190107-Java-Spark-USF)
+	 * @author Jaitee Pitts (190107-Java-Spark-USF)
 	 */
 	@Before
 	public void setup() {
@@ -60,10 +64,10 @@ public class AuthControllerTest {
 	
 	
 	/**
-	 *
 	 * Test Delete user with good values.
-	 * @author Ankit Patel
-	 * @author Jaitee Pitts
+	 * 
+	 * @author Ankit Patel (190107-Java-Spark-USF)
+	 * @author Jaitee Pitts (190107-Java-Spark-USF)
 	 * @throws Exception 
 	 */
 	@Test
@@ -71,23 +75,22 @@ public class AuthControllerTest {
 		when(userService.findById(0)).thenReturn(mockUser);
 		when(mockUser.getId()).thenReturn(0);
 		when(userService.deleteUserById(0)).thenReturn(true);
-		authControl.deleteUser(0);
+		authController.deleteUser(0);
 		verify(userService, times(1)).deleteUserById(0);
 	}
 		
 
 	/**
 	 * Test if user object doesn't exist.
-	 * Fails with a Null Pointer Exception.
-	 * @author Ankit Patel
-	 * @author Jaitee Pitts
+	 * @author Ankit Patel (190107-Java-Spark-USF)
+	 * @author Jaitee Pitts (190107-Java-Spark-USF)
 	 * @throws UserNotFoundException
 	 */
 
 	@Test (expected = UserNotFoundException.class)
 	public void testDeleteUserIfUserDoesntExist() {
 		when(userService.findById(0)).thenReturn(null);		
-		authControl.deleteUser(0);
+		authController.deleteUser(0);
 	}
 	
 //-------------------------------------------------------------------------------------------------------
@@ -98,8 +101,8 @@ public class AuthControllerTest {
 	/**
 	 *  Tests if it updates successfully with given user.
 	 *  Please refactor the controller method to use already fetched user object.
-	 *  @author Ankit Patel
-	 * 	@author Jaitee Pitts
+	 *  @author Ankit Patel (190107-Java-Spark-USF)
+	 * 	@author Jaitee Pitts (190107-Java-Spark-USF)
 	 */
 	@Test
 	public void testUpdateUserWithValidInfo() {
@@ -122,7 +125,7 @@ public class AuthControllerTest {
 		when(userService.findById(mockUser.getId())).thenReturn(backUser);
 		when(userService.updateUser(mockUser)).thenReturn(true);
 		
-		authControl.updateUser(mockUser, mockAuth);
+		authController.updateUser(mockUser, mockAuth);
 		verify(userService, times(1)).updateUser(mockUser);
 		
 	}
@@ -130,8 +133,8 @@ public class AuthControllerTest {
 	/**
 	 * Tests update user 
 	 * where backend password is different from given password from front end.
-	 * @author Jaitee Pitts
-	 * @author Ankit Patel
+	 * @author Jaitee Pitts (190107-Java-Spark-USF)
+	 * @author Ankit Patel (190107-Java-Spark-USF)
 	 */
 	
 	@Test(expected = UserNotFoundException.class)
@@ -148,45 +151,35 @@ public class AuthControllerTest {
 		when(backUser.getPassword()).thenReturn("newPass");
 		
 		
-		authControl.updateUser(mockUser, mockAuth);
+		authController.updateUser(mockUser, mockAuth);
 		verify(userService, times(1)).updateUser(mockUser);
 		
 	}
+	//------------------------------
+	// New Update Tests
+	//------------------------------
 	
 
 	/**
-	 * Test if backend user has a different username then front end user.
-	 * Pretty sure this is impossible in actual implementation
-	 * backend user is fetched from the DB by the front end username 
-	 * there's no reason to check if they have the same username.
-	 * @author Jaitee Pitts
-	 * @author Ankit Patel
+	 * Current version of UpdateUser has complicated logic.
+	 * This test is written with Test Driven Development in mind
+	 * The rewritten version of update user should use this test as a guideline.
+	 * 
+	 * Ideally these checks would happen in the service layer,
+	 * however since they were originally in the controller this test is placed here.
+	 * 
+	 * @author Jaitee Pitts (190107-Java-Spark-USF)
 	 */
-	@Test(expected = UserNotFoundException.class)
-	public void testUpdateUserWithDifferentUsername() {
-		mockAuth.setAuthenticated(true);
-		
-		when(mockAuth.getPrincipal()).thenReturn("sally");
-		
-		when(userService.findUserByUsername(mockAuth.getPrincipal().toString())).thenReturn(backUser);
-		
-		when(mockUser.getRole()).thenReturn(roleAdmin);
-		when(mockUser.getPassword()).thenReturn("seashore newPass");
-		when(mockUser.getUsername()).thenReturn("sally");
-		
-		when(backUser.getPassword()).thenReturn("seashore");
-		when(backUser.getUsername()).thenReturn("NotSally");
-		
-		authControl.updateUser(mockUser, mockAuth);
-		verify(userService, times(1)).updateUser(mockUser);
+	@Ignore
+	public void testUpdateUser() throws Exception {
+		when(mockPrincipal.getAppUser()).thenReturn(mockUser)
 		
 	}
+	
+	//----------------------------------------------------------------
+	//----------------------------------------------------------------
 
-	@Mock
-	private AppUser mockAppUser;
 
-	@InjectMocks
-	private AuthController authController;
 
 	/**
 	 * This method will test if we can check if a email is in use. We will provide a
@@ -205,7 +198,7 @@ public class AuthControllerTest {
 		// Expected assert value, result should be true
 		String expected = "{\"emailIsInUse\": true}";
 
-		when(userService.findUserByEmail(email)).thenReturn(mockAppUser);
+		when(userService.findUserByEmail(email)).thenReturn(mockUser);
 		assertEquals(expected, authController.checkIfEmailIsInUse(email));
 	}
 
@@ -247,7 +240,7 @@ public class AuthControllerTest {
 		// Expected assert value, Username should not be available
 		String expected = "{\"usernameIsAvailable\":false}";
 
-		when(userService.findUserByUsername(username)).thenReturn(mockAppUser);
+		when(userService.findUserByUsername(username)).thenReturn(mockUser);
 		assertEquals(expected, authController.checkIfUsernameIsAvailable(username));
 	}
 
