@@ -237,8 +237,6 @@ public class AuthController {
 		AppUser user = userService.findById(id);
 		if (user == null)
 			throw new UserNotFoundException("User with id: " +id + "not found");
-		if (userService.findById(user.getId()) == null)
-			throw new UserNotFoundException("User with id: " + user.getId() + " not found");
 		if (!userService.deleteUserById(user.getId()))
 			throw new UserNotFoundException("User with id: " + user.getId() + " does not exist.");
 	}
