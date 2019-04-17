@@ -1,13 +1,13 @@
 package com.revature.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
-
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
@@ -237,4 +237,21 @@ public class UserServiceTest {
 		assertTrue("The expected result is true, meaning that the user was successfully deleted", testResult);
 	}
 	
+	/**
+	 * This test case verifies the proper functionality of the UserService.deleteUserById() method when a valid id
+	 * is provided to it. The expected result is that the UserRepository.delete() method is not called and that the
+	 * returned value is false.
+	 * 
+	 * @author Wezley Singleton
+	 */
+	@Test
+	public void testDeleteUserByIdInvalidId() {
+		AppUser mockedUser = null;
+		Optional<AppUser> mockedOptional = Optional.ofNullable(mockedUser);
+		when(mockRepo.findById(1)).thenReturn(mockedOptional);
+		
+		boolean testResult = userService.deleteUserById(1);
+		verify(mockRepo, times(0)).delete(mockedUser);
+		assertFalse("The expected result is false, meaning that no user was deleted", testResult);
+	}
 }
