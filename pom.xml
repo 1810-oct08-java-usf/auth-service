@@ -149,12 +149,10 @@
 					<append>true</append>
 					<excludes>
 						<exclude>com/revature/RpmAuthServiceApplication.class</exclude>
-						<exclude>com/revature/security/JwtConfig.class</exclude>
-						<exclude>com/revature/security/ZuulConfig.class</exclude>
-						<exclude>com/revature/security/UserDetailsServiceImpl.class</exclude>
-
+						
 						<exclude>com/revature/exceptions/*</exclude>
 						<exclude>com/revature/models/*</exclude>
+						<exclude>com/revature/security/*</exclude>
 						<exclude>com/revature/swagger/*</exclude>
 					</excludes>
 				</configuration>
