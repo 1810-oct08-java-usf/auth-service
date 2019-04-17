@@ -76,9 +76,10 @@ public class AuthController {
 	@GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public AppUser getUserById(@PathVariable int id) {
-		if (userService.findById(id) == null)
+		AppUser user = userService.findById(id);
+		if (user == null)
 			throw new UserNotFoundException("There is no user with that ID.");
-		return userService.findById(id);
+		return user;
 	}
 
 	/**
@@ -177,7 +178,7 @@ public class AuthController {
 	 * @throws UserNotFoundException
 	 */
 	@PreAuthorize("hasRole('ADMIN')")
-	@DeleteMapping(value = "/id/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@DeleteMapping(value = "/id/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteUser(@PathVariable int id) {
 		AppUser user = userService.findById(id);
@@ -193,7 +194,7 @@ public class AuthController {
 	 * @param unfe
 	 * @return This method will return an error of type UserErrorResponse
 	 */
-	@ExceptionHandler
+	@ExceptionHandler({UserNotFoundException.class})
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public UserErrorResponse handleUserNotFoundException(UserNotFoundException unfe) {
 		UserErrorResponse error = new UserErrorResponse();

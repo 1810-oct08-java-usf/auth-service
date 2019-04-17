@@ -128,20 +128,19 @@ public class UserServiceTest {
 	 * 	Tests the addUser() of the UserService
 	 * 	when the given user does not already exists
 	 * 	in the database. 
-	 * 
 	 */
 	@Test
 	public void testAddUserIfUserNotInDatabase() {
+//		mockup the mockAppUser's methods. 
 		when(mockUser.getUsername()).thenReturn("William");
-		when(userService.findUserByUsername("William"))
-		.thenReturn(null);
-		
+	
 		when(mockUser.getEmail()).thenReturn("William@gmail.com");
-		when(userService.findUserByEmail("William@gmail.com"))
-		.thenReturn(null);
-		
+
 		when(mockRepo.save(mockUser)).thenReturn(mockUser);
-		
+
+//		Now test the actual results of invocation. 
+//		Since there is no such user in the database,
+//		we should be returned the user that was added just now.  
 		assertEquals(mockUser, userService.addUser(mockUser));
 	}
 	
