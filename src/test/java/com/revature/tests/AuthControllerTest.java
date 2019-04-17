@@ -30,11 +30,6 @@ import com.revature.service.UserService;
  * be done using Junit to test different scenarios.
  * 
  * @RunWith(): Specifies that we will be using the MockitoJUnit runner class.
- * 
- * @author Ankit Patel (190107-java-spark-usf)
- * @author Jaitee Pitts (190107-java-spark-usf)
- * @author Jose Rivera (190107-Java-Spark-USF)
- * @author Christopher Shanor (190107-Java-Spark-USF)
  */
 @RunWith(MockitoJUnitRunner.class)
 public class AuthControllerTest {
@@ -273,53 +268,49 @@ public class AuthControllerTest {
 		assertEquals("The AppUser returned is expected to match the mocked one", expectedResult, testResult);
 	}
 	
-	// TODO More test cases need to be written for AuthController.updateUser() so that the scheduled refactoring can be done.
+	// TODO Test cases need to be written for AuthController.updateUser() so that the scheduled refactoring can be done.
 		
 	
 	/**
-	 * Tests Delete user functionality when userID is null.
-	 * @author Ankit Patel
-	 * @author Jaitee Pitts
-	 * @throws Exception
-	 */
-	@Test(expected = UserNotFoundException.class)  
-	public void testDeleteWithInvalidId(){
-		when(userService.findById(0)).thenReturn(mockUser);
-		when(mockUser.getId()).thenReturn(null);
-		authController.deleteUser(0);
-		
-	}
-	
-	/**
-	 *
-	 * Test Delete user with good values.
-	 * @author Ankit Patel
-	 * @author Jaitee Pitts
-	 * @throws Exception 
+	 * This test case verifies the proper functionality of the AuthController.deleteUser() method when a valid id
+	 * is provided to it. The expected result is
+	 * 
+	 * @author Wezley Singleton
 	 */
 	@Test
-	public void testDeleteUserIfUserExist() throws Exception {
-		when(userService.findById(0)).thenReturn(mockUser);
-		when(mockUser.getId()).thenReturn(0);
-		when(userService.deleteUserById(0)).thenReturn(true);
-		authController.deleteUser(0);
-		verify(userService, times(1)).deleteUserById(0);
+	public void testDeleteWithValidId() {
+		AppUser mockedPersistentUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "ROLE_USER");
+		when(userService.findById(1)).thenReturn(mockedPersistentUser);
+		when(userService.deleteUserById(1)).thenReturn(true);
+		authController.deleteUser(1);
+		verify(userService, times(1)).deleteUserById(1);
 	}
-		
-
+	
 	/**
-	 * Test if user object doesn't exist.
-	 * Fails with a Null Pointer Exception.
-	 * @author Ankit Patel
-	 * @author Jaitee Pitts
-	 * @throws UserNotFoundException
+	 * This test case verifies the proper functionality of the AuthController.deleteUser() method when a invalid id
+	 * is provided to it. The expected result is for the method to throw a UserNotFoundException.
+	 * 
+	 * @author Wezley Singleton
 	 */
-
-	@Test (expected = UserNotFoundException.class)
-	public void testDeleteUserIfUserDoesntExist() {
-		when(userService.findById(0)).thenReturn(mockUser);
-		when(mockUser.getId()).thenReturn(null);
+	@Test(expected=UserNotFoundException.class)  
+	public void testDeleteWithInvalidId() {
+		when(userService.findById(0)).thenReturn(null);
 		authController.deleteUser(0);
+	}
+	
+	/**
+	 * This test case verifies the proper functionality of the AuthController.deleteUser() method when a invalid id
+	 * is provided to it. The expected result is for the method to throw a UserNotFoundException.
+	 * 
+	 * @author Wezley Singleton
+	 */
+	@Test(expected=UserNotFoundException.class)  
+	public void testDeleteWhenServiceReturnsFalse() {
+		AppUser mockedPersistentUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "ROLE_USER");
+		when(userService.findById(1)).thenReturn(mockedPersistentUser);
+		when(userService.deleteUserById(1)).thenReturn(false);
+		authController.deleteUser(1);
+		verify(userService, times(0)).deleteUserById(1);
 	}
 	
 	/**
