@@ -19,9 +19,9 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<spring-cloud.version>Greenwich.M3</spring-cloud.version>
-		
-	</properties>	
-		
+
+	</properties>
+
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -43,76 +43,86 @@
 	</dependencyManagement>
 
 	<dependencies>
+
+		<!-- Security Dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
 			<version>0.9.0</version>
 		</dependency>
+
+		<!-- Spring Boot/Cloud Dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
+
 		<dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
-        </dependency>
-<!--         <dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-actuator</artifactId>
-		</dependency> -->
-        <dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!-- Database Dependencies -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
+		<!-- Swagger Documentation Dependencies -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-test</artifactId>
-		    <version>2.1.1.RELEASE</version>
-		    <scope>test</scope>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-test -->
-<dependency>
-    <groupId>org.springframework.security</groupId>
-    <artifactId>spring-security-test</artifactId>
-    <version>4.0.4.RELEASE</version>
-    <scope>test</scope>
-</dependency>
-		
-		
-		<dependency>
-    		<groupId>org.springframework.cloud</groupId>
-    		<artifactId>spring-cloud-contract-wiremock</artifactId>
-    		<version>2.0.2.RELEASE</version>
-    		<scope>test</scope>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.4.0</version>
 		</dependency>
 
 		<dependency>
-	      <groupId>io.springfox</groupId>
-	      <artifactId>springfox-swagger2</artifactId>
-	      <version>2.4.0</version>
-	    </dependency>
-	     <dependency>
-	      <groupId>io.springfox</groupId>
-	      <artifactId>springfox-swagger-ui</artifactId>
-	      <version>2.4.0</version>
-	    </dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+
+		<!-- Testing Dependencies -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-contract-wiremock</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>
@@ -133,10 +143,20 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.6.201602180812</version>
+				<version>0.8.2</version>
 				<configuration>
 					<destFile>${sonar.jacoco.reportPath}</destFile>
 					<append>true</append>
+					<excludes>
+						<exclude>com/revature/RpmAuthServiceApplication.class</exclude>
+						<exclude>com/revature/security/JwtConfig.class</exclude>
+						<exclude>com/revature/security/ZuulConfig.class</exclude>
+						<exclude>com/revature/security/UserDetailsServiceImpl.class</exclude>
+
+						<exclude>com/revature/exceptions/*</exclude>
+						<exclude>com/revature/models/*</exclude>
+						<exclude>com/revature/swagger/*</exclude>
+					</excludes>
 				</configuration>
 				<executions>
 					<execution>
@@ -146,18 +166,18 @@
 						</goals>
 					</execution>
 					<execution>
-					  <id>jacoco-site</id>
-					  <phase>verify</phase>
-					  <goals>
-					    <goal>report</goal>
-					  </goals>
+						<id>jacoco-site</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
 	</build>
-	
-	
+
+
 
 	<repositories>
 		<repository>
