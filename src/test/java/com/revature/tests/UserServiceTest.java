@@ -221,7 +221,9 @@ public class UserServiceTest {
 	}
 	
 	/**
-	 * Description coming soon.
+	 * This test case verifies the proper functionality of the UserService.deleteUserById() method when a valid id
+	 * is provided to it. The expected result is that the UserRepository.delete() method is called once and that the
+	 * returned value is true.
 	 * 
 	 * @author Wezley Singleton
 	 */
