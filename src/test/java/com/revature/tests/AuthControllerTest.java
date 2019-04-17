@@ -270,7 +270,7 @@ public class AuthControllerTest {
 	
 	/**
 	 * This test case verifies the proper functionality of the AuthController.deleteUser() method when a valid id
-	 * is provided to it. The expected result is
+	 * is provided to it. The expected result is that the UserService.deleteUserById() method is called once.
 	 * 
 	 * @author Wezley Singleton
 	 */
