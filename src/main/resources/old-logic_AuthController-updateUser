@@ -1,0 +1,57 @@
+Below is the logic previous contained within AuthController.updateUser(). This code should only be used a reference, the logic is unnecessarily 
+complex and needs to be simplified. 
+
+
+AppUser backEndUser = userService.findUserByUsername(auth.getPrincipal().toString());
+
+String[] byPassPassword = new String[2];
+if(!frontEndUser.getRole().toLowerCase().equals("role_admin") && !frontEndUser.getRole().toLowerCase().equals("role_user")) {
+	byPassPassword = frontEndUser.getRole().split(" ");
+	if(byPassPassword[1].toLowerCase().equals("special")) {
+		if(byPassPassword[0].toLowerCase().equals("role_admin")) {
+			frontEndUser.setRole("ROLE_ADMIN");
+		} else if(byPassPassword[0].toLowerCase().equals("role_user")) {
+			frontEndUser.setRole("ROLE_USER");
+		}
+		if (!userService.updateUser(frontEndUser)) {
+			throw new UserNotFoundException("User with id: " + frontEndUser.getId() + "not found");
+		}
+		return frontEndUser;
+	}
+	else {
+		throw new UserNotFoundException("The keyword is incorrect or missing");
+	}
+}
+
+String[] passwords = frontEndUser.getPassword().split(" ");
+if(passwords[0].equals(backEndUser.getPassword())) {
+	frontEndUser.setPassword(passwords[1]);
+} else {
+	throw new UserNotFoundException("Password is wrong");
+}
+if (!backEndUser.getUsername().equals(frontEndUser.getUsername())) {
+	throw new UserNotFoundException("Username cannot be changed.");
+}
+if (frontEndUser.getEmail() == null) {
+	frontEndUser.setEmail(backEndUser.getEmail());
+}
+if (frontEndUser.getFirstName() == null) {
+	frontEndUser.setFirstName(backEndUser.getFirstName());
+}
+if (frontEndUser.getLastName() == null) {
+	frontEndUser.setLastName(backEndUser.getLastName());
+}
+/*	This function will be used when updating password for the separate form to just update passwords.
+ * if (frontEndUser.getPassword() == null) {
+	frontEndUser.setPassword(backEndUser.getPassword());
+}*/
+if (frontEndUser.getId() == null) {
+	throw new UserNotFoundException("Id cannot be null!");
+}
+if (userService.findById(frontEndUser.getId()) == null) {
+	throw new UserNotFoundException("User with id: " + frontEndUser.getId() + " not found");
+}
+if (!userService.updateUser(frontEndUser)) {
+	throw new UserNotFoundException("User with id: " + frontEndUser.getId() + "not found");
+}
+return frontEndUser;

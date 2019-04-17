@@ -14,6 +14,8 @@ import com.revature.exceptions.UserCreationException;
 import com.revature.models.AppUser;
 import com.revature.service.UserService;
 
+// TODO Merge this logic into the existing AuthControllerTest suite.
+
 @RunWith(MockitoJUnitRunner.class)
 public class TestRegisterUser {
 	

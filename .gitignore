@@ -101,3 +101,8 @@ target/
 # config files (bootstrap.yml will stay on repo, but no need to update it)
 bootstrap.yml
 application.yml
+
+# .attach files
+.attach*
+@
+# Attach files
