@@ -1,7 +1,13 @@
 package com.revature.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -19,121 +25,73 @@ import com.revature.service.UserService;
 
 
 
-/** Test Suite for the UserService class. 
- *  May it please Zachary Marazita, the GitLord and Jose Rivera,
- *  our Master of Documentation.  
- *  Special thanks to Alonzo Muncy
- *	for his helpful explanations regarding the Unit Testing process.   
- *  
- * @author Brandon Morris (190107 Java-Spark-USF) 2019-04-09
- *  
+/** 
+ * Test Suite for the UserService class.  
  */
 @SpringBootTest
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
+	
+	@Mock UserRepository mockRepo;  
+	
+	@Mock AppUser mockUser;
 
-	/*
-	 * Required Mocks for this class are:
-	 * 	UserRepository
-	 */
-	
-	@Mock 
-	UserRepository mockUserRepo;  
-	
-	@Mock
-	AppUser mockAppUser;
+	@Mock List<AppUser> mockUserList;
 
-	@Mock
-	List<AppUser> mockUserList;
-	
-	
-	/*	NOTICE: 
-	 * 	this version of Mockito does not allow
-	 * 	for mocking of final classes such as the 
-	 * 	Optional<AppUser> mockOptUser;
-	 * 
-	 */	
-	
-	
-	
-	/* When making a test suite,
-	 *  1) Create Mock Dependencies 
-	 *  2) Inject these into the class
-	 *  	 that you are testing. 
-	 */
 	@InjectMocks
-	UserService testUserService;
-	
-	
-	//-------------------------------------------------------------------
-	
-	/* Tests Needed for findAllUsers() 
-	 * 1) Simple check for the proper calling of the repo.findAll()
-	 *  
-	 * Mocks
-	 * List<AppUser> userList;
-	 */
-	
-	/** Simple test for UserService.findAllUsers() 
+	UserService userService;
+
+	/** 
+	 *  Simple test for UserService.findAllUsers() 
 	 * 	Test that the repo method findAll() is called and
 	 * 	returns a list of users.  	
 	 */
 	@Test
 	public void testFindAllUsers() {
-		when(mockUserRepo.findAll()).thenReturn(mockUserList);
-		assertEquals(testUserService.findAllUsers(), mockUserList);
+		when(mockRepo.findAll()).thenReturn(mockUserList);
+		assertEquals(userService.findAllUsers(), mockUserList);
 	}
-
-	//-------------------------------------------------------------------
 	
-	/*
-	 * Tests Needed for findById()
-	 * 	1) If id found in db
-	 * 	2) If id not found in db
-	 *  
-	 *  Mocks for findById() Optional<AppUser> optUser;
-	 *  
-	 */
-	
-
-	/** TODO: Not Testable with this version Mockito!
-	 * 	If we want to test this method, we need to
-	 * 	create a wrapper class for the Optional
-	 * 	because the version of Mockito presently in use
-	 * 	does not support mocking of Final Classes 
-	 * 	such as Optional. 
+	/**
+	 * This test case verifies proper functionality of the UserService.findById() method.
+	 * A non-null AppUser object is expected to be returned.
 	 * 
-	 *  Tests the findById() in UserService
-	 *  when the id is found in the database. 
-	 *  
-	 *  The following is how we can test this method in the future:
-	 *  
-	 * 	when(mockUserRepo.findById(47)).thenReturn(mockUser);
-	 *	when(mockOptUser.isPresent()).thenReturn(true); 
-	 * 	when(mockOptUser.get()).thenReturn(mockAppUser);
-	 * 	assertEquals(mockAppUser, testUserService.findById(47));
+	 * @author Wezley Singleton
 	 */
+	@Test
+	public void testFindUserByIdWithValidId() {
+		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
+		Optional<AppUser> mockedOptional = Optional.of(expectedResult);
+		when(mockRepo.findById(1)).thenReturn(mockedOptional);
 	
+		AppUser testResult = userService.findById(1);
+		assertNotNull("The AppUser returned should not be a null value", testResult);
+		assertEquals("The AppUser returned should match the mocked one", expectedResult, testResult);
+	}
 	
-	
-	//-------------------------------------------------------------------
-	
-	/*
-	 * Tests Needed for findUserByUsername()
-	 * 1) If the username is found. 
-	 * 2) If the username is not found. 
+	/**
+	 * This test case verifies proper functionality of the AuthController.UserService.findById() method when it is given an invalid id.
+	 * A null AppUser object is expected to be returned from the service, which will cause a UserNotFoundException to be thrown.
 	 * 
+	 * @author Wezley Singleton
 	 */
+	@Test
+	public void testFindUserByIdWithInvalidId() {
+		Optional<AppUser> mockedOptional = Optional.ofNullable(null);
+		when(mockRepo.findById(1)).thenReturn(mockedOptional);
 	
+		AppUser testResult = userService.findById(1);
+		assertNull("The AppUser returned should be a null value", testResult);
+	}
 	
 	/**
 	 * Test for UserService.findUserByUsername()
 	 * When the given username is found in the database. 
 	 */
 	@Test
-	public void testFindUserByUsernameIfUsernameIsFound() {
-		when(mockUserRepo.findUserByUsername("wShatner")).thenReturn(mockAppUser);
-		assertEquals(mockAppUser, testUserService.findUserByUsername("wShatner"));
+	public void testFindUserByUsernameValidUsername() {
+		when(mockRepo.findUserByUsername("wShatner")).thenReturn(mockUser);
+		assertEquals(mockUser, userService.findUserByUsername("wShatner"));
 	}
 	
 	/**
@@ -141,27 +99,19 @@ public class UserServiceTest {
 	 * When the given username is not found in the database. 
 	 */
 	@Test
-	public void testFindUserByUsernameIfUsernameIsNotFound() {
-		when(mockUserRepo.findUserByUsername("wShatner")).thenReturn(null);
-		assertEquals(null, testUserService.findUserByUsername("wShatner"));
+	public void testFindUserByUsernameInvalidUsername() {
+		when(mockRepo.findUserByUsername("wShatner")).thenReturn(null);
+		assertEquals(null, userService.findUserByUsername("wShatner"));
 	}
-	
-	//-------------------------------------------------------------------
-	
-	/*
-	 * Tests Needed for findUserByEmail
-	 * 1) Found in database
-	 * 2) Not Found in database
-	 */
 	
 	/**
 	 * 	Tests behavior of UserService's findUserByEmail()
 	 * 	when the user is found in the database.  
 	 */
 	@Test
-	public void testFindUserByEmailIfEmailIsFound() {
-		when(mockUserRepo.findUserByEmail("wshatner@gmail.com")).thenReturn(mockAppUser);
-		assertEquals(mockAppUser, testUserService.findUserByEmail("wshatner@gmail.com"));
+	public void testFindUserByEmailValidEmail() {
+		when(mockRepo.findUserByEmail("wshatner@gmail.com")).thenReturn(mockUser);
+		assertEquals(mockUser, userService.findUserByEmail("wshatner@gmail.com"));
 	}
 	
 	/**
@@ -169,33 +119,10 @@ public class UserServiceTest {
 	 *	when the user is NOT found in the database. 
 	 */
 	@Test
-	public void testFindUserByEmailIfEmailIsNotFound() {
-		when(mockUserRepo.findUserByEmail("wshatner@gmail.com")).thenReturn(null);
-		assertEquals(null, testUserService.findUserByEmail("wshatner@gmail.com"));
+	public void testFindUserByEmailInvalidEmail() {
+		when(mockRepo.findUserByEmail("wshatner@gmail.com")).thenReturn(null);
+		assertEquals(null, userService.findUserByEmail("wshatner@gmail.com"));
 	}
-	
-
-	
-	//-------------------------------------------------------------------
-	
-	/*
-	 * Tests Needed for addUser()
-	 *  testAddUserIfNewUserIsNull()
-	 *  testAddUserIfUserAlreadyExists()
-	 *  testAddUserIfEmailAlreadyExists()
-	 *  
-	 *  Three conditions to test for: 
-	 *  1) if tempUser is null after findUserByUsername() is invoked. 
-	 *  2) if tempUser is null after findUserByEmail() is invoked. 
-	 *  3) normal behavior. 
-	 * 		Ie. test that addUser() will 
-	 *  	return the result of repo.save(newUser)
-	 *    
-	 *  Mocks for addUser(): 
-	 *  AppUser mockAppUser;
-	 *    
-	 */
-	
 	
 	/**
 	 * 	Tests the addUser() of the UserService
@@ -205,17 +132,17 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void testAddUserIfUserNotInDatabase() {
-		when(mockAppUser.getUsername()).thenReturn("William");
-		when(testUserService.findUserByUsername("William"))
+		when(mockUser.getUsername()).thenReturn("William");
+		when(userService.findUserByUsername("William"))
 		.thenReturn(null);
 		
-		when(mockAppUser.getEmail()).thenReturn("William@gmail.com");
-		when(testUserService.findUserByEmail("William@gmail.com"))
+		when(mockUser.getEmail()).thenReturn("William@gmail.com");
+		when(userService.findUserByEmail("William@gmail.com"))
 		.thenReturn(null);
 		
-		when(mockUserRepo.save(mockAppUser)).thenReturn(mockAppUser);
+		when(mockRepo.save(mockUser)).thenReturn(mockUser);
 		
-		assertEquals(mockAppUser, testUserService.addUser(mockAppUser));
+		assertEquals(mockUser, userService.addUser(mockUser));
 	}
 	
 	
@@ -234,11 +161,11 @@ public class UserServiceTest {
 	 */ 
 	@Test
 	public void testAddUserIfUsernameAlreadyExists() {
-		when(testUserService.findUserByUsername("William"))
-		.thenReturn(mockAppUser);
-		when(mockAppUser.getUsername()).thenReturn("William"); 
+		when(userService.findUserByUsername("William"))
+		.thenReturn(mockUser);
+		when(mockUser.getUsername()).thenReturn("William"); 
 		
-		assertEquals(null, testUserService.addUser(mockAppUser));
+		assertEquals(null, userService.addUser(mockUser));
 	}
 	
 	
@@ -266,28 +193,21 @@ public class UserServiceTest {
 	@Test
 	public void testAddUserIfEmailAlreadyExists() {
 	
-		when(mockAppUser.getEmail()).thenReturn("William@gmail.com");
-		when(testUserService.findUserByEmail("William@gmail.com"))
-		.thenReturn(mockAppUser);
+		when(mockUser.getEmail()).thenReturn("William@gmail.com");
+		when(userService.findUserByEmail("William@gmail.com"))
+		.thenReturn(mockUser);
 		
 		
-		assertEquals(null, testUserService.addUser(mockAppUser));
+		assertEquals(null, userService.addUser(mockUser));
 	}
-	
-	//-------------------------------------------------------------------
-	
-	/*
-	 * Tests Needed for updateUser()
-	 * 1) if the passed in user is null
-	 * 2) if the passed in user if valid
-	 */
+
 	/**
 	 * Test UserService's updateUser()
 	 * when passed a null value. 
 	 */
 	@Test
 	public void testUpdateUserNull() {
-		assertEquals(false, testUserService.updateUser(null));
+		assertEquals(false, userService.updateUser(null));
 	}
 	
 	/**
@@ -296,41 +216,23 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void testUpdateUserValid() {
-		when(mockUserRepo.save(mockAppUser)).thenReturn(mockAppUser);
-		assertEquals(true, testUserService.updateUser(mockAppUser));
+		when(mockRepo.save(mockUser)).thenReturn(mockUser);
+		assertEquals(true, userService.updateUser(mockUser));
 	}
-
+	
 	/**
-	 * This test case verifies proper functionality of the UserService.findById() method.
-	 * A non-null AppUser object is expected to be returned.
+	 * Description coming soon.
 	 * 
 	 * @author Wezley Singleton
 	 */
 	@Test
-	public void testFindUserByIdWithValidId() {
-		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
-		Optional<AppUser> mockedOptional = Optional.of(expectedResult);
-		when(mockUserRepo.findById(1)).thenReturn(mockedOptional);
-	
-		AppUser testResult = testUserService.findById(1);
-		assertNotNull("The AppUser returned should not be a null value", testResult);
-		assertEquals("The AppUser returned should match the mocked one", expectedResult, testResult);
+	public void testDeleteUserByIdValidId() {
+		AppUser mockedUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
+		Optional<AppUser> mockedOptional = Optional.of(mockedUser);
+		when(mockRepo.findById(1)).thenReturn(mockedOptional);
+		boolean testResult = userService.deleteUserById(1);
+		verify(mockRepo, times(1)).delete(mockedUser);
+		assertTrue("The expected result is true, meaning that the user was successfully deleted", testResult);
 	}
 	
-
-	
-	/**
-	 * This test case verifies proper functionality of the AuthController.UserService.findById() method when it is given an invalid id.
-	 * A null AppUser object is expected to be returned from the service, which will cause a UserNotFoundException to be thrown.
-	 * 
-	 * @author Wezley Singleton
-	 */
-	@Test
-	public void testFindUserByIdWithInvalidId() {
-		Optional<AppUser> mockedOptional = Optional.ofNullable(null);
-		when(mockUserRepo.findById(1)).thenReturn(mockedOptional);
-	
-		AppUser testResult = testUserService.findById(1);
-		assertNull("The AppUser returned should be a null value", testResult);
-	}
 }
