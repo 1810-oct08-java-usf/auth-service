@@ -23,6 +23,8 @@ import com.revature.controller.AuthController;
 import com.revature.exceptions.UserCreationException;
 import com.revature.exceptions.UserNotFoundException;
 import com.revature.models.AppUser;
+
+import com.revature.models.UserPrincipal;
 import com.revature.models.UserErrorResponse;
 import com.revature.service.UserService;
 /**
@@ -34,9 +36,22 @@ import com.revature.service.UserService;
 @RunWith(MockitoJUnitRunner.class)
 public class AuthControllerTest {
 
+
+	@Mock
+	private UserService userService;
+	@Mock
+	private AppUser mockUser;
+	@Mock
+	private UserPrincipal mockPrincipal;
+	@Mock
+	private AppUser backUser;
+  
 	@Mock private UserService userService;
-	
+
 	@Mock private AppUser mockUser;
+	
+	private String roleAdmin = "role_admin";
+	private String password = "valid";
 	
 	@Mock private Authentication mockAuth;
 
@@ -45,8 +60,8 @@ public class AuthControllerTest {
 		
 	/**
 	 * makes a mock auth controller for each test methods.
-	 * @author Ankit Patel
-	 * @author Jaitee Pitts
+	 * @author Ankit Patel (190107-Java-Spark-USF)
+	 * @author Jaitee Pitts (190107-Java-Spark-USF)
 	 */
 	@Before
 	public void setup() {
@@ -54,6 +69,7 @@ public class AuthControllerTest {
 	}
 	
 	/**
+
 	 * This test case verifies proper functionality of the AuthController.getAllUsers() method.
 	 * A non-null ArrayList of AppUser objects with a size of one is expected to be returned.
 	 * 
@@ -109,8 +125,7 @@ public class AuthControllerTest {
 	@Test
 	public void testGetUserByUsernameWithValidUsername() {
 		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
-		when(userService.findUserByUsername("mocked")).thenReturn(expectedResult);
-		
+		when(userService.findUserByUsername("mocked")).thenReturn(expectedResult);		
 		AppUser testResult = authController.getUserByUsername("mocked");
 		assertNotNull("The AppUser returned is expected to be not null", testResult);
 		assertEquals("The AppUser returned is expected to match the mocked one", expectedResult, testResult); 
@@ -143,6 +158,9 @@ public class AuthControllerTest {
 		assertNotNull("The AppUser returned is expected to be not null", testResult);
 		assertEquals("The AppUser returned is expected to match the mocked one", expectedResult, testResult); 
 	}
+	//------------------------------
+	// New Update Tests
+	//------------------------------
 	
 	/**
 	 * This test case verifies proper functionality of the AuthController.getUserByEmail() method.
@@ -155,7 +173,6 @@ public class AuthControllerTest {
 		when(userService.findUserByEmail("mocked@email.com")).thenReturn(null);
 		authController.getUserByEmail("mocked@email.com");
 	}
-	
 	/**
 	 * This method will test if we can check if a email is in use. We will provide a
 	 * valid email, and we will us an assert to check if the controller will return

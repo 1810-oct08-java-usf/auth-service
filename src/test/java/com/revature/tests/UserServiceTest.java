@@ -25,7 +25,12 @@ import com.revature.service.UserService;
 
 
 
-/** 
+/** Test Suite for the UserService class. 
+ *  Special thanks to Alonzo Muncy
+ *	for his helpful explanations regarding the Unit Testing process.   
+ *  
+ * @author Brandon Morris (190107 Java-Spark-USF) 2019-04-09
+ *  
  * Test Suite for the UserService class.  
  */
 @SpringBootTest
