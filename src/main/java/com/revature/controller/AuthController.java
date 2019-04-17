@@ -157,64 +157,14 @@ public class AuthController {
 	 * @return null if any of the fields are blank
 	 * @throws UserNotFoundException
 	 */
-	// TODO This method is scheduled for complete refactoring to simplify the logic.
 	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public AppUser updateUser(@RequestBody AppUser frontEndUser, Authentication auth) {
-
-		AppUser backEndUser = userService.findUserByUsername(auth.getPrincipal().toString());
-
-		String[] byPassPassword = new String[2];
-		if(!frontEndUser.getRole().toLowerCase().equals("role_admin") && !frontEndUser.getRole().toLowerCase().equals("role_user")) {
-			byPassPassword = frontEndUser.getRole().split(" ");
-			if(byPassPassword[1].toLowerCase().equals("special")) {
-				if(byPassPassword[0].toLowerCase().equals("role_admin")) {
-					frontEndUser.setRole("ROLE_ADMIN");
-				} else if(byPassPassword[0].toLowerCase().equals("role_user")) {
-					frontEndUser.setRole("ROLE_USER");
-				}
-				if (!userService.updateUser(frontEndUser)) {
-					throw new UserNotFoundException("User with id: " + frontEndUser.getId() + "not found");
-				}
-				return frontEndUser;
-			}
-			else {
-				throw new UserNotFoundException("The keyword is incorrect or missing");
-			}
-		}
 		
-		String[] passwords = frontEndUser.getPassword().split(" ");
-		if(passwords[0].equals(backEndUser.getPassword())) {
-			frontEndUser.setPassword(passwords[1]);
-		} else {
-			throw new UserNotFoundException("Password is wrong");
-		}
-		if (!backEndUser.getUsername().equals(frontEndUser.getUsername())) {
-			throw new UserNotFoundException("Username cannot be changed.");
-		}
-		if (frontEndUser.getEmail() == null) {
-			frontEndUser.setEmail(backEndUser.getEmail());
-		}
-		if (frontEndUser.getFirstName() == null) {
-			frontEndUser.setFirstName(backEndUser.getFirstName());
-		}
-		if (frontEndUser.getLastName() == null) {
-			frontEndUser.setLastName(backEndUser.getLastName());
-		}
-		/*	This function will be used when updating password for the separate form to just update passwords.
-		 * if (frontEndUser.getPassword() == null) {
-			frontEndUser.setPassword(backEndUser.getPassword());
-		}*/
-		if (frontEndUser.getId() == null) {
-			throw new UserNotFoundException("Id cannot be null!");
-		}
-		if (userService.findById(frontEndUser.getId()) == null) {
-			throw new UserNotFoundException("User with id: " + frontEndUser.getId() + " not found");
-		}
-		if (!userService.updateUser(frontEndUser)) {
-			throw new UserNotFoundException("User with id: " + frontEndUser.getId() + "not found");
-		}
-		return frontEndUser;
+		// TODO This method is scheduled for complete refactoring to simplify the logic.
+		
+		// Previous logic can be found in src/main/resources/old-logic_AuthController-updateUser
+		throw new UnsupportedOperationException();
 	}
 	
 	
@@ -231,10 +181,8 @@ public class AuthController {
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteUser(@PathVariable int id) {
 		AppUser user = userService.findById(id);
-		if (user.getId() == null)
-			throw new UserNotFoundException("Id cannot be null!");
-		if (userService.findById(user.getId()) == null)
-			throw new UserNotFoundException("User with id: " + user.getId() + " not found");
+		if (user == null)
+			throw new UserNotFoundException("User with id: " + id + " not found");
 		if (!userService.deleteUserById(user.getId()))
 			throw new UserNotFoundException("User with id: " + user.getId() + " does not exist.");
 	}
