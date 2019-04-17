@@ -50,6 +50,7 @@ public class AuthControllerTest {
 	
 	
 	private String roleAdmin = "role_admin";
+	private String password = "valid";
 	
 	/**
 	 * makes a mock auth controller for each test methods.
@@ -172,11 +173,66 @@ public class AuthControllerTest {
 	 */
 	@Ignore
 	public void testUpdateUser() throws Exception {
-		when(mockPrincipal.getAppUser()).thenReturn(mockUser)
+		
+		mockAuth.setAuthenticated(true);
+		
+		//assuming front end is refactored to send a userPrincipal
+		when(mockPrincipal.getAppUser()).thenReturn(mockUser);
+		when(userService.findUserByUsername(mockPrincipal.getUsername())).thenReturn(backUser);
+		
+		//checking that principal gave a valid password
+		when(backUser.getPassword()).thenReturn(password);
+		when(mockPrincipal.getPassword()).thenReturn(password);
+		
+		//commented out because it's incompatible with current method
+//		authController.updateUser(mockPrincipal, mockAuth);
+		
+	}
+	
+	/**
+	 * This tests that if the client gave us an incorrect password,
+	 * it does not update and returns a status of 401.
+	 * 
+	 * @author Jaitee Pitts (190107-Java-Spark-USF)
+	 */
+	@Ignore
+	public void testUpdateUserWithIncorrectPassword() throws Exception {
+		mockAuth.setAuthenticated(true);
+
+		when(mockPrincipal.getAppUser()).thenReturn(mockUser);
+		when(userService.findUserByUsername(mockPrincipal.getUsername())).thenReturn(backUser);
+		
+		//checking that principal gave a valid password
+		when(backUser.getPassword()).thenReturn(password);
+		when(mockPrincipal.getPassword()).thenReturn("invalid");
+		
+		
+		//commented out because it's incompatible with current method
+//		authController.updateUser(mockPrincipal, mockAuth);
+		
+	}
+	
+	/**
+	 * This tests that if the client gave us an incorrect username,
+	 * it does not update and throws and exception.
+	 * 
+	 * @author Jaitee Pitts (190107-Java-Spark-USF)
+	 */
+	@Ignore
+	public void testUpdateUserWhenNull() throws Exception {
+		mockAuth.setAuthenticated(true);
+
+		when(mockPrincipal.getAppUser()).thenReturn(mockUser);
+		when(userService.findUserByUsername(mockPrincipal.getUsername())).thenReturn(null);
+		
+		
+		//commented out because it's incompatible with current method
+//		authController.updateUser(mockPrincipal, mockAuth);
 		
 	}
 	
 	//----------------------------------------------------------------
+	//                   Testing checking methods
 	//----------------------------------------------------------------
 
 
