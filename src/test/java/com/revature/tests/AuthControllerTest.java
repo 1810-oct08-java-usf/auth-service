@@ -42,7 +42,7 @@ public class AuthControllerTest {
 	private Authentication mockAuth;
 		
 	@InjectMocks
-	AuthController authControl;
+	private AuthController authControl;
 	
 	
 	private String roleAdmin = "role_admin";
@@ -182,11 +182,6 @@ public class AuthControllerTest {
 		
 	}
 
-	@Mock
-	private AppUser mockAppUser;
-
-	@InjectMocks
-	private AuthController authController;
 
 	/**
 	 * This method will test if we can check if a email is in use. We will provide a
@@ -205,7 +200,7 @@ public class AuthControllerTest {
 		// Expected assert value, result should be true
 		String expected = "{\"emailIsInUse\": true}";
 
-		when(userService.findUserByEmail(email)).thenReturn(mockAppUser);
+		when(userService.findUserByEmail(email)).thenReturn(mockUser);
 		assertEquals(expected, authController.checkIfEmailIsInUse(email));
 	}
 
@@ -247,7 +242,7 @@ public class AuthControllerTest {
 		// Expected assert value, Username should not be available
 		String expected = "{\"usernameIsAvailable\":false}";
 
-		when(userService.findUserByUsername(username)).thenReturn(mockAppUser);
+		when(userService.findUserByUsername(username)).thenReturn(mockUser);
 		assertEquals(expected, authController.checkIfUsernameIsAvailable(username));
 	}
 
