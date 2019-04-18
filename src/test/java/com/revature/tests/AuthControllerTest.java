@@ -42,21 +42,19 @@ public class AuthControllerTest {
 	@Mock
 	private AppUser mockUser;
 	@Mock
+	private AppUser backUser;
+	@Mock
 	private UserPrincipal mockPrincipal;
 	@Mock
-	private AppUser backUser;
-  
-	@Mock private UserService userService;
-
-	@Mock private AppUser mockUser;
+	private Authentication mockAuth;
+		
+	@InjectMocks
+	private AuthController authController;
+	
 	
 	private String roleAdmin = "role_admin";
 	private String password = "valid";
 	
-	@Mock private Authentication mockAuth;
-
-	@InjectMocks
-	private AuthController authController;
 		
 	/**
 	 * makes a mock auth controller for each test methods.
@@ -161,6 +159,27 @@ public class AuthControllerTest {
 	//------------------------------
 	// New Update Tests
 	//------------------------------
+	
+	/**
+	 * Test if backend user has a different username then front end user.
+	 * Pretty sure this is impossible in actual implementation
+	 * backend user is fetched from the DB by the front end username 
+	 * there's no reason to check if they have the same username.
+	 * @author Jaitee Pitts
+	 * @author Ankit Patel
+	 * Current version of UpdateUser has complicated logic.
+	 * This test is written with Test Driven Development in mind
+	 * The rewritten version of update user should use this test as a guideline.
+	 * 
+	 * Ideally these checks would happen in the service layer,
+	 * however since they were originally in the controller this test is placed here.
+	 * 
+	 * @author Jaitee Pitts (190107-Java-Spark-USF)
+	 */
+	 
+	 
+
+	
 	
 	/**
 	 * This test case verifies proper functionality of the AuthController.getUserByEmail() method.
