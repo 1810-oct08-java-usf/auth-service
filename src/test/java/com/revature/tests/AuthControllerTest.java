@@ -156,73 +156,96 @@ public class AuthControllerTest {
 		assertNotNull("The AppUser returned is expected to be not null", testResult);
 		assertEquals("The AppUser returned is expected to match the mocked one", expectedResult, testResult); 
 	}
+	
 	//------------------------------
 	// New Update Tests
 	//------------------------------
 	
-	/**
-
-
- 
-	 * Test if backend user has a different username then front end user.
-
-
- 
-	 * Pretty sure this is impossible in actual implementation
-
-
- 
-	 * backend user is fetched from the DB by the front end username 
-
-
- 
-	 * there's no reason to check if they have the same username.
-
-
- 
-	 * @author Jaitee Pitts
-
-
- 
-	 * @author Ankit Patel
-
-
- 
+	/** 
 	 * Current version of UpdateUser has complicated logic.
-
-
- 
 	 * This test is written with Test Driven Development in mind
-
-
- 
 	 * The rewritten version of update user should use this test as a guideline.
-
-
- 
 	 * 
-
-
- 
 	 * Ideally these checks would happen in the service layer,
-
-
- 
 	 * however since they were originally in the controller this test is placed here.
-
-
- 
 	 * 
-
-
- 
 	 * @author Jaitee Pitts (190107-Java-Spark-USF)
-
-
- 
 	 */
+	
+	@Ignore
+	public void testUpdateUser() throws Exception {
+		mockAuth.setAuthenticated(true);
+		
+		//assuming front end is refactored to send a userPrincipal
+
+		when(mockPrincipal.getAppUser()).thenReturn(mockUser);
+		when(userService.findUserByUsername(mockPrincipal.getUsername())).thenReturn(backUser);
+		
+
+		//checking that principal gave a valid password
+		when(backUser.getPassword()).thenReturn(password);
+		when(mockPrincipal.getPassword()).thenReturn(password);
+
+		//commented out because it's incompatible with current method
+//		authController.updateUser(mockPrincipal, mockAuth);
+	}
 	 
-	 
+	/**
+	 * This tests that if the client gave us an incorrect password,
+	 * it does not update and returns a status of 401.
+	 * 
+	 * @author Jaitee Pitts (190107-Java-Spark-USF)
+	 */
+
+	@Ignore
+	public void testUpdateUserWithIncorrectPassword() throws Exception {
+
+		mockAuth.setAuthenticated(true);
+
+		when(mockPrincipal.getAppUser()).thenReturn(mockUser);
+		when(userService.findUserByUsername(mockPrincipal.getUsername())).thenReturn(backUser);
+
+		//checking that principal gave a valid password
+
+		when(backUser.getPassword()).thenReturn(password);
+		when(mockPrincipal.getPassword()).thenReturn("invalid");
+
+		//commented out because it's incompatible with current method
+//		authController.updateUser(mockPrincipal, mockAuth);
+
+		
+
+	}
+
+	
+
+	/**
+	 * This tests that if the client gave us an incorrect username,
+	 * it does not update and throws and exception.
+	 * 
+	 * @author Jaitee Pitts (190107-Java-Spark-USF)
+	 */
+
+	@Ignore
+
+	public void testUpdateUserWhenNull() throws Exception {
+
+		mockAuth.setAuthenticated(true);
+
+		when(mockPrincipal.getAppUser()).thenReturn(mockUser);
+		when(userService.findUserByUsername(mockPrincipal.getUsername())).thenReturn(null);
+
+		//commented out because it's incompatible with current method
+//		authController.updateUser(mockPrincipal, mockAuth);
+	}
+
+	
+
+	//----------------------------------------------------------------
+
+	//                   Testing checking methods
+
+	//----------------------------------------------------------------
 
 	
 	
