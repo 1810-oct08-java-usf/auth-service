@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.revature.integration;
+package com.revature.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
