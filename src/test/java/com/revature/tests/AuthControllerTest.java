@@ -11,12 +11,14 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.rules.ExpectedException;
 import org.springframework.security.core.Authentication;
 
 import com.revature.controller.AuthController;
@@ -51,8 +53,9 @@ public class AuthControllerTest {
 	@InjectMocks
 	private AuthController authController;
 	
+	@Rule
+	public ExpectedException exceptionRule = ExpectedException.none();
 	
-	private String roleAdmin = "role_admin";
 	private String password = "valid";
 	
 		
@@ -157,10 +160,12 @@ public class AuthControllerTest {
 		assertEquals("The AppUser returned is expected to match the mocked one", expectedResult, testResult); 
 	}
 	
-	//------------------------------
-	// New Update Tests
-	//------------------------------
+	//------------------------------------------
 	
+	//                 New Update Tests
+	
+	//------------------------------------------
+	// TODO Test cases need to be written for AuthController.updateUser() so that the scheduled refactoring can be done.	
 	/** 
 	 * Current version of UpdateUser has complicated logic.
 	 * This test is written with Test Driven Development in mind
@@ -188,6 +193,7 @@ public class AuthControllerTest {
 
 		//commented out because it's incompatible with current method
 //		authController.updateUser(mockPrincipal, mockAuth);
+		verify(userService).updateUser(mockUser);
 	}
 	 
 	/**
@@ -201,7 +207,9 @@ public class AuthControllerTest {
 	public void testUpdateUserWithIncorrectPassword() throws Exception {
 
 		mockAuth.setAuthenticated(true);
-
+		exceptionRule.expect(UserNotFoundException.class);
+		exceptionRule.expectMessage("The given password is incorrect");
+		
 		when(mockPrincipal.getAppUser()).thenReturn(mockUser);
 		when(userService.findUserByUsername(mockPrincipal.getUsername())).thenReturn(backUser);
 
@@ -212,13 +220,10 @@ public class AuthControllerTest {
 
 		//commented out because it's incompatible with current method
 //		authController.updateUser(mockPrincipal, mockAuth);
-
 		
-
 	}
 
 	
-
 	/**
 	 * This tests that if the client gave us an incorrect username,
 	 * it does not update and throws and exception.
@@ -231,12 +236,11 @@ public class AuthControllerTest {
 	public void testUpdateUserWhenNull() throws Exception {
 
 		mockAuth.setAuthenticated(true);
-
-		when(mockPrincipal.getAppUser()).thenReturn(mockUser);
-		when(userService.findUserByUsername(mockPrincipal.getUsername())).thenReturn(null);
+		exceptionRule.expect(UserCreationException.class);
+		exceptionRule.expectMessage("User cannot be null");
 
 		//commented out because it's incompatible with current method
-//		authController.updateUser(mockPrincipal, mockAuth);
+//		authController.updateUser(mockPrincipal, null);
 	}
 
 	
@@ -368,8 +372,6 @@ public class AuthControllerTest {
 		assertNotNull("The AppUser returned is expected to be not null", testResult);
 		assertEquals("The AppUser returned is expected to match the mocked one", expectedResult, testResult);
 	}
-	
-	// TODO Test cases need to be written for AuthController.updateUser() so that the scheduled refactoring can be done.
 		
 	
 	/**
