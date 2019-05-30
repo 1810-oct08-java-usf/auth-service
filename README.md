@@ -1,2 +1,2 @@
 # auth-service
-Auth microservice for the MSE supporting P3
+The objective of the auth-service is to handle all CRUD functionality for RPM users as well as authentication. It utilizes Spring Security to check if the user has a validation token in the header. If a token is present, they will be allowed to access this service. Otherwise, they will be given a '401 Unauthorized' status code. The controller of this service will contain all of the endpoints for updating, registering, and deleting users.
