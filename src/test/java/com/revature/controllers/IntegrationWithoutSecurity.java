@@ -83,10 +83,8 @@ public class IntegrationWithoutSecurity {
 	 * @throws Exception
 	 * @author Jaitee Pitts (190107-Java-Spark-USF)
 	 * 
-	 * Currently fails with a Null Pointer Exception
 	 */
 	
-	@Ignore //Currently fails with a Null Pointer Exception
 	@Test
 	@WithMockUser(roles= {"USER","ADMIN"})
 	public void deleteUserWhenNull() throws Exception{	
