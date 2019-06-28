@@ -1,4 +1,4 @@
-package com.revature.tests;
+package com.revature.controllers;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -9,10 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import com.revature.controller.AuthController;
+import com.revature.controllers.AuthController;
 import com.revature.exceptions.UserCreationException;
 import com.revature.models.AppUser;
-import com.revature.service.UserService;
+import com.revature.services.UserService;
 
 // TODO Merge this logic into the existing AuthControllerTest suite.
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.revature.tests;
+package com.revature.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -21,10 +21,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.revature.controller.AuthController;
+import com.revature.controllers.AuthController;
 import com.revature.exceptions.UserNotFoundException;
 import com.revature.models.AppUser;
-import com.revature.service.UserService;
+import com.revature.services.UserService;
 
 
 /**
