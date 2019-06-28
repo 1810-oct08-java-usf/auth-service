@@ -9,6 +9,8 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -29,6 +31,16 @@ import com.revature.models.AppUser;
 import com.revature.models.UserPrincipal;
 import com.revature.models.UserErrorResponse;
 import com.revature.service.UserService;
+import com.revature.security.CustomAuthenticationFilter;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+
+
+
 /**
  * This class will be used to test methods in the AuthController. Testing will
  * be done using Junit to test different scenarios.
@@ -36,9 +48,20 @@ import com.revature.service.UserService;
  * @RunWith(): Specifies that we will be using the MockitoJUnit runner class.
  */
 @RunWith(MockitoJUnitRunner.class)
+
+@WebMvcTest(AuthController.class)
 public class AuthControllerTest {
 
+	private MockMvc mvc;
+	
+	
 
+	
+	@InjectMocks
+	private CustomAuthenticationFilter filter;
+	
+	@Mock
+	HttpServletRequest request;
 	@Mock
 	private UserService userService;
 	@Mock
@@ -454,4 +477,43 @@ public class AuthControllerTest {
 		assertEquals("The UserErrorResponse.message is expected to match the mocked message", "Mocked user creation exception", testResult.getMessage());
 	}
 	
+
+
+
+
+/**
+ * This method tests integration of the controller with MockMVC
+ * 
+ * @author Jaitee Pitts
+ * @author Ankit Patel
+ *
+ */
+
+
+	
+
+	
+	
+	
+	/**
+	 * Tests that delete user cannot be called without a user role
+	 * @throws Exception
+	 */
+	@Test
+	public void deleteUserUnauthorized() throws Exception{
+		this.mvc.perform(delete("/id/0")).andExpect(status().isUnauthorized());
+		
+	}
+	/**
+	 * Tests that delete user cannot be called without a Zuul header
+	 * @throws Exception
+	 * 
+	 */
+	@Test
+	@WithMockUser(roles= {"USER"})
+	public void SubVersionAttemptTest() throws Exception{
+		this.mvc.perform(delete("/id/0")).andExpect(status().isUnauthorized());
+	}
+	
+
 }
