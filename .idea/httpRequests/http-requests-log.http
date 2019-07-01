@@ -1,0 +1,12 @@
+GET http://localhost:10001/users/username/{username}
+Accept: application/json
+
+###
+
+GET http://localhost:10001/users
+Accept: application/json
+
+<> 2019-06-25T070719.401.json
+
+###
+

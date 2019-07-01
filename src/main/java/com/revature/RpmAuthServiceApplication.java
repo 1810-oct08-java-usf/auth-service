@@ -11,5 +11,6 @@ public class RpmAuthServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(RpmAuthServiceApplication.class, args);
 	}
-	
+
 }
+

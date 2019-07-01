@@ -24,7 +24,9 @@ public class JwtConfig {
 	private String prefix;
 
 	// Amount of time a token is valid, currently set to: 24 hours
-	@Value("${security.jwt.expiration:#{24*60*60}}")
+
+	//	@Value("${security.jwt.expiration:#{24*60*60}}") //Production expiration timer (1 day)
+	@Value("${security.jwt.expiration:#{60}}") //Development-JWT Debug expiration timer (1 minute)
 	private int expiration;
 
 	/*

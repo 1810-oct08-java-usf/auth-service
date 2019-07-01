@@ -1,0 +1,7 @@
+{
+  "timestamp": "2019-06-25T23:07:18.900+0000",
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "No message available",
+  "path": "/users"
+}
