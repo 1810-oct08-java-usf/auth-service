@@ -1,10 +1,9 @@
 package com.revature.security;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
+import com.revature.exceptions.JWTExpiredException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -12,17 +11,16 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.GenericFilterBean;
-
-import com.revature.exceptions.SubversionAttemptException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 
 /**
  * The purpose of this class is to create custom filters for this service to only
- * accept and authorize requests from zuul or to anything that wants info about the 
+ * accept and authorize requests from zuul or to anything that wants info about the
  * health of the service. Currently, it looks for this header from zuul using the ZuulConfig.
  * object. If anything tries to hit an end point for actuator it lets it through regardless
  * of headers. This is allowed for now as ELB on AWS will check actuator/info in order
@@ -36,22 +34,22 @@ import com.revature.exceptions.SubversionAttemptException;
  * @author John Savath (1810-Oct22-Java-USF)
  */
 public class CustomAuthenticationFilter extends GenericFilterBean {
-	
+
 	private ZuulConfig zuulConfig;
 
 	/**
 	 * Constructor for CustomAuthenticationFilter that instantiates the ZuulConfig
 	 * field.
-	 * 
+	 *
 	 * @param zuulConfig Provides configuration for validating that requests came through Zuul
 	 */
 	public CustomAuthenticationFilter(ZuulConfig zuulConfig) {
 		this.zuulConfig = zuulConfig;
 	}
-	
+
 	/**
 	 * This is the filter that is used to authenticate specific traffic.
-	 * 
+	 *
 	 * @author Sean Doyle (1810-Oct22-Java-USF)
 	 */
 	@Override
@@ -63,7 +61,7 @@ public class CustomAuthenticationFilter extends GenericFilterBean {
 			//System.out.println(httpRequest.getRequestURI());
 			// This is where the main check if the actuator end point is being hit or
 			//	that the zuul header is present.
-			
+
 			if (httpRequest.getRequestURI().contains("/actuator")) {
 				Authentication auth = new AccessAuthenticationToken(headerZuul, "ROLE_ACTUATOR", new ArrayList<>());
 				SecurityContextHolder.getContext().setAuthentication(auth);
@@ -81,14 +79,16 @@ public class CustomAuthenticationFilter extends GenericFilterBean {
 				SecurityContextHolder.clearContext();
 				((HttpServletResponse) response).setStatus(401);
 				// Log this
-				throw new SubversionAttemptException("ZUUL header is " + headerZuul);
+//				throw new SubversionAttemptException("ZUUL header is " + headerZuul);
+				throw new JWTExpiredException("ZUUL header is " + headerZuul);
 			}
-		} catch (SubversionAttemptException e) {
+//		} catch (SubversionAttemptException e) {
+		} catch (JWTExpiredException jwtee) {
 			/*
 			 * TODO This should be refactored to log the failed authentication attempt,
 			 * including the IP address of the requester.
 			 */
-			e.printStackTrace();
+			jwtee.printStackTrace();
 			String ipAddress = ((HttpServletRequest) request).getHeader("X-FORWARDED-FOR");
 			if (ipAddress == null) {
 				ipAddress = request.getRemoteAddr();
@@ -122,10 +122,10 @@ public class CustomAuthenticationFilter extends GenericFilterBean {
 		}
 		return generatedPassword;
 	}
-	
+
 	/**
 	 * Method to check if the header matches that provided by Zuul
-	 * 
+	 *
 	 * @param header The retrieved header from the request object
 	 */
 	public boolean validateHeader(String header) {
@@ -134,10 +134,10 @@ public class CustomAuthenticationFilter extends GenericFilterBean {
 		}
 		return header.equals(get_SHA_512_SecureHash(zuulConfig.getSecret(), zuulConfig.getSalt()));
 	}
-	
+
 	/**
 	 * Method to check if the header matches that provided by Zuul, for public access only
-	 * 
+	 *
 	 * @param header The retrieved header from the request object
 	 */
 	public boolean validatePublicHeader(String header) {
