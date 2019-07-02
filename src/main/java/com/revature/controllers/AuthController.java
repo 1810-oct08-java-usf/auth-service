@@ -1,4 +1,4 @@
-package com.revature.controller;
+package com.revature.controllers;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ import com.revature.exceptions.UserCreationException;
 import com.revature.exceptions.UserNotFoundException;
 import com.revature.models.AppUser;
 import com.revature.models.UserErrorResponse;
-import com.revature.service.UserService;
+import com.revature.services.UserService;
 
 /*
  * TODO 
