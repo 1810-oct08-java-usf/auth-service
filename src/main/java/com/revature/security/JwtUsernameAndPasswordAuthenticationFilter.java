@@ -1,9 +1,7 @@
 package com.revature.security;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.util.Collections;
-import java.util.stream.Collectors;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -13,15 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.models.UserCredentials;
 import com.revature.models.UserPrincipal;
-
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 
 /**
  * Filter used for authenticating a login request using the provided username and password. Upon 
@@ -33,11 +27,9 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 	 * user credentials
 	 */
 	private AuthenticationManager authManager;
-
-	/*
-	 * Used to provide configuration during the creation of the JWT
-	 */
-	private final JwtConfig jwtConfig;
+	//These two Jwt fields can be avoided by using static methods, but an issue was occurring when trying to do so.
+	private JwtConfig jwtConfig;
+	private JwtGenerator jwtGen;
 
 	/**
 	 * Constructor for the JwtUsernameAndPasswordAuthenticationFilter that
@@ -106,7 +98,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 
 	/**
 	 * Upon a successful authentication, a token should be generated. The token is
-	 * generated using the configuration found within the JwtConfig field.
+	 * generated from the JwtGenerator using the configuration found within the JwtConfig field.
 	 * 
 	 * @param request 
 	 * 		Provides information regarding the HTTP request.
@@ -124,45 +116,8 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication auth) throws IOException, ServletException {
 
-		// The current time in milliseconds, to be used as part of the JWT creation
-		Long now = System.currentTimeMillis();
-
-		/*
-		 * Build the JWT and store it within a string to be added, along with the
-		 * prefix, to the response header
-		 */
-		String token = Jwts.builder()
-
-				// Identifies the principal (authenticated user) that is the subject of the JWT
-				.setSubject(auth.getName())
-
-				/* 
-				 * Convert to list of strings. This is important because it affects the way we
-				 * get them back in the Gateway.
-				 */
-				.claim("authorities", auth.getAuthorities().stream()
-
-						// map the list of GrantedAuthority objects to a list of representative strings
-						.map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
-
-				// Set when the token was issued
-				.setIssuedAt(new Date(now))
-
-				/*
-				 * Set the expiration time for the token (24 hours), using the JwtConfig
-				 * expiration value
-				 */
-				.setExpiration(new Date(now + jwtConfig.getExpiration() * 1000)) // in milliseconds
-
-				/*
-				 * Sign the JWT token using the HS512 algorithm, using the JwtConfig secret
-				 * value
-				 */
-				.signWith(SignatureAlgorithm.HS512, jwtConfig.getSecret().getBytes())
-
-				// Builds the JWT and serializes it to a compact, URL-safe string
-				.compact();
-
+		String token = jwtGen.createJwt(auth,jwtConfig);
+		
 		// Add AppUser object as JSON to the response body upon successful login by getting the print writer
 		// of HttpServletResponse response
 		response.getWriter().write(new ObjectMapper().writeValueAsString(((UserPrincipal)auth.getPrincipal()).getAppUser()));
