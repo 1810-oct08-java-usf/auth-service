@@ -23,12 +23,17 @@ import com.revature.models.UserPrincipal;
  */
 public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	
-	/* Spring Security's AuthenticationManager which is used to validate the 
+	/** Spring Security's AuthenticationManager which is used to validate the 
 	 * user credentials
 	 */
 	private AuthenticationManager authManager;
-	//These two Jwt fields can be avoided by using static methods, but an issue was occurring when trying to do so.
+	/**
+	 * Class for determining properties of generated JWTs.
+	 */
 	private JwtConfig jwtConfig;
+	/**
+	 * Class used for building JWTs.
+	 */
 	private JwtGenerator jwtGen;
 
 	/**
@@ -56,6 +61,12 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 	 * class in order to generate an authentication token that will be authenticated
 	 * by the AuthenticationManager.
 	 * 
+	 * Tries to:
+	 * 1. Get credentials from request body.
+	 * 2. Create an authentication token (contains user credentials) which will be used by the AuthenticationManager.
+	 * 3. Leverage AuthenticationManager to authenticate the user, 
+	 * 		and use UserDetailsServiceImpl::loadUserByUsername() method to load the user.
+	 * 
 	 * @param request 
 	 * 		Provides information regarding the HTTP request.
 	 * 
@@ -69,29 +80,15 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
-
-			// 1. Get credentials from request body
+			
 			UserCredentials creds = new ObjectMapper().readValue(request.getInputStream(), UserCredentials.class);
-
-			/* 
-			 * 2. Create an authentication token (contains user credentials) which will be
-			 * used by the AuthenticationManager
-			 */
 			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(creds.getUsername(),
 					creds.getPassword(), Collections.emptyList());
-			
-			/*
-			 * 3. Leverage AuthenticationManager to authenticate the user, and use
-			 * UserDetailsServiceImpl::loadUserByUsername() method to load the user.
-			 */
 			return authManager.authenticate(authToken);
-
+			
 		} catch (IOException e) {
-
-			/*
-			 * TODO This should be refactored to log the failed authentication attempt,
-			 * including the IP address of the requester.
-			 */
+			//TODO This should be refactored to log the failed authentication attempt,
+			//	including the IP address of the requester.
 			throw new RuntimeException(e);
 		}
 	}
@@ -99,6 +96,10 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 	/**
 	 * Upon a successful authentication, a token should be generated. The token is
 	 * generated from the JwtGenerator using the configuration found within the JwtConfig field.
+	 * After a token is generated, add AppUser object as JSON to the response body upon 
+	 * successful login by getting the print writer of HttpServletResponse.
+	 * Token is then added to the response header from JwtConfig with corresponding
+	 * prefix. 
 	 * 
 	 * @param request 
 	 * 		Provides information regarding the HTTP request.
@@ -117,12 +118,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 			Authentication auth) throws IOException, ServletException {
 
 		String token = jwtGen.createJwt(auth,jwtConfig);
-		
-		// Add AppUser object as JSON to the response body upon successful login by getting the print writer
-		// of HttpServletResponse response
 		response.getWriter().write(new ObjectMapper().writeValueAsString(((UserPrincipal)auth.getPrincipal()).getAppUser()));
-		
-		// Add token to the response header
 		response.addHeader(jwtConfig.getHeader(), jwtConfig.getPrefix() + token);
 	}	
 	

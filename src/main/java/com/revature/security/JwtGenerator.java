@@ -14,23 +14,18 @@ public class JwtGenerator {
 
 	/**
 	 * Method used for generating a JWT based on code gutted from
-	 * JwtUsernameAndPasswordAuthenticationFilter.successfulAuthentication() An
+	 * JwtUsernameAndPasswordAuthenticationFilter.successfulAuthentication().
 	 * Authentication object from Spring Security is passed in to make this
-	 * previously designed code to behave the same way.
+	 * previously designed code behave the same way it did.
+	 * Similarly, a JwtConfig object is passed in to guarantee correct behavior.
 	 * 
-	 * 
-	 * Build the JWT and store it within a string to be added, along with the
-	 * prefix, to the response header Identifies the principal (authenticated user)
-	 * that is the subject of the JWT Convert claim to list of strings. This is
-	 * important because it affects the way we get them back in the Gateway. map the
-	 * list of GrantedAuthority objects to a list of representative strings compact
-	 * builds the JWT and serializes it to a compact, URL-safe string
-	 * 
-	 * 
-	 * 
-	 * 
-	 * @param auth
-	 * @return
+	 * @param auth 
+	 * 		Authentication object from Spring Security
+	 * @param jwtConfig 
+	 * 		configures the settings for the JWT's creation.
+	 * @return String
+	 * 		contains JWT info (without prefix)
+	 * @author Daniel Shaffer (190422-USF-Java)
 	 */
 
 	public String createJwt(Authentication auth, JwtConfig jwtConfig) {
@@ -39,6 +34,7 @@ public class JwtGenerator {
 		SignatureAlgorithm sigAlg = SignatureAlgorithm.HS512;
 		long nowMillis = System.currentTimeMillis();
 
+		//Converts info in .claim() to list of strings; IMPORTANT: affects the way we get them back in the Gateway
 		JwtBuilder builder = Jwts.builder()
 				.setSubject(auth.getName())
 				.setIssuer("revature")
