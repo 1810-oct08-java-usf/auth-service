@@ -28,7 +28,7 @@ public class JwtGenerator {
 	 * @author Daniel Shaffer (190422-USF-Java)
 	 */
 
-	public String createJwt(Authentication auth, JwtConfig jwtConfig) {
+	public static String createJwt(Authentication auth, JwtConfig jwtConfig) {
 		System.out.println("creating new JWT for: " + auth.getName());
 
 		SignatureAlgorithm sigAlg = SignatureAlgorithm.HS512;
