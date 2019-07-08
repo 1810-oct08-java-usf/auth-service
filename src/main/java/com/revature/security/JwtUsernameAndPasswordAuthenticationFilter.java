@@ -31,10 +31,6 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 	 * Class for determining properties of generated JWTs.
 	 */
 	private JwtConfig jwtConfig;
-	/**
-	 * Class used for building JWTs.
-	 */
-	private JwtGenerator jwtGen;
 
 	/**
 	 * Constructor for the JwtUsernameAndPasswordAuthenticationFilter that
@@ -117,7 +113,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication auth) throws IOException, ServletException {
 
-		String token = jwtGen.createJwt(auth,jwtConfig);
+		String token = JwtGenerator.createJwt(auth,jwtConfig);
 		response.getWriter().write(new ObjectMapper().writeValueAsString(((UserPrincipal)auth.getPrincipal()).getAppUser()));
 		response.addHeader(jwtConfig.getHeader(), jwtConfig.getPrefix() + token);
 	}	
