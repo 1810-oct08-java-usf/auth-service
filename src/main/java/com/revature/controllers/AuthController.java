@@ -166,8 +166,24 @@ public class AuthController {
 		
 		// Previous logic can be found in src/main/resources/old-logic_AuthController-updateUser
 		throw new UnsupportedOperationException();
+			
 	}
 	
+	
+	@PreAuthorize("hasRole('ADMIN')")
+	@PutMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public AppUser updateToAdmin(@PathVariable int id, Authentication auth) {
+		
+		AppUser user = userService.findById(id);
+		if(user == null) { throw new UserNotFoundException("user with id: " +id +", not found"); }
+		user.setRole("ROLE_ADMIN");
+		userService.updateUser(user);
+		return user;
+		
+		
+	
+	}
 	
 
 	/**
