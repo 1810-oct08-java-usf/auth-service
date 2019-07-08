@@ -11,11 +11,14 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import org.springframework.stereotype.Component;
+
 /**
  * Represents an authenticated user with all of their core information.
  */
 @Entity
 @Table(name="RPM_USERS")
+@Component
 public class AppUser implements Serializable{
 
 	private static final long serialVersionUID = -2361806217291440694L;

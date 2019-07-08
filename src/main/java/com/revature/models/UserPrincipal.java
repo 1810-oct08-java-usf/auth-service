@@ -4,12 +4,14 @@ import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.stereotype.Component;
 
 
 /**
  * UserPrincipal
  * Custom implementation of provided User object from Spring Security. Extends User.
  */
+@Component
 public class UserPrincipal extends User {
 
 	private static final long serialVersionUID = 1L;
