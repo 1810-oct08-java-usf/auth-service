@@ -1,12 +1,9 @@
 package com.revature.models;
 
-import org.springframework.stereotype.Component;
-
 /**
  * Used to store user credentials recieved from request body of an
  * authentication request.
  */
-@Component
 public class UserCredentials {
 
 	private String username;
