@@ -172,6 +172,7 @@ public class AuthController {
 	/**
 	 * Method takes in a user object and updates it to ROLE_ADMIN
 	 * User must be ROLE_ADMIN
+	 * (Needs unit test)
 	 * 
 	 * @param user
 	 * @param auth
@@ -179,7 +180,6 @@ public class AuthController {
 	 * 
 	 * @author Austin Bark, Aaron Rea, Joshua Karvelis (190422-Java-USF)
 	 */
-
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping(value = "/id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
