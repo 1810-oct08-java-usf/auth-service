@@ -25,8 +25,8 @@ public class JwtConfig {
 	@Value("${security.jwt.prefix:Bearer }")
 	private String prefix;
 
-	//	@Value("${security.jwt.expiration:#{24*60*60*1000}}") 		//Production expiration timer (1 day)
-	@Value("${security.jwt.expiration:#{60*1000}}") 				//Development-JWT Debug expiration timer (1 minute)
+	@Value("${security.jwt.expiration:#{24*60*60*1000}}") 		//Production expiration timer (1 day)
+//	@Value("${security.jwt.expiration:#{60*1000}}") 				//Development-JWT Debug expiration timer (1 minute)
 	private int expiration;
 
 	@Value("${security.jwt.secret}")
