@@ -5,6 +5,12 @@ import org.springframework.stereotype.Repository;
 
 import com.revature.models.AppUser;
 
+/**
+ * Class is responsible for storing data into the database
+ * 
+ * @author Austin Bark (190422-Java-Spark)
+ *
+ */
 @Repository
 public interface UserRepository extends JpaRepository<AppUser, Integer>{
 	

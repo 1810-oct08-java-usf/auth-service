@@ -116,7 +116,7 @@ public class AuthController {
 	 * Used in checking if email is already in use
 	 * 
 	 * @param email
-	 * @return
+	 * @return String
 	 */
 	@GetMapping(value="/emailInUse/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
@@ -130,7 +130,7 @@ public class AuthController {
 	 * Used in checking if the username is available
 	 * 
 	 * @param username
-	 * @return
+	 * @return String
 	 */
 	@GetMapping(value="/usernameAvailable/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
