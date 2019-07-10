@@ -96,6 +96,7 @@ public class UserService {
 	 */
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public boolean updateUser(AppUser user) {
+	      System.out.println("In update user of user service");
 		if(user == null) return false;
 		repo.save(user);
 		return true;
