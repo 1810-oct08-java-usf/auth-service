@@ -1,4 +1,4 @@
-package com.revature.controller;
+package com.revature.controllers;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ import com.revature.exceptions.UserCreationException;
 import com.revature.exceptions.UserNotFoundException;
 import com.revature.models.AppUser;
 import com.revature.models.UserErrorResponse;
-import com.revature.service.UserService;
+import com.revature.services.UserService;
 
 /*
  * TODO 
@@ -167,14 +167,40 @@ public class AuthController {
 	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public AppUser updateUser(@RequestBody AppUser frontEndUser, Authentication auth) {
-		
+		System.out.println("in update user");
 		// TODO This method is scheduled for complete refactoring to simplify the logic.
 		
 		// Previous logic can be found in src/main/resources/old-logic_AuthController-updateUser
 		throw new UnsupportedOperationException();
+
 	}
+
+	/**
+	 * Method takes in a user object and updates it to ROLE_ADMIN
+	 * User must be ROLE_ADMIN
+	 * (Needs unit test)
+	 * 
+	 * @param user
+	 * @param auth
+	 * @return AppUser
+	 * 
+	 * @author Austin Bark, Aaron Rea, Joshua Karvelis (190422-Java-USF)
+	 */
+	@PreAuthorize("hasRole('ADMIN')")
+	@PutMapping(value = "/id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public AppUser updateToAdmin(@RequestBody AppUser user, Authentication auth) {
+		System.out.println("in update to Admin");
+		AppUser user1 = userService.findById(user.getId());
+		System.out.println(user.getId());
+		if(user1 == null) { throw new UserNotFoundException("user with id: " +user.getId() +", not found"); }
+		user.setRole("ROLE_ADMIN");
+		userService.updateUser(user);
+		return user;
+		
+		
 	
-	
+	}	
 
 	/**
 	 * This method will delete a user given that user's id. This method is only
