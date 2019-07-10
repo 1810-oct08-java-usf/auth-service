@@ -126,6 +126,12 @@ public class AuthController {
 		return "{\"emailIsInUse\": true}";
 	}
 
+	/**
+	 * Used in checking if the username is available
+	 * 
+	 * @param username
+	 * @return
+	 */
 	@GetMapping(value="/usernameAvailable/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public String checkIfUsernameIsAvailable(@PathVariable String username) {
