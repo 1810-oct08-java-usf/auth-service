@@ -1,5 +1,11 @@
 package com.revature.exceptions;
 
+/**
+ * Exception thrown if a user is not found in the database
+ * 
+ * @author Austin Bark (1904422-Java-Spark)
+ *
+ */
 public class UserNotFoundException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
