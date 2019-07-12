@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.revature.models.AppUser;
 import com.revature.models.UserPrincipal;
-import com.revature.repository.UserRepository;
+import com.revature.repositories.UserRepository;
 
 /**
  * An implementation of Spring Security's UserDetailService which can be used

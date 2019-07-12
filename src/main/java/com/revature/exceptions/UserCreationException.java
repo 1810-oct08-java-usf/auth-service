@@ -1,5 +1,11 @@
 package com.revature.exceptions;
 
+/**
+ * Exception gets thrown when a user cannot be created
+ * 
+ * @author Austin Bark (190422-Java-Spark)
+ *
+ */
 public class UserCreationException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;

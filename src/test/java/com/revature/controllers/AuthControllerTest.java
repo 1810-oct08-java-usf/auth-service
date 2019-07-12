@@ -1,4 +1,4 @@
-package com.revature.tests;
+package com.revature.controllers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -21,14 +21,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.junit.rules.ExpectedException;
 import org.springframework.security.core.Authentication;
 
-import com.revature.controller.AuthController;
+import com.revature.controllers.AuthController;
 import com.revature.exceptions.UserCreationException;
 import com.revature.exceptions.UserNotFoundException;
 import com.revature.models.AppUser;
 
 import com.revature.models.UserPrincipal;
+import com.revature.services.UserService;
 import com.revature.models.UserErrorResponse;
-import com.revature.service.UserService;
 /**
  * This class will be used to test methods in the AuthController. Testing will
  * be done using Junit to test different scenarios.
@@ -70,7 +70,6 @@ public class AuthControllerTest {
 	}
 	
 	/**
-
 	 * This test case verifies proper functionality of the AuthController.getAllUsers() method.
 	 * A non-null ArrayList of AppUser objects with a size of one is expected to be returned.
 	 * 
