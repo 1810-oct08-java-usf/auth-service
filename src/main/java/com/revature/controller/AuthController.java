@@ -164,7 +164,6 @@ public class AuthController {
 		
 		// TODO This method is scheduled for complete refactoring to simplify the logic.
 		
-		// Previous logic can be found in src/main/resources/old-logic_AuthController-updateUser
 		throw new UnsupportedOperationException();
 	}
 	
