@@ -34,7 +34,8 @@ public class AppUser implements Serializable{
 	private String lastName;
 	
 	@NotNull
-	@Pattern(regexp="^[a-zA-Z0-9_.+-]+(?:(?:[a-zA-Z0-9-]+\\.)?[a-zA-Z]+\\.)?@(revature)\\.com$")
+	//@Pattern(regexp="^[a-zA-Z0-9_.+-]+(?:(?:[a-zA-Z0-9-]+\\.)?[a-zA-Z]+\\.)?@(revature)\\.com$")
+	@Pattern(regexp="^[a-zA-Z0-9_.+-]+(?:(?:[a-zA-Z0-9-]+\\.)?[a-zA-Z]+\\.)?@(.+)$")
 	@Column(name="RPM_USER_EMAIL")
 	private String email;
 	
