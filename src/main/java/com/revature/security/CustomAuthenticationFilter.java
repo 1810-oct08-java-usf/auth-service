@@ -129,11 +129,11 @@ public class CustomAuthenticationFilter extends GenericFilterBean {
 	 * @param header The retrieved header from the request object
 	 */
 	public boolean validateHeader(String header) {
-//		if (header == null) {
-//			return false;
-//		}
-//		return header.equals(get_SHA_512_SecureHash(zuulConfig.getSecret(), zuulConfig.getSalt()));
-		return true;
+		if (header == null) {
+			return false;
+		}
+		return header.equals(get_SHA_512_SecureHash(zuulConfig.getSecret(), zuulConfig.getSalt()));
+		
 	}
 
 	/**
