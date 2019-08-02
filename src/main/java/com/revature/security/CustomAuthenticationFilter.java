@@ -133,6 +133,7 @@ public class CustomAuthenticationFilter extends GenericFilterBean {
 			return false;
 		}
 		return header.equals(get_SHA_512_SecureHash(zuulConfig.getSecret(), zuulConfig.getSalt()));
+		
 	}
 
 	/**
