@@ -2,12 +2,15 @@ package com.revature.controllers;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -158,19 +161,54 @@ public class AuthController {
 	/**
 	 * This method will update a user with the newly provided information
 	 * 
-	 * @param frontEndUser This is the user information that is taken from the front end.
+	 * @param frontEndUser This is the user information that is taken from the front
+	 *                     end.
 	 * @param auth
-	 * @return frontEndUser This is the updated frontEndUser with information filled in from the back
+	 * @return frontEndUser This is the updated frontEndUser with information filled
+	 *         in from the back
 	 * @return null if any of the fields are blank
 	 * @throws UserNotFoundException
 	 */
 	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public AppUser updateUser(@RequestBody AppUser frontEndUser, Authentication auth) {
+	public AppUser updateUser(@Valid @RequestBody AppUser frontEndUser, Authentication auth) {
 		System.out.println("in update user");
-		// TODO This method is scheduled for complete refactoring to simplify the logic.
+
+		// If the user we got from the front-end is null we don't do anything and we
+		// just return null
+		if (frontEndUser == null) {
+			return null;
+		}
+
+		// Verifying the username us not null, this is just a precaution
+		if (frontEndUser.getUsername() == null) {
+			return null;
+		}
+
+		// We get the old user from the database, to assign the properties from the user
+		// that
+		// we don't want the user to change
+		AppUser oldUser = userService.findById(frontEndUser.getId());
+		frontEndUser.setRole(oldUser.getRole());
 		
-		throw new UnsupportedOperationException();
+		if (!frontEndUser.getUsername().equals(oldUser.getUsername())) {
+			return null;
+		}
+
+		// Verifying the user provided its current password in order to make the changes
+		if (!new BCryptPasswordEncoder().matches(frontEndUser.getPassword(), oldUser.getPassword())) {
+			throw new UserNotFoundException("The given password is incorrect");
+		}
+		
+		// Setting the stored password to the updated user
+		frontEndUser.setPassword(oldUser.getPassword());
+
+		// Updating the user, if the user is updated we return the new updated user to the front end
+		if (userService.updateUser(frontEndUser)) {
+			return frontEndUser;
+		}
+
+		return null;
 
 	}
 
