@@ -250,5 +250,31 @@ public class AuthController {
 		error.setTimestamp(System.currentTimeMillis());
 		return error;
 	}
+	
+//	@PreAuthorize("hasRole('ADMIN')")
+//	@PutMapping(value = "/users/update", consumes=MediaType.APPLICATION_JSON_VALUE)
+//	@ResponseStatus(HttpStatus.OK) 
+//	public String changeRole(List<AppUser> users) {
+//		for (AppUser a : users) {
+//			userService.updateUser(a);
+//		}
+//		return "update successful";
+//	}
+	
+	@PreAuthorize("hasRole('ADMIN')")
+	@PutMapping(value = "/changeroles", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public AppUser updateRole(@RequestBody AppUser user, Authentication auth) {
+		System.out.println("in update");
+		AppUser user1 = userService.findById(user.getId());
+		System.out.println(user.getId());
+		if(user1 == null) { throw new UserNotFoundException("user with id: " +user.getId() +", not found"); }
+//		user.setRole("ROLE_ADMIN");
+		userService.updateUser(user);
+		return user;
+		
+		
+	
+	}
 
 }
