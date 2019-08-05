@@ -2,6 +2,7 @@ package com.revature.controllers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,25 +11,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.junit.rules.ExpectedException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.revature.controllers.AuthController;
 import com.revature.exceptions.UserCreationException;
 import com.revature.exceptions.UserNotFoundException;
 import com.revature.models.AppUser;
-
+import com.revature.models.UserErrorResponse;
 import com.revature.models.UserPrincipal;
 import com.revature.services.UserService;
-import com.revature.models.UserErrorResponse;
 /**
  * This class will be used to test methods in the AuthController. Testing will
  * be done using Junit to test different scenarios.
@@ -165,108 +165,122 @@ public class AuthControllerTest {
 	
 	//------------------------------------------
 	
-	// TODO Test cases need to be written for AuthController.updateUser() so that the scheduled refactoring can be done.
-	
-	/** 
-	 * Current version of UpdateUser has complicated logic.
-	 * This test is written with Test Driven Development in mind
-	 * The rewritten version of update user should use this test as a guideline.
-	 * 
-	 * Ideally these checks would happen in the service layer,
-	 * however since they were originally in the controller this test is placed here.
-	 * 
-	 * @author Jaitee Pitts (190107-Java-Spark-USF)
-	 */
-	
-	@Ignore
-	public void testUpdateUser() throws Exception {
-		mockAuth.setAuthenticated(true);
-		
-		//assuming front end is refactored to send a userPrincipal
-
-		when(mockPrincipal.getAppUser()).thenReturn(mockUser);
-		when(userService.findUserByUsername(mockPrincipal.getUsername())).thenReturn(backUser);
-		
-
-		//checking that principal gave a valid password
-		when(backUser.getPassword()).thenReturn(password);
-		when(mockPrincipal.getPassword()).thenReturn(password);
-
-		//commented out because it's incompatible with current method
-//		authController.updateUser(mockPrincipal, mockAuth);
-		verify(userService, times(1)).updateUser(mockUser);
-	}
-	 
 	/**
-	 * This tests that if the client gave us an incorrect password,
-	 * it does not update and returns a status of 401.
+	 * UPDATED: This test the updateUser method, making sure everything is right
+	 * and returning a successful status 
 	 * 
 	 * @author Jaitee Pitts (190107-Java-Spark-USF)
+	 * @author Testing team (ago 2019) - USF
 	 */
 
-	@Ignore
-	public void testUpdateUserWithIncorrectPassword() throws Exception {
+	@Test
+	public void testUpdateUser() throws Exception {
+		mockAuth.setAuthenticated(true); // This is supposed to be the user authenticated in the system
 
-		mockAuth.setAuthenticated(true);
+		String originalPass = "hello";
+		String encryptedPassword = new BCryptPasswordEncoder().encode(originalPass);
+
+		// Creating mock user, this user is going to be pass to the rest controller
+		// simulating we are calling this method using the angular front-end
+		
+		AppUser oldUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", encryptedPassword, "ROLE_USER");
+		AppUser newUser = new AppUser(1, "mocked", "user", "mocked@email.com", "mocked", originalPass, "");
+
+		when(userService.findById(Mockito.anyInt())).thenReturn(oldUser);
+		// We are expecting the updateUser method to be called and the result is successful
+		when(userService.updateUser(Mockito.any())).thenReturn(true);
+
+		// Calling updateUser method from the controller
+		AppUser resultUser = authController.updateUser(newUser, mockAuth);
+
+		assertEquals(resultUser.getRole(), oldUser.getRole()); // verifying that the update user is sending back to angular
+		verify(userService, times(1)).updateUser(Mockito.any()); // verifying the service updateUser was called inside
+																	// rest method
+	}
+
+
+	/**
+	 * This tests that if the client gave us an incorrect password, it does not
+	 * update and returns a status of 401.
+	 * 
+	 * UPDATED: This test was updated to avoid getting the password from the principal,
+	 * and we are making sure when the user enter a wrong password its profile does not update.
+	 * 
+	 * @author Jaitee Pitts (190107-Java-Spark-USF)
+	 * @author Testing team (ago 2019) - USF
+	 */
+	@Test
+	public void testUpdateUserWithIncorrectPassword() throws Exception {
+		
+		mockAuth.setAuthenticated(true); // This is supposed to be the user authenticated in the system
+
+		String originalPass = "hello";
+		String encryptedPassword = new BCryptPasswordEncoder().encode(originalPass);
+		
 		exceptionRule.expect(UserNotFoundException.class);
 		exceptionRule.expectMessage("The given password is incorrect");
+
+		// Creating mock user, this user is going to be pass to the rest controller
+		// simulating we are calling this method using the angular front-end
 		
-		when(mockPrincipal.getAppUser()).thenReturn(mockUser);
-		when(userService.findUserByUsername(mockPrincipal.getUsername())).thenReturn(backUser);
+		AppUser oldUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", encryptedPassword, "ROLE_USER");
+		AppUser newUser = new AppUser(1, "mocked", "user", "mocked@email.com", "mocked", originalPass + "aa", "");
 
-		//checking that principal gave a valid password
+		when(userService.findById(Mockito.anyInt())).thenReturn(oldUser);
 
-		when(backUser.getPassword()).thenReturn(password);
-		when(mockPrincipal.getPassword()).thenReturn("invalid");
-
-		//commented out because it's incompatible with current method
-//		authController.updateUser(mockPrincipal, mockAuth);
-		AppUser testResult = authController.updateUser(mockUser, mockAuth);
-		verify(userService, times(1)).updateUser(mockUser);
-		assertNotNull("The AppUser returned is expected to be not null", testResult);
+		// Calling updateUser method from the controller
+		authController.updateUser(newUser, mockAuth);
 		
+		// Verifying we call the find by id method
+		verify(userService).findById(Mockito.anyInt());
+
 	}
 
-	
 	/**
-	 * This tests that if the client gave us an incorrect username,
-	 * it does not update and throws and exception.
+	 * 
+	 * UPDATE: If the user is null, we return null back to the front-end.
 	 * 
 	 * @author Jaitee Pitts (190107-Java-Spark-USF)
+	 * @author Testing team (ago 2019) - USF
 	 */
-
-	@Ignore
+	@Test
 	public void testUpdateUserWhenNull() throws Exception {
 
-		mockAuth.setAuthenticated(true);
-		exceptionRule.expect(UserCreationException.class);
-		exceptionRule.expectMessage("User cannot be null");
-
-		//commented out because it's incompatible with current method
-//		authController.updateUser(mockPrincipal, null);
+		mockAuth.setAuthenticated(true); // User has to be authenticated
+		
+		// Trying to update the user, sending a null parameter
+		AppUser result = authController.updateUser(null, mockAuth);
+		
+		assertNull(result); // Verifying we are returning null from the controller
 	}
-	
+
 	/**
-	 * This test case verifies the proper functionality of the AuthController.updateUser() method when it
-	 * is provided a valid updated AppUser with all updateable fields. The expected result is an AppUser
-	 * object whose fields match those of the AppUser passed as a method argument.
+	 * This test case verifies the proper functionality of the
+	 * AuthController.updateUser() method when it is provided a valid updated
+	 * AppUser with all updateable fields. The expected result is an AppUser object
+	 * whose fields match those of the AppUser passed as a method argument.
 	 * 
 	 * @author Wezley Singleton
 	 */
-	@Ignore("AuthController.updateUser() is scheduled for refactor")
+	@Test
 	public void testUpdateUserValidUserValidWithAllUpdateableFields() {
-		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "ROLE_USER");
-		AppUser mockedUserForUpdate = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "ROLE_USER");
-		AppUser mockedPersistedUser = new AppUser(1, "mock", "user", "mock@email.com", "mocked", "mocked", "ROLE_USER");
+		// Added this to test password functionality
+		// Testing Team (Ago 2019) - USF
+		String originalPass = "hello";
+		String encryptedPassword = new BCryptPasswordEncoder().encode(originalPass);
+		
+		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", encryptedPassword, "ROLE_USER");
+		AppUser mockedUserForUpdate = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", originalPass,
+				"ROLE_USER");
+		AppUser mockedPersistedUser = new AppUser(1, "mock", "user", "mock@email.com", "mocked", encryptedPassword, "ROLE_USER");
 		mockAuth.setAuthenticated(true);
-		
-		when(mockAuth.getPrincipal()).thenReturn("mocked");
-		when(userService.findUserByUsername(mockAuth.getPrincipal().toString())).thenReturn(mockedPersistedUser);
+
+//		when(mockAuth.getPrincipal()).thenReturn("mocked");
 		when(userService.findById(1)).thenReturn(mockedPersistedUser);
-		when(userService.updateUser(mockUser)).thenReturn(true);
-		
+		when(userService.updateUser(mockedUserForUpdate)).thenReturn(true);
+
 		AppUser testResult = authController.updateUser(mockedUserForUpdate, mockAuth);
-		verify(userService, times(1)).updateUser(mockUser);
+		verify(userService, times(1)).updateUser(mockedUserForUpdate);
 		assertNotNull("The AppUser returned is expected to be not null", testResult);
 		assertEquals("The AppUser returned is expected to match the mocked one", expectedResult, testResult);
 	}
