@@ -284,8 +284,32 @@ public class AuthControllerTest {
 		assertNotNull("The AppUser returned is expected to be not null", testResult);
 		assertEquals("The AppUser returned is expected to match the mocked one", expectedResult, testResult);
 	}
+	/**
+	 * This test case verifies the proper functionality of the 
+	 * AuthController.updateToAdmin() method when it is provided a valid updated AppUser with the updated fields.
+	 * The expected result is an AppUser object whose fields match those of the AppUser passed as the argument. 
+	 */
 
-	
+	@Test
+	public void testUpdateUserRole() {
+		String originalRole = "ROLE_ADMIN";
+		String newRole = "ROLE_ADMIN";
+		
+		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mock", newRole);
+		AppUser mockedUserForUpdate = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mock", originalRole);
+		
+		AppUser mockedPersistedAdmin = new AppUser(1, "mock", "user", "mock@email.com", "mocked", "mock", newRole);
+		mockAuth.setAuthenticated(true);
+
+//		when(mockAuth.getPrincipal()).thenReturn("mocked");
+		when(userService.findById(1)).thenReturn(mockedPersistedAdmin);
+		when(userService.updateUser(mockedUserForUpdate)).thenReturn(true);
+
+		AppUser testResult = authController.updateToAdmin(mockedUserForUpdate, mockAuth);
+		verify(userService, times(1)).updateUser(mockedUserForUpdate);
+		assertNotNull("The AppUser returned is expected to be not null", testResult);
+		assertEquals("The AppUser returned is expected to match the mocked one", expectedResult, testResult);
+	}
 
 	//----------------------------------------------------------------
 
