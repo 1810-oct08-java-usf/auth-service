@@ -178,7 +178,7 @@ public class AuthControllerTest {
 		mockAuth.setAuthenticated(true); // This is supposed to be the user authenticated in the system
 
 		String originalPass = "Terrell12 newPassword";
-		String encryptedPassword = "Terrell12";/*BCryptPasswordEncoder().encode();*/
+		String encryptedPassword = "Terrell12";
 
 		// Creating mock user, this user is going to be pass to the rest controller
 		// simulating we are calling this method using the angular front-end
@@ -215,10 +215,9 @@ public class AuthControllerTest {
 		mockAuth.setAuthenticated(true); // This is supposed to be the user authenticated in the system
 
 		String originalPass = "Terrell12 newPassword";
-		String encryptedPassword = "Terrell12"; /* BCryptPasswordEncoder().encode(originalPass); */
+		String encryptedPassword = "Terrell12"; 
 		
-//		exceptionRule.expect(UserNotFoundException.class);
-//		exceptionRule.expectMessage("The given password is incorrect");
+
 
 		// Creating mock user, this user is going to be pass to the rest controller
 		// simulating we are calling this method using the angular front-end
@@ -267,7 +266,7 @@ public class AuthControllerTest {
 		// Added this to test password functionality
 		// Testing Team (Ago 2019) - USF
 		String originalPass = "Terrell12 Terrell12";
-		String encryptedPassword = "Terrell12"; /* BCryptPasswordEncoder().encode(originalPass); */
+		String encryptedPassword = "Terrell12"; 
 		
 		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", encryptedPassword, "ROLE_USER");
 		AppUser mockedUserForUpdate = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", originalPass,
@@ -275,7 +274,6 @@ public class AuthControllerTest {
 		AppUser mockedPersistedUser = new AppUser(1, "mock", "user", "mock@email.com", "mocked", encryptedPassword, "ROLE_USER");
 		mockAuth.setAuthenticated(true);
 
-//		when(mockAuth.getPrincipal()).thenReturn("mocked");
 		when(userService.findById(1)).thenReturn(mockedPersistedUser);
 		when(userService.updateUser(mockedUserForUpdate)).thenReturn(true);
 
@@ -301,7 +299,6 @@ public class AuthControllerTest {
 		AppUser mockedPersistedAdmin = new AppUser(1, "mock", "user", "mock@email.com", "mocked", "mock", newRole);
 		mockAuth.setAuthenticated(true);
 
-//		when(mockAuth.getPrincipal()).thenReturn("mocked");
 		when(userService.findById(1)).thenReturn(mockedPersistedAdmin);
 		when(userService.updateUser(mockedUserForUpdate)).thenReturn(true);
 
