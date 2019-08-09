@@ -177,8 +177,8 @@ public class AuthControllerTest {
 	public void testUpdateUser() throws Exception {
 		mockAuth.setAuthenticated(true); // This is supposed to be the user authenticated in the system
 
-		String originalPass = "hello";
-		String encryptedPassword = new BCryptPasswordEncoder().encode(originalPass);
+		String originalPass = "Terrell12 newPassword";
+		String encryptedPassword = "Terrell12";
 
 		// Creating mock user, this user is going to be pass to the rest controller
 		// simulating we are calling this method using the angular front-end
@@ -214,18 +214,17 @@ public class AuthControllerTest {
 		
 		mockAuth.setAuthenticated(true); // This is supposed to be the user authenticated in the system
 
-		String originalPass = "hello";
-		String encryptedPassword = new BCryptPasswordEncoder().encode(originalPass);
+		String originalPass = "Terrell12 newPassword";
+		String encryptedPassword = "Terrell12"; 
 		
-		exceptionRule.expect(UserNotFoundException.class);
-		exceptionRule.expectMessage("The given password is incorrect");
+
 
 		// Creating mock user, this user is going to be pass to the rest controller
 		// simulating we are calling this method using the angular front-end
 		
 		AppUser oldUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", encryptedPassword, "ROLE_USER");
 		AppUser newUser = new AppUser(1, "mocked", "user", "mocked@email.com", "mocked", originalPass + "aa", "");
-
+		
 		when(userService.findById(Mockito.anyInt())).thenReturn(oldUser);
 
 		// Calling updateUser method from the controller
@@ -266,8 +265,8 @@ public class AuthControllerTest {
 	public void testUpdateUserValidUserValidWithAllUpdateableFields() {
 		// Added this to test password functionality
 		// Testing Team (Ago 2019) - USF
-		String originalPass = "hello";
-		String encryptedPassword = new BCryptPasswordEncoder().encode(originalPass);
+		String originalPass = "Terrell12 Terrell12";
+		String encryptedPassword = "Terrell12"; 
 		
 		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", encryptedPassword, "ROLE_USER");
 		AppUser mockedUserForUpdate = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", originalPass,
@@ -275,7 +274,6 @@ public class AuthControllerTest {
 		AppUser mockedPersistedUser = new AppUser(1, "mock", "user", "mock@email.com", "mocked", encryptedPassword, "ROLE_USER");
 		mockAuth.setAuthenticated(true);
 
-//		when(mockAuth.getPrincipal()).thenReturn("mocked");
 		when(userService.findById(1)).thenReturn(mockedPersistedUser);
 		when(userService.updateUser(mockedUserForUpdate)).thenReturn(true);
 
@@ -284,8 +282,31 @@ public class AuthControllerTest {
 		assertNotNull("The AppUser returned is expected to be not null", testResult);
 		assertEquals("The AppUser returned is expected to match the mocked one", expectedResult, testResult);
 	}
+	/**
+	 * This test case verifies the proper functionality of the 
+	 * AuthController.updateToAdmin() method when it is provided a valid updated AppUser with the updated fields.
+	 * The expected result is an AppUser object whose fields match those of the AppUser passed as the argument. 
+	 */
 
-	
+	@Test
+	public void testUpdateUserRole() {
+		String originalRole = "ROLE_ADMIN";
+		String newRole = "ROLE_ADMIN";
+		
+		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mock", newRole);
+		AppUser mockedUserForUpdate = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mock", originalRole);
+		
+		AppUser mockedPersistedAdmin = new AppUser(1, "mock", "user", "mock@email.com", "mocked", "mock", newRole);
+		mockAuth.setAuthenticated(true);
+
+		when(userService.findById(1)).thenReturn(mockedPersistedAdmin);
+		when(userService.updateUser(mockedUserForUpdate)).thenReturn(true);
+
+		AppUser testResult = authController.updateToAdmin(mockedUserForUpdate, mockAuth);
+		verify(userService, times(1)).updateUser(mockedUserForUpdate);
+		assertNotNull("The AppUser returned is expected to be not null", testResult);
+		assertEquals("The AppUser returned is expected to match the mocked one", expectedResult, testResult);
+	}
 
 	//----------------------------------------------------------------
 

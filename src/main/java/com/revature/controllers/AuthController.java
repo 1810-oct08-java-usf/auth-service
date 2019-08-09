@@ -172,15 +172,13 @@ public class AuthController {
 	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public AppUser updateUser(@Valid @RequestBody AppUser frontEndUser, Authentication auth) {
-		System.out.println("in update user");
-
 		// If the user we got from the front-end is null we don't do anything and we
 		// just return null
 		if (frontEndUser == null) {
 			return null;
 		}
 
-		// Verifying the username us not null, this is just a precaution
+		// Verifying the username is not null, this is just a precaution
 		if (frontEndUser.getUsername() == null) {
 			return null;
 		}
@@ -189,23 +187,33 @@ public class AuthController {
 		// that
 		// we don't want the user to change
 		AppUser oldUser = userService.findById(frontEndUser.getId());
+		//old password^
 		frontEndUser.setRole(oldUser.getRole());
 		
 		if (!frontEndUser.getUsername().equals(oldUser.getUsername())) {
 			return null;
 		}
+		
 
+		//parse frontEndUser.getPassword() on the first space and then set it into a new variable
+		String passwordToParse = frontEndUser.getPassword();
+		String[] passwordArray = passwordToParse.split("\\s+");
+		
+		
 		// Verifying the user provided its current password in order to make the changes
-		if (!new BCryptPasswordEncoder().matches(frontEndUser.getPassword(), oldUser.getPassword())) {
+
+		if (!passwordArray[0].equals(oldUser.getPassword())) {
 			throw new UserNotFoundException("The given password is incorrect");
 		}
-		
+
 		// Setting the stored password to the updated user
-		frontEndUser.setPassword(oldUser.getPassword());
+		frontEndUser.setPassword(passwordArray[1]);
 
 		// Updating the user, if the user is updated we return the new updated user to the front end
 		if (userService.updateUser(frontEndUser)) {
+
 			return frontEndUser;
+			
 		}
 
 		return null;
