@@ -1,6 +1,8 @@
 package com.revature.controllers;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.validation.Valid;
 
@@ -50,6 +52,8 @@ import com.revature.services.UserService;
 @RequestMapping("/users")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AuthController {
+	
+	private static Logger log = Logger.getLogger("DRIVER_LOGGER");
 
 	private UserService userService;
 
@@ -234,12 +238,15 @@ public class AuthController {
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping(value = "/id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public AppUser updateToAdmin(@RequestBody AppUser user, Authentication auth) {
+	public AppUser updateUserRole(@RequestBody AppUser user, Authentication auth) {
 		System.out.println("in update to Admin");
 		AppUser user1 = userService.findById(user.getId());
 		System.out.println(user.getId());
 		if(user1 == null) { throw new UserNotFoundException("user with id: " +user.getId() +", not found"); }
-		user.setRole("ROLE_ADMIN");
+		
+		log.log(Level.INFO, "User Role: " + user.getRole());
+		log.log(Level.INFO, "User1 Role: " + user1.getRole());
+		log.log(Level.INFO, user.getRole());
 		userService.updateUser(user);
 		return user;
 		

@@ -302,7 +302,7 @@ public class AuthControllerTest {
 		when(userService.findById(1)).thenReturn(mockedPersistedAdmin);
 		when(userService.updateUser(mockedUserForUpdate)).thenReturn(true);
 
-		AppUser testResult = authController.updateToAdmin(mockedUserForUpdate, mockAuth);
+		AppUser testResult = authController.updateUserRole(mockedUserForUpdate, mockAuth);
 		verify(userService, times(1)).updateUser(mockedUserForUpdate);
 		assertNotNull("The AppUser returned is expected to be not null", testResult);
 		assertEquals("The AppUser returned is expected to match the mocked one", expectedResult, testResult);
