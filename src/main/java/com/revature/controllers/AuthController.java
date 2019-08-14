@@ -1,6 +1,8 @@
 package com.revature.controllers;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.validation.Valid;
 
@@ -50,6 +52,8 @@ import com.revature.services.UserService;
 @RequestMapping("/users")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AuthController {
+	
+	private static Logger log = Logger.getLogger("DRIVER_LOGGER");
 
 	private UserService userService;
 
@@ -240,9 +244,9 @@ public class AuthController {
 		System.out.println(user.getId());
 		if(user1 == null) { throw new UserNotFoundException("user with id: " +user.getId() +", not found"); }
 		
-		System.out.println("User Role: " + user.getRole());
-		System.out.println("User1 Role: " + user1.getRole());
-		System.out.println(user.getRole());
+		log.log(Level.INFO, "User Role: " + user.getRole());
+		log.log(Level.INFO, "User1 Role: " + user1.getRole());
+		log.log(Level.INFO, user.getRole());
 		userService.updateUser(user);
 		return user;
 		
