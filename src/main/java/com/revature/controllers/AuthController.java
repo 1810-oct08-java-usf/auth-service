@@ -234,12 +234,15 @@ public class AuthController {
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping(value = "/id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public AppUser updateToAdmin(@RequestBody AppUser user, Authentication auth) {
+	public AppUser updateUserRole(@RequestBody AppUser user, Authentication auth) {
 		System.out.println("in update to Admin");
 		AppUser user1 = userService.findById(user.getId());
 		System.out.println(user.getId());
 		if(user1 == null) { throw new UserNotFoundException("user with id: " +user.getId() +", not found"); }
-		user.setRole("ROLE_ADMIN");
+		
+		System.out.println("User Role: " + user.getRole());
+		System.out.println("User1 Role: " + user1.getRole());
+		System.out.println(user.getRole());
 		userService.updateUser(user);
 		return user;
 		
