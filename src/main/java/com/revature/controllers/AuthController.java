@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,6 +43,8 @@ import com.revature.services.UserService;
 
 /**
  * This class contains all CRUD functionality for the users
+ * This controller is prefaced with the mapping of /auth then
+ * the request mapping as specified in SecurityCredentialsConfig.java
  * 
  * @author Caleb
  *
@@ -166,74 +167,56 @@ public class AuthController {
 	 * This method will update a user with the newly provided information
 	 * 
 	 * @param frontEndUser This is the user information that is taken from the front
-	 *                     end.
+	 *                     end. The password is sent with two fields, the first being
+	 *                     the users current password and the next being the password the
+	 *                     user wants to have. There is now a parser in order separate the 
+	 *                     passwords and put them into an array.
 	 * @param auth
 	 * @return frontEndUser This is the updated frontEndUser with information filled
 	 *         in from the back
 	 * @return null if any of the fields are blank
 	 * @throws UserNotFoundException
+	 * @author Tevin Thomas, Donald Henderson, Glory Umeasalugo, Tan Ho, Mohamad Hijazi (1905-Java-Nick)
 	 */
 	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public AppUser updateUser(@Valid @RequestBody AppUser frontEndUser, Authentication auth) {
-		// If the user we got from the front-end is null we don't do anything and we
-		// just return null
 		if (frontEndUser == null) {
 			return null;
 		}
-
-		// Verifying the username is not null, this is just a precaution
 		if (frontEndUser.getUsername() == null) {
 			return null;
 		}
-
-		// We get the old user from the database, to assign the properties from the user
-		// that
-		// we don't want the user to change
 		AppUser oldUser = userService.findById(frontEndUser.getId());
-		//old password^
 		frontEndUser.setRole(oldUser.getRole());
-		
 		if (!frontEndUser.getUsername().equals(oldUser.getUsername())) {
 			return null;
 		}
-		
-
-		//parse frontEndUser.getPassword() on the first space and then set it into a new variable
 		String passwordToParse = frontEndUser.getPassword();
 		String[] passwordArray = passwordToParse.split("\\s+");
-		
-		
-		// Verifying the user provided its current password in order to make the changes
-
 		if (!passwordArray[0].equals(oldUser.getPassword())) {
 			throw new UserNotFoundException("The given password is incorrect");
 		}
-
-		// Setting the stored password to the updated user
 		frontEndUser.setPassword(passwordArray[1]);
-
-		// Updating the user, if the user is updated we return the new updated user to the front end
 		if (userService.updateUser(frontEndUser)) {
-
 			return frontEndUser;
-			
 		}
-
 		return null;
-
 	}
 
 	/**
 	 * Method takes in a user object and updates it to ROLE_ADMIN
-	 * User must be ROLE_ADMIN
-	 * (Needs unit test)
+	 * or ROLE_USER based on the Admin's choice. 
+	 * 
+	 * User changing the roles must be ROLE_ADMIN
+	 * 
 	 * 
 	 * @param user
 	 * @param auth
 	 * @return AppUser
 	 * 
 	 * @author Austin Bark, Aaron Rea, Joshua Karvelis (190422-Java-USF)
+	 * @author Tevin Thomas, Aisha Hodge, Glory Umeasalugo, Tan Ho (1905-Java-Nick)
 	 */
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping(value = "/id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -248,10 +231,8 @@ public class AuthController {
 		log.log(Level.INFO, "User1 Role: " + user1.getRole());
 		log.log(Level.INFO, user.getRole());
 		userService.updateUser(user);
+		
 		return user;
-		
-		
-	
 	}	
 
 	/**
