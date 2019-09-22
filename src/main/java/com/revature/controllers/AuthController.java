@@ -1,6 +1,10 @@
-package com.revature.controller;
+package com.revature.controllers;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +27,7 @@ import com.revature.exceptions.UserCreationException;
 import com.revature.exceptions.UserNotFoundException;
 import com.revature.models.AppUser;
 import com.revature.models.UserErrorResponse;
-import com.revature.service.UserService;
+import com.revature.services.UserService;
 
 /*
  * TODO 
@@ -39,6 +43,8 @@ import com.revature.service.UserService;
 
 /**
  * This class contains all CRUD functionality for the users
+ * This controller is prefaced with the mapping of /auth then
+ * the request mapping as specified in SecurityCredentialsConfig.java
  * 
  * @author Caleb
  *
@@ -47,6 +53,8 @@ import com.revature.service.UserService;
 @RequestMapping("/users")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AuthController {
+	
+	private static Logger log = Logger.getLogger("DRIVER_LOGGER");
 
 	private UserService userService;
 
@@ -116,7 +124,7 @@ public class AuthController {
 	 * Used in checking if email is already in use
 	 * 
 	 * @param email
-	 * @return
+	 * @return String
 	 */
 	@GetMapping(value="/emailInUse/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
@@ -126,6 +134,12 @@ public class AuthController {
 		return "{\"emailIsInUse\": true}";
 	}
 
+	/**
+	 * Used in checking if the username is available
+	 * 
+	 * @param username
+	 * @return String
+	 */
 	@GetMapping(value="/usernameAvailable/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public String checkIfUsernameIsAvailable(@PathVariable String username) {
@@ -152,23 +166,74 @@ public class AuthController {
 	/**
 	 * This method will update a user with the newly provided information
 	 * 
-	 * @param frontEndUser This is the user information that is taken from the front end.
+	 * @param frontEndUser This is the user information that is taken from the front
+	 *                     end. The password is sent with two fields, the first being
+	 *                     the users current password and the next being the password the
+	 *                     user wants to have. There is now a parser in order separate the 
+	 *                     passwords and put them into an array.
 	 * @param auth
-	 * @return frontEndUser This is the updated frontEndUser with information filled in from the back
+	 * @return frontEndUser This is the updated frontEndUser with information filled
+	 *         in from the back
 	 * @return null if any of the fields are blank
 	 * @throws UserNotFoundException
+	 * @author Tevin Thomas, Donald Henderson, Glory Umeasalugo, Tan Ho, Mohamad Hijazi (1905-Java-Nick)
 	 */
 	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public AppUser updateUser(@RequestBody AppUser frontEndUser, Authentication auth) {
-		
-		// TODO This method is scheduled for complete refactoring to simplify the logic.
-		
-		// Previous logic can be found in src/main/resources/old-logic_AuthController-updateUser
-		throw new UnsupportedOperationException();
+	public AppUser updateUser(@Valid @RequestBody AppUser frontEndUser, Authentication auth) {
+		if (frontEndUser == null) {
+			return null;
+		}
+		if (frontEndUser.getUsername() == null) {
+			return null;
+		}
+		AppUser oldUser = userService.findById(frontEndUser.getId());
+		frontEndUser.setRole(oldUser.getRole());
+		if (!frontEndUser.getUsername().equals(oldUser.getUsername())) {
+			return null;
+		}
+		String passwordToParse = frontEndUser.getPassword();
+		String[] passwordArray = passwordToParse.split("\\s+");
+		if (!passwordArray[0].equals(oldUser.getPassword())) {
+			throw new UserNotFoundException("The given password is incorrect");
+		}
+		frontEndUser.setPassword(passwordArray[1]);
+		if (userService.updateUser(frontEndUser)) {
+			return frontEndUser;
+		}
+		return null;
 	}
-	
-	
+
+	/**
+	 * Method takes in a user object and updates it to ROLE_ADMIN
+	 * or ROLE_USER based on the Admin's choice. 
+	 * 
+	 * User changing the roles must be ROLE_ADMIN
+	 * 
+	 * 
+	 * @param user
+	 * @param auth
+	 * @return AppUser
+	 * 
+	 * @author Austin Bark, Aaron Rea, Joshua Karvelis (190422-Java-USF)
+	 * @author Tevin Thomas, Aisha Hodge, Glory Umeasalugo, Tan Ho (1905-Java-Nick)
+	 */
+	@PreAuthorize("hasRole('ADMIN')")
+	@PutMapping(value = "/id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public AppUser updateUserRole(@RequestBody AppUser user, Authentication auth) {
+		System.out.println("in update to Admin");
+		AppUser user1 = userService.findById(user.getId());
+		System.out.println(user.getId());
+		if(user1 == null) { throw new UserNotFoundException("user with id: " +user.getId() +", not found"); }
+		
+		log.log(Level.INFO, "User Role: " + user.getRole());
+		log.log(Level.INFO, "User1 Role: " + user1.getRole());
+		log.log(Level.INFO, user.getRole());
+		userService.updateUser(user);
+		
+		return user;
+	}	
 
 	/**
 	 * This method will delete a user given that user's id. This method is only

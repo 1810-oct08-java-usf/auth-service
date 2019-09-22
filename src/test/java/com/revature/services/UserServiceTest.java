@@ -1,4 +1,4 @@
-package com.revature.tests;
+package com.revature.services;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -20,8 +20,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.revature.models.AppUser;
-import com.revature.repository.UserRepository;
-import com.revature.service.UserService;
+import com.revature.repositories.UserRepository;
+import com.revature.services.UserService;
 
 
 

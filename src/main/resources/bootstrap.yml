@@ -1,4 +1,6 @@
 spring:
+ profiles:
+    active: local
  application:
    name: auth-service
  cloud:
@@ -11,3 +13,13 @@ security:
   zsign:
     secret: ${RPM_ZUUL_ACCESS_HEADER}
     salt: ${RPM_ZUUL_ACCESS_SALT}
+
+---
+#Configuration settings that used when the local profile is active
+spring:
+  profiles: local
+  application:    name: auth-service
+  cloud:
+    config:
+      uri:
+      - http://localhost:8888

@@ -1,4 +1,4 @@
-package com.revature.service;
+package com.revature.services;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.revature.models.AppUser;
-import com.revature.repository.UserRepository;
+import com.revature.repositories.UserRepository;
 
 /**
  * This class contains methods that should be accessed by the controller to find and edit users.
@@ -96,6 +96,7 @@ public class UserService {
 	 */
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public boolean updateUser(AppUser user) {
+	      System.out.println("In update user of user service");
 		if(user == null) return false;
 		repo.save(user);
 		return true;
