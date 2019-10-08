@@ -4,12 +4,19 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.revature.models.AppUser;
+import com.revature.models.UserPrincipal;
 import com.revature.repositories.UserRepository;
 
 /**
@@ -18,15 +25,15 @@ import com.revature.repositories.UserRepository;
  *
  */
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 	
+	private BCryptPasswordEncoder encoder;
 	private UserRepository repo;
 	
-	public UserService() {}
-	
 	@Autowired
-	public UserService(UserRepository repo) {
+	public UserService(UserRepository repo, BCryptPasswordEncoder encoder) {
 		this.repo = repo;
+		this.encoder = encoder;
 	}
 	
 	/**
@@ -119,6 +126,39 @@ public class UserService {
 		else {
 			return false;
 		}
+	}
+	
+	/**
+	 * Returns a user from the DB using the provided username. If no user is found
+	 * with the given username, an exception is thrown.
+	 * 
+	 *  @param username
+	 *  	The username of a user.
+	 *  
+	 *  @return UserDetails
+	 *  	Provides core user information.
+	 *  
+	 *  @throws UsernameNotFoundException
+	 *  	Throws this if there is no user found with the given username.
+	 */
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		
+		AppUser retrievedUser = repo.findUserByUsername(username);
+		
+		if(retrievedUser == null) {
+			throw new UsernameNotFoundException("Username: " + username + " not found");
+		}
+		
+		String userPw = retrievedUser.getPassword();
+		String encodedPw = encoder.encode(userPw);
+		String userRole = retrievedUser.getRole();
+		retrievedUser.setPassword(encodedPw);
+	
+		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(userRole);
+
+		return new UserPrincipal(retrievedUser, username, userPw, grantedAuthorities);
+
 	}
 	
 }
