@@ -65,8 +65,7 @@ public class UserService implements UserDetailsService {
 	 */
 	@Transactional(readOnly=true, isolation=Isolation.READ_COMMITTED)
 	public AppUser findUserByUsername(String username) {
-		if(repo.findUserByUsername(username) == null) return null;
-		else return repo.findUserByUsername(username);
+		return repo.findUserByUsername(username);
 	}
 	
 	/**
@@ -157,7 +156,7 @@ public class UserService implements UserDetailsService {
 	
 		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(userRole);
 
-		return new UserPrincipal(retrievedUser, username, userPw, grantedAuthorities);
+		return new UserPrincipal(retrievedUser, username, encodedPw, grantedAuthorities);
 
 	}
 	
