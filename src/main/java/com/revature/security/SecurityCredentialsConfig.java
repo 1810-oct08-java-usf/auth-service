@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Provides the configuration for the Spring Security framework.
@@ -31,13 +30,6 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private ZuulConfig zuulConfig;
 
-	/**
-	 * Allows configuring web based security for specific http requests. By default
-	 * it will be applied to all requests, but can be restricted using
-	 * requestMatcher(RequestMatcher) or other similar methods.
-	 * 
-	 * @param http Used to configure Spring Security with regard to HTTP requests
-	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
@@ -66,68 +58,63 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 				 */
 				.exceptionHandling()
 				.authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)).and()
+				
 				/*
-				 * Adding our customized filter to check for the presence of the Zuul header or if that request is
-				 * to get information from the Acutator
-				 */
-	            .addFilterBefore(new CustomAuthenticationFilter(zuulConfig), UsernamePasswordAuthenticationFilter.class)
-
-				/*
-				 * We need to add a filter to validate user credentials and add token in the
-				 * response header. This filter will take in an AuthenticationManager object and
-				 * a JwtConfig object.
+				 * Registering filters:
 				 * 
-				 * AuthenticationManager is an object provided by WebSecurityConfigurerAdapter,
-				 * used to authenticate the user using the provided credentials
+				 * 		- CustomAuthenticationFilter
+				 * 		- JwtUsernameAndPasswordAuthenticationFilter
+				 * 		- JwtTokenAuthenticationFilter
 				 */
-				.addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig))
-				.addFilterAfter(new JwtTokenAuthenticationFilter(jwtConfig), UsernamePasswordAuthenticationFilter.class)
+	            .addFilterBefore(new GatewaySubversionFilter(zuulConfig), AuthFilter.class)
+				.addFilter(new AuthFilter(authenticationManager(), jwtConfig))
+				.addFilterAfter(new TokenFilter(jwtConfig), AuthFilter.class)
+				
 				/*
 				 * Allows for the access to specific endpoints to be restricted and for others
 				 * to be unrestricted
 				 */
 				.authorizeRequests()
 
-				// Allow POST requests to the "/auth" and "/auth/users" endpoints
+				/*
+				 *  Allow unrestricted access to:
+				 *  
+				 *  	- POST requests to 
+				 *  	- POST requests to 
+				 *  	- GET requests to /users/
+				 *  	- GET requests to /users/usernameAvailable
+				 *  	- GET requests to /actuator/info (needed for ELB)
+				 *  	- GET requests to /actuator/routes (needed for ELB)
+				 *  	- All requests to Swagger API doc endpoints (will be restricted in production)
+				 */
 				.mvcMatchers(HttpMethod.POST, "/auth").permitAll()
 				.mvcMatchers(HttpMethod.POST, "/users").permitAll()
-
-				//Used in checking if email is already in use
+				
 				.mvcMatchers(HttpMethod.GET, "/users/emailInUse/**").permitAll()
-				//Used in checking if username is available
 				.mvcMatchers(HttpMethod.GET, "/users/usernameAvailable/**").permitAll()
+				
+				.mvcMatchers(HttpMethod.GET, "/actuator/info").permitAll()
+				.mvcMatchers(HttpMethod.GET, "/actuator/routes").permitAll()
+				
+				.mvcMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security", "/swagger-ui.html", "/webjars/**").permitAll()
 
-				// Allow only admins to access the h2-console
+
+				/*
+				 *  Allow only admins to access:
+				 *  	
+				 *  	- All requests to /h2-console
+				 *  	- GET requests to /auth/users
+				 *  	- POST requests to /auth/users/admin
+				 */
 				.mvcMatchers("/h2-console/**").hasRole("ADMIN")
-				
-				// Allow only admins to access the "/auth/users/**" GET endpoints
 				.mvcMatchers(HttpMethod.GET, "/users/**").hasRole("ADMIN")
-				
-				// Allow only admins to access the "/auth/users/admin" POST endpoint
 				.mvcMatchers(HttpMethod.POST, "/users/admin").hasRole("ADMIN")
 				
-				/*
-				 * Allow unrestricted access to the actuator/info endpoint. Otherwise, AWS ELB
-				 * cannot perform a health check on the instance and it drains the instances.
-				 */
-				.antMatchers(HttpMethod.GET, "/actuator/info").permitAll()
-				.antMatchers(HttpMethod.GET, "/actuator/routes").permitAll()
 				
-				// Allow unrestricted access to swagger's documentation
-				.antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security", "/swagger-ui.html", "/webjars/**").permitAll()
-
 				// All other requests must be authenticated
 				.anyRequest().authenticated();
 	}
 
-	/*
-	 * Spring has UserDetailsService interface, which can be overriden to provide
-	 * our implementation for fetching user from the database (or any other source).
-	 * 
-	 * The UserDetailsService object is used by the AuthenticationManager to load
-	 * the user from database. Additionally, we need to define the password encoder
-	 * also. So, our AuthentcationManager object can compare and verify passwords.
-	 */
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
