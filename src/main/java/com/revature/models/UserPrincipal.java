@@ -30,7 +30,6 @@ public class UserPrincipal extends User {
 	public UserPrincipal(AppUser appUser, String username, String password, Collection<? extends GrantedAuthority> authorities) {
 		super(username, password, authorities);
 		this.appUser = appUser;
-		// TODO Auto-generated constructor stub
 	}
 
 	public AppUser getAppUser() {
