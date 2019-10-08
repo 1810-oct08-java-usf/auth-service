@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.revature.exceptions.UserCreationException;
 import com.revature.models.AppUser;
 import com.revature.models.UserPrincipal;
 import com.revature.repositories.UserRepository;
@@ -86,12 +87,14 @@ public class UserService implements UserDetailsService {
 	 */
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public AppUser addUser(AppUser newUser) {
-		AppUser tempUser = findUserByUsername(newUser.getUsername());
-		if(tempUser != null) return null;
-		tempUser = findUserByEmail(newUser.getEmail());
-		if(tempUser != null) return null;
-		newUser.setRole("ROLE_USER");
-		return repo.save(newUser);
+		
+		if(isUsernameAvailable(newUser.getUsername()) && isEmailAddressAvailable(newUser.getUsername())) {
+			newUser.setRole("ROLE_USER");
+			return repo.save(newUser);
+		} else {
+			throw new UserCreationException("Username or email address already taken");
+		}
+		
 	}
 
 	/**
@@ -102,10 +105,16 @@ public class UserService implements UserDetailsService {
 	 */
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public boolean updateUser(AppUser user) {
-	      System.out.println("In update user of user service");
-		if(user == null) return false;
-		repo.save(user);
-		return true;
+		
+		if(!validateFields(user)) return false;
+		
+		if(isUsernameAvailable(user.getUsername()) && isEmailAddressAvailable(user.getUsername())) {
+			repo.save(user);
+			return true;
+		} else {
+			throw new UserCreationException("Username or email address already taken");
+		}
+		
 	}
 	
 	/**
@@ -116,15 +125,15 @@ public class UserService implements UserDetailsService {
 	 */
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public boolean deleteUserById(int id) {
-		Optional<AppUser> optUser = repo.findById(id);
-		if(optUser.isPresent()) {
-			AppUser tempUser = optUser.get();
-			repo.delete(tempUser);
+		
+		Optional<AppUser> _user = repo.findById(id);
+		
+		if(_user.isPresent()) {
+			repo.delete(_user.get());
 			return true;
 		}
-		else {
-			return false;
-		}
+		
+		return false;
 	}
 	
 	/**
@@ -160,4 +169,24 @@ public class UserService implements UserDetailsService {
 
 	}
 	
+	public boolean isUsernameAvailable( String username) {
+		if(repo.findUserByUsername(username) != null) return true;
+		return false;
+	}
+	
+	public boolean isEmailAddressAvailable(String email) {
+		if(repo.findUserByEmail(email) != null) return true;
+		return false;
+	}
+	
+	public boolean validateFields(AppUser user) {
+		if(user == null) return false;
+		if(user.getFirstName() == null || user.getFirstName().equals("")) return false;
+		if(user.getLastName() == null || user.getLastName().equals("")) return false;
+		if(user.getUsername() == null || user.getUsername().equals("")) return false;
+		if(user.getPassword() == null || user.getPassword().equals("")) return false;
+		if(user.getEmail() == null || user.getEmail().equals("")) return false;
+		if(user.getRole() == null || user.getRole().equals("")) return false;
+		return true;
+	}
 }
