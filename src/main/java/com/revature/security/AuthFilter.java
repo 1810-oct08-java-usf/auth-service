@@ -21,7 +21,7 @@ import com.revature.models.UserPrincipal;
  * Filter used for authenticating a login request using the provided username and password. Upon 
  * successful authentication a JWT will be passed back to the client via a HTTP response header.
  */
-public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class AuthFilter extends UsernamePasswordAuthenticationFilter {
 	
 	/** Spring Security's AuthenticationManager which is used to validate the 
 	 * user credentials
@@ -45,7 +45,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 	 * @param jwtConfig
 	 *		Provides the configuration for how JWT tokens are created/validated.
 	 */
-	public JwtUsernameAndPasswordAuthenticationFilter(AuthenticationManager authManager, JwtConfig jwtConfig) {
+	public AuthFilter(AuthenticationManager authManager, JwtConfig jwtConfig) {
 		this.authManager = authManager;
 		this.jwtConfig = jwtConfig;
 	}
@@ -83,8 +83,11 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 			return authManager.authenticate(authToken);
 			
 		} catch (IOException e) {
-			//TODO This should be refactored to log the failed authentication attempt,
-			//	including the IP address of the requester.
+			
+			/*
+			 * TODO This should be refactored to log the failed authentication attempt, 
+			 * including the IP address of the requester.
+			 */
 			throw new RuntimeException(e);
 		}
 	}
