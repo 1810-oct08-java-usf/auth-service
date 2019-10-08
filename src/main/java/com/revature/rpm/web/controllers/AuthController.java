@@ -1,4 +1,4 @@
-package com.revature.controllers;
+package com.revature.rpm.web.controllers;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -23,11 +23,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.revature.exceptions.UserCreationException;
-import com.revature.exceptions.UserNotFoundException;
-import com.revature.models.AppUser;
-import com.revature.models.UserErrorResponse;
-import com.revature.services.UserService;
+import com.revature.rpm.exceptions.UserCreationException;
+import com.revature.rpm.exceptions.UserNotFoundException;
+import com.revature.rpm.entities.AppUser;
+import com.revature.rpm.dtos.UserErrorResponse;
+import com.revature.rpm.services.UserService;
 
 /*
  * TODO 

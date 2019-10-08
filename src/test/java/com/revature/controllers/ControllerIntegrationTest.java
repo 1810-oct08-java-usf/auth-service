@@ -14,13 +14,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.revature.controllers.AuthController;
 import com.revature.models.AppUser;
-import com.revature.security.CustomAuthenticationFilter;
+import com.revature.security.GatewaySubversionFilter;
 import com.revature.services.UserService;
 
 
@@ -46,7 +44,7 @@ public class ControllerIntegrationTest {
 	private UserService userService;
 	
 	@InjectMocks
-	private CustomAuthenticationFilter filter;
+	private GatewaySubversionFilter filter;
 	
 	AppUser mockUser;
 	

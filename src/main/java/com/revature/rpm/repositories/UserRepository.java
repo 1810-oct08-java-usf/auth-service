@@ -1,9 +1,9 @@
-package com.revature.repositories;
+package com.revature.rpm.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.revature.models.AppUser;
+import com.revature.rpm.entities.AppUser;
 
 /**
  * Class is responsible for storing data into the database

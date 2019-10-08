@@ -1,4 +1,4 @@
-package com.revature.security;
+package com.revature.rpm.security.util;
 
 import java.sql.Date;
 import java.util.stream.Collectors;
@@ -9,6 +9,8 @@ import org.springframework.security.core.GrantedAuthority;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+
+import com.revature.rpm.security.config.JwtConfig;
 
 public class JwtGenerator {
 

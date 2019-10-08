@@ -1,4 +1,4 @@
-package com.revature;
+package com.revature.rpm;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

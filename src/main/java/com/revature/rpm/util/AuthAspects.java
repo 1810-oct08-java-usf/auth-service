@@ -1,4 +1,4 @@
-package com.revature.aop;
+package com.revature.rpm.util;
 
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -11,6 +11,9 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
+/*
+ *	TODO fix pointcut to match new package structure
+ */
 /**
  * This is a tentative outline for future batches to use to help log what is happening across methods. 
  * Uses Spring AOP to log the inputs and outputs of ALL methods in ALL packages.

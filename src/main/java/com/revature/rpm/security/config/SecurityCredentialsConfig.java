@@ -1,4 +1,4 @@
-package com.revature.security;
+package com.revature.rpm.security.config;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,6 +13,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import com.revature.rpm.web.filters.AuthFilter;
+import com.revature.rpm.web.filters.GatewaySubversionFilter;
+import com.revature.rpm.web.filters.TokenFilter;
 
 /**
  * Provides the configuration for the Spring Security framework.

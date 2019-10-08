@@ -1,4 +1,4 @@
-package com.revature.security;
+package com.revature.rpm.security.config;
 
 import org.springframework.beans.factory.annotation.Value;
 

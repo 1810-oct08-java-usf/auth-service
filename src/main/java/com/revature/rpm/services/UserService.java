@@ -1,4 +1,4 @@
-package com.revature.services;
+package com.revature.rpm.services;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,10 +15,10 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.revature.exceptions.UserCreationException;
-import com.revature.models.AppUser;
-import com.revature.models.UserPrincipal;
-import com.revature.repositories.UserRepository;
+import com.revature.rpm.exceptions.UserCreationException;
+import com.revature.rpm.entities.AppUser;
+import com.revature.rpm.dtos.UserPrincipal;
+import com.revature.rpm.repositories.UserRepository;
 
 /*
  * TODO

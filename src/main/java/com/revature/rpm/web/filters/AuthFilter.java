@@ -1,4 +1,4 @@
-package com.revature.security;
+package com.revature.rpm.web.filters;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -14,8 +14,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.revature.models.UserCredentials;
-import com.revature.models.UserPrincipal;
+import com.revature.rpm.dtos.UserCredentials;
+import com.revature.rpm.dtos.UserPrincipal;
+
+import com.revature.rpm.security.config.JwtConfig;
+import com.revature.rpm.security.util.JwtGenerator;
 
 /**
  * Filter used for authenticating a login request using the provided username and password. Upon 

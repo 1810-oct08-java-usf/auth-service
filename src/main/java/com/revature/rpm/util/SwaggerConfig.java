@@ -1,4 +1,4 @@
-package com.revature.swagger;
+package com.revature.rpm.util;
 
 import java.util.Arrays;
 import java.util.HashSet;

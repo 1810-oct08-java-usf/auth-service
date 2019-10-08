@@ -1,4 +1,4 @@
-package com.revature.models;
+package com.revature.rpm.dtos;
 
 /**
  * Used to store user credentials recieved from request body of an

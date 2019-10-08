@@ -1,4 +1,4 @@
-package com.revature.security;
+package com.revature.rpm.web.filters;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.revature.rpm.security.config.JwtConfig;
 
 /**
  * A filter used to intercept all requests and validate the JWT, if present, in

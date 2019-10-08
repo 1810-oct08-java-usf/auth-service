@@ -1,4 +1,4 @@
-package com.revature.exceptions;
+package com.revature.rpm.exceptions;
 
 import java.io.IOException;
 

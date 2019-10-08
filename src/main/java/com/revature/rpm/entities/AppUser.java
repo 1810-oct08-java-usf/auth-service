@@ -1,4 +1,4 @@
-package com.revature.models;
+package com.revature.rpm.entities;
 
 import java.io.Serializable;
 import java.util.Objects;

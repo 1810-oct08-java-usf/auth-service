@@ -1,4 +1,4 @@
-package com.revature.exceptions;
+package com.revature.rpm.exceptions;
 
 /**
  * Exception thrown if a user is not found in the database

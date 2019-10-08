@@ -1,4 +1,4 @@
-package com.revature.security;
+package com.revature.rpm.web.filters;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -15,7 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
 
-import com.revature.exceptions.GatewaySubversionException;
+import com.revature.rpm.exceptions.GatewaySubversionException;
+import com.revature.rpm.security.config.ZuulConfig;
 
 /*
  * TODO

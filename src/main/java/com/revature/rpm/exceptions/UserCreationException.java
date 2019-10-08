@@ -1,4 +1,4 @@
-package com.revature.exceptions;
+package com.revature.rpm.exceptions;
 
 /**
  * Exception gets thrown when a user cannot be created
