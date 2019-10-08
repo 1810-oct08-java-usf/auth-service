@@ -35,7 +35,7 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
 	/**
 	 * Constructor for the JwtUsernameAndPasswordAuthenticationFilter that
 	 * instantiates the AuthenticationManager and the JwtConfig fields.
-	 * 
+	 * <br><br>
 	 * The default endpoint is being leveraged. All authentication (login)
 	 * requests should be POST requests made to /login
 	 * 
@@ -56,12 +56,11 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
 	 * passed to the constructor of Spring Security's UsernamePasswordAuthenticationToken 
 	 * class in order to generate an authentication token that will be authenticated
 	 * by the AuthenticationManager.
-	 * 
-	 * Tries to:
-	 * 1. Get credentials from request body.
-	 * 2. Create an authentication token (contains user credentials) which will be used by the AuthenticationManager.
-	 * 3. Leverage AuthenticationManager to authenticate the user, 
-	 * 		and use UserDetailsServiceImpl::loadUserByUsername() method to load the user.
+	 * <br><br>
+	 * Tries to:<br>
+	 * 1. Get credentials from request body.<br>
+	 * 2. Create an authentication token (contains user credentials) which will be used by the AuthenticationManager.<br>
+	 * 3. Leverage AuthenticationManager to authenticate the user.
 	 * 
 	 * @param request 
 	 * 		Provides information regarding the HTTP request.
