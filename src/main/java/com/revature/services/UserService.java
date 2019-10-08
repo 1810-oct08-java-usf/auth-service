@@ -88,7 +88,7 @@ public class UserService implements UserDetailsService {
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public AppUser addUser(AppUser newUser) {
 		
-		if(isUsernameAvailable(newUser.getUsername()) && isEmailAddressAvailable(newUser.getUsername())) {
+		if(!isUsernameAvailable(newUser.getUsername()) || !isEmailAddressAvailable(newUser.getUsername())) {
 			newUser.setRole("ROLE_USER");
 			return repo.save(newUser);
 		} else {
@@ -108,7 +108,7 @@ public class UserService implements UserDetailsService {
 		
 		if(!validateFields(user)) return false;
 		
-		if(isUsernameAvailable(user.getUsername()) && isEmailAddressAvailable(user.getUsername())) {
+		if(!isUsernameAvailable(user.getUsername()) || !isEmailAddressAvailable(user.getUsername())) {
 			repo.save(user);
 			return true;
 		} else {
@@ -169,16 +169,34 @@ public class UserService implements UserDetailsService {
 
 	}
 	
-	public boolean isUsernameAvailable( String username) {
+	/**
+	 * Checks to see if there is a user record with the provided username.
+	 * 
+	 * @param username
+	 * @return true if present, false if not
+	 */
+	public boolean isUsernameAvailable(String username) {
 		if(repo.findUserByUsername(username) != null) return true;
 		return false;
 	}
 	
+	/**
+	 * Checks to see if there is a user record with the provided email.
+	 * 
+	 * @param username
+	 * @return true if present, false if not
+	 */
 	public boolean isEmailAddressAvailable(String email) {
 		if(repo.findUserByEmail(email) != null) return true;
 		return false;
 	}
 	
+	/**
+	 * Checks to see if the provided user objcet has valid fields.
+	 * 
+	 * @param user
+	 * @return true if valid, false if invalid
+	 */
 	public boolean validateFields(AppUser user) {
 		if(user == null) return false;
 		if(user.getFirstName() == null || user.getFirstName().equals("")) return false;
