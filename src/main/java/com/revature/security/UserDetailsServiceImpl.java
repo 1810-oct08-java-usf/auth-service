@@ -2,6 +2,7 @@ package com.revature.security;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -53,44 +54,22 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	 */
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+				
+		AppUser retrievedUser = userRepo.findUserByUsername(username);
 		
-		/*
-		 * TODO This method should be refactored to actually pull a user from the embedded 
-		 * DB based upon their user name. The current implementation is not efficient.
-		 */
-		List<AppUser> users = new ArrayList<AppUser>();
-		userRepo.findAll().forEach(user -> users.add(user));
-		
-		for(AppUser appUser : users) {
-			appUser.setPassword(encoder.encode(appUser.getPassword()));
+		if(retrievedUser == null) {
+			throw new UsernameNotFoundException("Username: " + username + " not found");
 		}
 		
-		for (AppUser appUser : users) {
-			if (appUser.getUsername().equals(username)) {
+		String userPw = retrievedUser.getPassword();
+		String encodedPw = encoder.encode(userPw);
+		String userRole = retrievedUser.getRole();
+		retrievedUser.setPassword(encodedPw);
+	
+		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(userRole);
 
-				/*
-				 * Spring needs roles to be in this format: "ROLE_ADMIN". So, we need to set it
-				 * to that format, so we can verify and compare roles and provide a list of
-				 * granted authorities based upon the user's role.
-				 */
-				List<GrantedAuthority> grantedAuthorities = AuthorityUtils
-						.commaSeparatedStringToAuthorityList(appUser.getRole());
+		return new UserPrincipal(retrievedUser, username, userPw, grantedAuthorities);
 
-				/*
-				 * The "User" class is provided by Spring and represents a model class for user
-				 * to be returned by UserDetailsService, and used by AuthenticationManager to
-				 * verify and check user authentication.
-				 */
-				/**
-				 * This method will return the entire AppUser object for use in the response body
-				 * by encapsulating the default Spring User inside our custom UserPrincipal class that extends User. 
-				 */
-				return new UserPrincipal(appUser, appUser.getUsername(), appUser.getPassword(), grantedAuthorities);
-			}
-		}
-
-		// If no user is not found, throw a UsernameNotFoundException
-		throw new UsernameNotFoundException("Username: " + username + " not found");
 	}
 	
 }
