@@ -129,7 +129,7 @@ public class AuthController {
 	@GetMapping(value="/emailInUse/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public String checkIfEmailIsInUse(@PathVariable String email) {
-		if (userService.findUserByEmail(email) == null)
+		if (userService.isEmailAddressAvailable(email))
 			return "{\"emailIsInUse\": false}";
 		return "{\"emailIsInUse\": true}";
 	}
@@ -143,7 +143,7 @@ public class AuthController {
 	@GetMapping(value="/usernameAvailable/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public String checkIfUsernameIsAvailable(@PathVariable String username) {
-		if (userService.findUserByUsername(username) == null)
+		if (userService.isUsernameAvailable(username))
 			return "{\"usernameIsAvailable\": true}";
 		return "{\"usernameIsAvailable\":false}";
 	}
