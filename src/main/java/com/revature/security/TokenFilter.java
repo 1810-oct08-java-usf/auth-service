@@ -18,8 +18,10 @@ import java.util.stream.Collectors;
 /**
  * A filter used to intercept all requests and validate the JWT, if present, in
  * the HTTP request header.
+ * 
+ * @author Wezley Singleton
  */
-public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
+public class TokenFilter extends OncePerRequestFilter {
 
 	private final JwtConfig jwtConfig;
 
@@ -30,7 +32,7 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
 	 * @param jwtConfig
 	 *            Provides configuration for validating JWTs
 	 */
-	public JwtTokenAuthenticationFilter(JwtConfig jwtConfig) {
+	public TokenFilter(JwtConfig jwtConfig) {
 		this.jwtConfig = jwtConfig;
 	}
 
@@ -54,74 +56,42 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp, FilterChain chain)
 			throws ServletException, IOException {
 
-		/*
-		 * 1. Get the authorization header. Tokens are supposed to be passed in the auth
-		 * header
-		 */
+	
 		String header = req.getHeader(jwtConfig.getHeader());
 
-		/*
-		 * 2. Validate the auth header and check the prefix (which we defined to be
-		 * "Bearer ")
-		 */
 		if (header == null || !header.startsWith(jwtConfig.getPrefix())) {
 			chain.doFilter(req, resp);
 			return;
 		}
 
-		/*
-		 * If there is no token provided, this means that the user is not authenticated.
-		 * It may seem wrong to send the request along the filter chain, but perhaps the
-		 * user is accessing a public path or asking for a token.
-		 *
-		 * All secured paths that needs a token are already defined and secured our
-		 * SecurityTokenConfig class. If a user tried to access one of the secured paths
-		 * without access token, then he won't be authenticated and an exception will be
-		 * thrown.
-		 */
-
-		// 3. Get the token
 		String token = header.replaceAll(jwtConfig.getPrefix(), "");
 
-		// Exceptions might be thrown in creating the claims (i.e if the token expired)
 		try {
 
-			Claims claims = Jwts.parser().setSigningKey(jwtConfig.getSecret().getBytes()).parseClaimsJws(token)
+			Claims claims = Jwts.parser()
+					.setSigningKey(jwtConfig.getSecret().getBytes())
+					.parseClaimsJws(token)
 					.getBody();
 
 			String username = claims.getSubject();
 
-
-			/*
-			 * 5. Create auth object
-			 *
-			 * UsernamePasswordAuthenticationToken: A built-in object, used by Spring to
-			 * represent the current authenticated / being authenticated user. It needs a
-			 * list of authorities, which has type of GrantedAuthority interface, where
-			 * SimpleGrantedAuthority is an implementation of that interface.
-			 */
 			if (username != null) {
-				List<String> authorities = (List<String>) claims.get("authorities");
-
-				authorities.forEach(String::toString);
-
-				UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null,
-						authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
-
-				// 6. Authenticate the user
+				
+				@SuppressWarnings("unchecked")
+				List<String> authoritiesClaim = (List<String>) claims.get("authorities");
+				
+				List<SimpleGrantedAuthority> grantedAuthorities = authoritiesClaim.stream()
+																				  .map(SimpleGrantedAuthority::new)
+																				  .collect(Collectors.toList());
+				
+				UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null, grantedAuthorities);
 				SecurityContextHolder.getContext().setAuthentication(auth);
 			}
 
 		} catch (Exception e) {
-
-			/*
-			 * In case of failure, make sure it's clear; so we can guarantee that the user
-			 * will not be authenticated
-			 */
 			SecurityContextHolder.clearContext();
 		}
 
-		// Go to the next filter in the filter chain
 		chain.doFilter(req, resp);
 	}
 
