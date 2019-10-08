@@ -1,10 +1,12 @@
 package com.revature.models;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * This is a data object for the errors
- * @Author Alonzo Muncy (190107 Java-Spark-USF)
+ * 
+ * @author Alonzo Muncy (190107 Java-Spark-USF)
  *
  */
 public class UserErrorResponse implements Serializable {
@@ -50,12 +52,7 @@ public class UserErrorResponse implements Serializable {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((message == null) ? 0 : message.hashCode());
-		result = prime * result + status;
-		result = prime * result + (int) (timestamp ^ (timestamp >>> 32));
-		return result;
+		return Objects.hash(message, status, timestamp);
 	}
 
 	@Override
@@ -64,19 +61,10 @@ public class UserErrorResponse implements Serializable {
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if (!(obj instanceof UserErrorResponse))
 			return false;
 		UserErrorResponse other = (UserErrorResponse) obj;
-		if (message == null) {
-			if (other.message != null)
-				return false;
-		} else if (!message.equals(other.message))
-			return false;
-		if (status != other.status)
-			return false;
-		if (timestamp != other.timestamp)
-			return false;
-		return true;
+		return Objects.equals(message, other.message) && status == other.status && timestamp == other.timestamp;
 	}
 
 	@Override
