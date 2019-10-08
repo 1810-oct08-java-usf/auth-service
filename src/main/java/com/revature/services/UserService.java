@@ -20,10 +20,15 @@ import com.revature.models.AppUser;
 import com.revature.models.UserPrincipal;
 import com.revature.repositories.UserRepository;
 
+/*
+ * TODO
+ * 
+ * - encrypt user passwords prior to persistence (should not break security functionality)
+ */
+
 /**
- * This class contains methods that should be accessed by the controller to find and edit users.
- * @author Caleb
- *
+ * This class contains methods that should be accessed by the 
+ * controller to find and edit users.
  */
 @Service
 public class UserService implements UserDetailsService {
