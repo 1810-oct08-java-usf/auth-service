@@ -13,19 +13,24 @@ import io.jsonwebtoken.SignatureAlgorithm;
 public class JwtGenerator {
 
 	/**
-	 * Method used for generating a JWT based on code gutted from
-	 * JwtUsernameAndPasswordAuthenticationFilter.successfulAuthentication().
-	 * Authentication object from Spring Security is passed in to make this
-	 * previously designed code behave the same way it did.
-	 * Similarly, a JwtConfig object is passed in to guarantee correct behavior.
+	 * Method used for generating a JWT based upon an authentication object. 
+	 * Creates a token which encodes the following: 
+	 * <br><br>
+	 * - The username of the subject<br>
+	 * - The issuer of the token<br>
+	 * - The authority claims of the user based upon their role<br>
+	 * - The time that the issued was issued<br>
+	 * - The time which the token expires<br>
+	 * 
 	 * 
 	 * @param auth 
 	 * 		Authentication object from Spring Security
+	 * 
 	 * @param jwtConfig 
 	 * 		configures the settings for the JWT's creation.
+	 * 
 	 * @return String
-	 * 		contains JWT info (without prefix)
-	 * @author Daniel Shaffer (190422-USF-Java)
+	 * 		the JWT (no prefix present)
 	 */
 
 	public static String createJwt(Authentication auth, JwtConfig jwtConfig) {
@@ -34,12 +39,17 @@ public class JwtGenerator {
 		SignatureAlgorithm sigAlg = SignatureAlgorithm.HS512;
 		long nowMillis = System.currentTimeMillis();
 
-		//Converts info in .claim() to list of strings; IMPORTANT: affects the way we get them back in the Gateway
+		/*
+		 * Converts info in .claim() to list of strings 
+		 * 
+		 * IMPORTANT: this affects the way we get them back in the Gateway
+		 */
 		JwtBuilder builder = Jwts.builder()
 				.setSubject(auth.getName())
 				.setIssuer("revature")
-				.claim("authorities",auth.getAuthorities().stream()
-						.map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+				.claim("authorities", auth.getAuthorities().stream()
+														   .map(GrantedAuthority::getAuthority)
+														   .collect(Collectors.toList()))
 				.setIssuedAt(new Date(nowMillis))
 				.setExpiration(new Date(nowMillis + jwtConfig.getExpiration()))
 				.signWith(sigAlg, jwtConfig.getSecret().getBytes());
