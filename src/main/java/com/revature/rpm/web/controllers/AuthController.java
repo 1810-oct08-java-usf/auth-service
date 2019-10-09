@@ -1,7 +1,6 @@
 package com.revature.rpm.web.controllers;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.validation.Valid;
 
@@ -27,6 +26,7 @@ import com.revature.rpm.entities.AppUser;
 import com.revature.rpm.exceptions.BadRequestException;
 import com.revature.rpm.exceptions.UserCreationException;
 import com.revature.rpm.exceptions.UserNotFoundException;
+import com.revature.rpm.exceptions.UserUpdateException;
 import com.revature.rpm.services.UserService;
 
 /*
@@ -234,7 +234,7 @@ public class AuthController {
 	}
 	
 	/**
-	 * This handles any UserCreationException thrown in the AuthController.
+	 * This handles any BadRequestException thrown in the AuthController.
 	 * 
 	 * @param uce
 	 * @return This method will return an error of type UserErrorResponse
@@ -245,6 +245,22 @@ public class AuthController {
 		UserErrorResponse error = new UserErrorResponse();
 		error.setStatus(HttpStatus.BAD_REQUEST.value());
 		error.setMessage(bre.getMessage());
+		error.setTimestamp(System.currentTimeMillis());
+		return error;
+	}
+	
+	/**
+	 * This handles any UserUpdateException thrown in the AuthController.
+	 * 
+	 * @param uce
+	 * @return This method will return an error of type UserErrorResponse
+	 */
+	@ExceptionHandler
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public UserErrorResponse handleUserUpdateException(UserUpdateException uue) {
+		UserErrorResponse error = new UserErrorResponse();
+		error.setStatus(HttpStatus.CONFLICT.value());
+		error.setMessage(uue.getMessage());
 		error.setTimestamp(System.currentTimeMillis());
 		return error;
 	}
