@@ -1,7 +1,6 @@
 package com.revature.rpm.web.controllers;
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.validation.Valid;
@@ -11,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,13 +18,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.revature.rpm.dtos.UserErrorResponse;
+import com.revature.rpm.entities.AppUser;
+import com.revature.rpm.exceptions.BadRequestException;
 import com.revature.rpm.exceptions.UserCreationException;
 import com.revature.rpm.exceptions.UserNotFoundException;
-import com.revature.rpm.entities.AppUser;
-import com.revature.rpm.dtos.UserErrorResponse;
 import com.revature.rpm.services.UserService;
 
 /*
@@ -42,25 +42,20 @@ import com.revature.rpm.services.UserService;
  */
 
 /**
- * This class contains all CRUD functionality for the users
- * This controller is prefaced with the mapping of /auth then
- * the request mapping as specified in SecurityCredentialsConfig.java
+ * This controller contains all CRUD functionality for the users
+ * and is mapped to handle all requests to /users.
  * 
- * @author Caleb
- *
  */
 @RestController
 @RequestMapping("/users")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AuthController {
 	
-	private static Logger log = Logger.getLogger("DRIVER_LOGGER");
-
 	private UserService userService;
 
 	@Autowired
-	public void setUserService(UserService userService) {
-		this.userService = userService;
+	public AuthController(UserService service) {
+		this.userService = service;
 	}
 
 	/**
@@ -84,10 +79,7 @@ public class AuthController {
 	@GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public AppUser getUserById(@PathVariable int id) {
-		AppUser user = userService.findById(id);
-		if (user == null)
-			throw new UserNotFoundException("There is no user with that ID.");
-		return user;
+		return userService.findById(id);
 	}
 
 	/**
@@ -100,8 +92,6 @@ public class AuthController {
 	@GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public AppUser getUserByUsername(@PathVariable String username) {
-		if (userService.findUserByUsername(username) == null)
-			throw new UserNotFoundException("There is no user with that username.");
 		return userService.findUserByUsername(username);
 	}
 
@@ -115,41 +105,35 @@ public class AuthController {
 	@GetMapping(value = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public AppUser getUserByEmail(@PathVariable String email) {
-		if (userService.findUserByEmail(email) == null)
-			throw new UserNotFoundException("There is no user with that email address.");
 		return userService.findUserByEmail(email);
 	}
 
-	// TODO Refactor this to use a proper object
 	/**
-	 * Used in checking if email is already in use
+	 * Used for checking the availability of user fields where uniqueness is enforced.
 	 * 
-	 * @param email
-	 * @return String
-	 */
-	@GetMapping(value="/emailInUse/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
-	@ResponseStatus(HttpStatus.OK)
-	public String checkIfEmailIsInUse(@PathVariable String email) {
-		if (userService.isEmailAddressAvailable(email))
-			return "{\"emailIsInUse\": false}";
-		return "{\"emailIsInUse\": true}";
-	}
-
-	// TODO Refactor this to use a proper object
-	/**
-	 * Used in checking if the username is available
+	 * @param field
+	 * 		Specifies the field (i.e. username, email) being checked for availability
 	 * 
-	 * @param username
-	 * @return String
+	 * @param value
+	 * 		The value being checked for uniqueness
+	 * 
+	 * @return true if available, false if not
 	 */
-	@GetMapping(value="/usernameAvailable/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value="/available", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public String checkIfUsernameIsAvailable(@PathVariable String username) {
-		if (userService.isUsernameAvailable(username))
-			return "{\"usernameIsAvailable\": true}";
-		return "{\"usernameIsAvailable\":false}";
+	public boolean isAvailable(@RequestParam String field, @RequestParam String value) {
+		
+		switch(field) {
+		case "username":
+			return userService.isUsernameAvailable(value);
+		case "email":
+			return userService.isEmailAddressAvailable(value);
+		default:
+			throw new BadRequestException("Invalid field value specified");
+		}
+		
 	}
-
+	
 	/**
 	 * This is the method for registering a new user
 	 * 
@@ -160,9 +144,7 @@ public class AuthController {
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
 	public AppUser registerUser(@RequestBody AppUser user) {
-		if (userService.addUser(user) == null)
-			throw new UserCreationException("That username or email already exists.");
-		return user;
+		return userService.addUser(user);
 	}
 
 	/**
@@ -182,28 +164,8 @@ public class AuthController {
 	 */
 	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public AppUser updateUser(@Valid @RequestBody AppUser frontEndUser, Authentication auth) {
-		if (frontEndUser == null) {
-			return null;
-		}
-		if (frontEndUser.getUsername() == null) {
-			return null;
-		}
-		AppUser oldUser = userService.findById(frontEndUser.getId());
-		frontEndUser.setRole(oldUser.getRole());
-		if (!frontEndUser.getUsername().equals(oldUser.getUsername())) {
-			return null;
-		}
-		String passwordToParse = frontEndUser.getPassword();
-		String[] passwordArray = passwordToParse.split("\\s+");
-		if (!passwordArray[0].equals(oldUser.getPassword())) {
-			throw new UserNotFoundException("The given password is incorrect");
-		}
-		frontEndUser.setPassword(passwordArray[1]);
-		if (userService.updateUser(frontEndUser)) {
-			return frontEndUser;
-		}
-		return null;
+	public boolean updateUser(@Valid @RequestBody AppUser updatedUser) {
+		return userService.updateUser(updatedUser, false);
 	}
 
 	/**
@@ -217,24 +179,12 @@ public class AuthController {
 	 * @param auth
 	 * @return AppUser
 	 * 
-	 * @author Austin Bark, Aaron Rea, Joshua Karvelis (190422-Java-USF)
-	 * @author Tevin Thomas, Aisha Hodge, Glory Umeasalugo, Tan Ho (1905-Java-Nick)
 	 */
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping(value = "/id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public AppUser updateUserRole(@RequestBody AppUser user, Authentication auth) {
-		System.out.println("in update to Admin");
-		AppUser user1 = userService.findById(user.getId());
-		System.out.println(user.getId());
-		if(user1 == null) { throw new UserNotFoundException("user with id: " +user.getId() +", not found"); }
-		
-		log.log(Level.INFO, "User Role: " + user.getRole());
-		log.log(Level.INFO, "User1 Role: " + user1.getRole());
-		log.log(Level.INFO, user.getRole());
-		userService.updateUser(user);
-		
-		return user;
+	public boolean updateUserRole(@RequestBody AppUser user) {
+		return userService.updateUser(user, true);
 	}	
 
 	/**
@@ -247,12 +197,8 @@ public class AuthController {
 	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping(value = "/id/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public void deleteUser(@PathVariable int id) {
-		AppUser user = userService.findById(id);
-		if (user == null)
-			throw new UserNotFoundException("User with id: " + id + " not found");
-		if (!userService.deleteUserById(user.getId()))
-			throw new UserNotFoundException("User with id: " + user.getId() + " does not exist.");
+	public boolean deleteUser(@PathVariable int id) {
+		return userService.deleteUserById(id);
 	}
 
 	/**
@@ -283,6 +229,22 @@ public class AuthController {
 		UserErrorResponse error = new UserErrorResponse();
 		error.setStatus(HttpStatus.CONFLICT.value());
 		error.setMessage(uce.getMessage());
+		error.setTimestamp(System.currentTimeMillis());
+		return error;
+	}
+	
+	/**
+	 * This handles any UserCreationException thrown in the AuthController.
+	 * 
+	 * @param uce
+	 * @return This method will return an error of type UserErrorResponse
+	 */
+	@ExceptionHandler
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public UserErrorResponse handleBadRequestException(BadRequestException bre) {
+		UserErrorResponse error = new UserErrorResponse();
+		error.setStatus(HttpStatus.BAD_REQUEST.value());
+		error.setMessage(bre.getMessage());
 		error.setTimestamp(System.currentTimeMillis());
 		return error;
 	}

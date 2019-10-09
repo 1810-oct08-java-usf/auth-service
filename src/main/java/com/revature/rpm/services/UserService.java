@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.revature.rpm.exceptions.UserCreationException;
+import com.revature.rpm.exceptions.UserNotFoundException;
+import com.revature.rpm.exceptions.UserUpdateException;
 import com.revature.rpm.entities.AppUser;
 import com.revature.rpm.dtos.UserPrincipal;
 import com.revature.rpm.repositories.UserRepository;
@@ -93,7 +95,7 @@ public class UserService implements UserDetailsService {
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public AppUser addUser(AppUser newUser) {
 		
-		if(!isUsernameAvailable(newUser.getUsername()) || !isEmailAddressAvailable(newUser.getUsername())) {
+		if(isUsernameAvailable(newUser.getUsername()) || isEmailAddressAvailable(newUser.getUsername())) {
 			newUser.setRole("ROLE_USER");
 			return repo.save(newUser);
 		} else {
@@ -104,21 +106,41 @@ public class UserService implements UserDetailsService {
 
 	/**
 	 * This method will update a user's information
-	 * @param user
+	 * @param updatedUser
 	 * @return false if the user does not exist
 	 * @return true if the user exists and was updated
 	 */
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
-	public boolean updateUser(AppUser user) {
+	public boolean updateUser(AppUser updatedUser, boolean updateRole) {
 		
-		if(!validateFields(user)) return false;
+		if(!validateFields(updatedUser)) return false;
 		
-		if(!isUsernameAvailable(user.getUsername()) || !isEmailAddressAvailable(user.getUsername())) {
-			repo.save(user);
-			return true;
-		} else {
+		if(isUsernameAvailable(updatedUser.getUsername()) || isEmailAddressAvailable(updatedUser.getUsername())) {
 			throw new UserCreationException("Username or email address already taken");
 		}
+		
+		Optional<AppUser> _userBeforeUpdate = repo.findById(updatedUser.getId());
+		if(!_userBeforeUpdate.isPresent()) {
+			throw new UserNotFoundException("No user found with the provided id");
+		}
+		
+		AppUser userBeforeUpdate = _userBeforeUpdate.get();
+		
+		String expectedUsername = userBeforeUpdate.getUsername();
+		String actualUsername = updatedUser.getUsername();
+		if(!actualUsername.equals(expectedUsername)) {
+			throw new UserUpdateException("Usernames cannot be changed");
+		}
+		
+		String expectedRole = userBeforeUpdate.getRole();
+		String actualRole = updatedUser.getRole();
+		if(!updateRole && !actualRole.equals(expectedRole)) {
+			throw new UserUpdateException("Could not update user role");
+		}
+		
+		repo.save(updatedUser);
+		
+		return true;
 		
 	}
 	
@@ -133,12 +155,12 @@ public class UserService implements UserDetailsService {
 		
 		Optional<AppUser> _user = repo.findById(id);
 		
-		if(_user.isPresent()) {
-			repo.delete(_user.get());
-			return true;
+		if(!_user.isPresent()) {
+			throw new UserNotFoundException("No user found with provided id");
 		}
 		
-		return false;
+		repo.delete(_user.get());
+		return true;
 	}
 	
 	/**
@@ -181,7 +203,7 @@ public class UserService implements UserDetailsService {
 	 * @return true if present, false if not
 	 */
 	public boolean isUsernameAvailable(String username) {
-		if(repo.findUserByUsername(username) != null) return true;
+		if(repo.findUserByUsername(username) == null) return true;
 		return false;
 	}
 	
@@ -192,7 +214,7 @@ public class UserService implements UserDetailsService {
 	 * @return true if present, false if not
 	 */
 	public boolean isEmailAddressAvailable(String email) {
-		if(repo.findUserByEmail(email) != null) return true;
+		if(repo.findUserByEmail(email) == null) return true;
 		return false;
 	}
 	
