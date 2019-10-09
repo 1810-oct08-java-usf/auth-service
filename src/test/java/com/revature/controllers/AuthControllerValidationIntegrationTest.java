@@ -23,9 +23,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.revature.models.AppUser;
-import com.revature.models.UserPrincipal;
-import com.revature.services.UserService;
+import com.revature.rpm.dtos.UserPrincipal;
+import com.revature.rpm.entities.AppUser;
+import com.revature.rpm.services.UserService;
+import com.revature.rpm.web.controllers.AuthController;
 
 /**
  * Testing that validation are applied when we update a user profile.

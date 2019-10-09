@@ -17,9 +17,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.revature.models.AppUser;
-import com.revature.security.GatewaySubversionFilter;
-import com.revature.services.UserService;
+import com.revature.rpm.entities.AppUser;
+import com.revature.rpm.services.UserService;
+import com.revature.rpm.web.controllers.AuthController;
+import com.revature.rpm.web.filters.GatewaySubversionFilter;
 
 
 /**

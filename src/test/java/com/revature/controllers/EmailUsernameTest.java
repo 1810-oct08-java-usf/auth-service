@@ -15,9 +15,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.revature.controllers.AuthController;
-import com.revature.models.AppUser;
-import com.revature.services.UserService;
+import com.revature.rpm.entities.AppUser;
+import com.revature.rpm.services.UserService;
+import com.revature.rpm.web.controllers.AuthController;
 
 /**
  * Class containing MockMVC tests for the email and username validation methods.

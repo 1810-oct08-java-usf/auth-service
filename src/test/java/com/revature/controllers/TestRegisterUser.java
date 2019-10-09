@@ -9,10 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import com.revature.controllers.AuthController;
-import com.revature.exceptions.UserCreationException;
-import com.revature.models.AppUser;
-import com.revature.services.UserService;
+import com.revature.rpm.entities.AppUser;
+import com.revature.rpm.exceptions.UserCreationException;
+import com.revature.rpm.services.UserService;
+import com.revature.rpm.web.controllers.AuthController;
 
 // TODO Merge this logic into the existing AuthControllerTest suite.
 

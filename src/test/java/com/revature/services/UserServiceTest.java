@@ -19,9 +19,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.revature.models.AppUser;
-import com.revature.repositories.UserRepository;
-import com.revature.services.UserService;
+import com.revature.rpm.entities.AppUser;
+import com.revature.rpm.repositories.UserRepository;
+import com.revature.rpm.services.UserService;
 
 
 
