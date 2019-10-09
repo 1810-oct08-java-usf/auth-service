@@ -120,6 +120,7 @@ public class AuthController {
 		return userService.findUserByEmail(email);
 	}
 
+	// TODO Refactor this to use a proper object
 	/**
 	 * Used in checking if email is already in use
 	 * 
@@ -134,6 +135,7 @@ public class AuthController {
 		return "{\"emailIsInUse\": true}";
 	}
 
+	// TODO Refactor this to use a proper object
 	/**
 	 * Used in checking if the username is available
 	 * 

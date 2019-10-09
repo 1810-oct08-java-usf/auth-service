@@ -21,14 +21,14 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.revature.exceptions.UserCreationException;
-import com.revature.exceptions.UserNotFoundException;
-import com.revature.models.AppUser;
-import com.revature.models.UserErrorResponse;
-import com.revature.models.UserPrincipal;
-import com.revature.services.UserService;
+import com.revature.rpm.dtos.UserErrorResponse;
+import com.revature.rpm.dtos.UserPrincipal;
+import com.revature.rpm.entities.AppUser;
+import com.revature.rpm.exceptions.UserCreationException;
+import com.revature.rpm.exceptions.UserNotFoundException;
+import com.revature.rpm.services.UserService;
+import com.revature.rpm.web.controllers.AuthController;
 /**
  * This class will be used to test methods in the AuthController. Testing will
  * be done using Junit to test different scenarios.
@@ -56,9 +56,6 @@ public class AuthControllerTest {
 	@Rule
 	public ExpectedException exceptionRule = ExpectedException.none();
 	
-	private String password = "valid";
-	
-		
 	/**
 	 * makes a mock auth controller for each test methods.
 	 * @author Ankit Patel (190107-Java-Spark-USF)
