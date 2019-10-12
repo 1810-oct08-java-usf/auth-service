@@ -65,7 +65,7 @@ public class IntegrationWithoutSecurity {
 	@Test
 	@WithMockUser(roles= {"USER","ADMIN"})
 	public void deleteUser() throws Exception{	
-		when(userService.findById(0)).thenReturn(mockAppUser);
+		when(userService.findUserById(0)).thenReturn(mockAppUser);
 		when(userService.deleteUserById(0)).thenReturn(true);
 		when(mockAppUser.getId()).thenReturn(0);
 		this.mockMvc.perform(delete(uri+"/id/0")
@@ -84,7 +84,7 @@ public class IntegrationWithoutSecurity {
 	@Test
 	@WithMockUser(roles= {"USER","ADMIN"})
 	public void deleteUserWhenNull() throws Exception{	
-		when(userService.findById(0)).thenReturn(null);
+		when(userService.findUserById(0)).thenReturn(null);
 		this.mockMvc.perform(delete(uri+"/id/0")
 				).andExpect(status().isNotFound());
 		

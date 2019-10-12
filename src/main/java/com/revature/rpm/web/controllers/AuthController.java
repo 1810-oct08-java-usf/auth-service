@@ -79,7 +79,7 @@ public class AuthController {
 	@GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public AppUser getUserById(@PathVariable int id) {
-		return userService.findById(id);
+		return userService.findUserById(id);
 	}
 
 	/**

@@ -105,7 +105,7 @@ public class AuthControllerValidationIntegrationTest {
 		AppUser mockedUser = new AppUser(1, "User", "Mocked", "mocked@revature.com", "mocked", originalPass, "ROLE_USER");
 		AppUser oldUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", encryptedPassword, "ROLE_USER");
 		
-		when(userService.findById(Mockito.anyInt())).thenReturn(oldUser);
+		when(userService.findUserById(Mockito.anyInt())).thenReturn(oldUser);
 
 		// Calling the updateUser method in the Auth rest controller
 		this.mockMvc
