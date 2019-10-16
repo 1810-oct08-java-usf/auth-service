@@ -15,12 +15,12 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.revature.rpm.dtos.UserPrincipal;
+import com.revature.rpm.entities.AppUser;
 import com.revature.rpm.exceptions.BadRequestException;
 import com.revature.rpm.exceptions.UserCreationException;
 import com.revature.rpm.exceptions.UserNotFoundException;
 import com.revature.rpm.exceptions.UserUpdateException;
-import com.revature.rpm.entities.AppUser;
-import com.revature.rpm.dtos.UserPrincipal;
 import com.revature.rpm.repositories.UserRepository;
 
 /*
@@ -212,13 +212,15 @@ public class UserService implements UserDetailsService {
 		}
 		
 		AppUser userBeforeUpdate = findUserById(updatedUser.getId());
+		if(userBeforeUpdate == null) {
+			throw new UserNotFoundException("No user found with provided id");
+		}
 		
 		String persistedUsername = userBeforeUpdate.getUsername();
 		String updatedUsername = updatedUser.getUsername();
 		if(!persistedUsername.equals(updatedUsername)) {
-			
-			AppUser u = findUserByUsername(updatedUsername);
-			if(u.getId() != updatedUser.getId()) {
+			AppUser u = repo.findUserByUsername(updatedUsername);
+			if(u != null && u.getId() != updatedUser.getId()) {
 				throw new UserUpdateException("Username is already in use");
 			}
 			
@@ -228,10 +230,9 @@ public class UserService implements UserDetailsService {
 		String persistedEmail = userBeforeUpdate.getEmail();
 		String updatedEmail = updatedUser.getEmail();
 		if(!persistedEmail.equals(updatedEmail)) {
-			
-			AppUser u = findUserByEmail(updatedEmail);
-			if(u.getId() != updatedUser.getId()) {
-				throw new UserUpdateException("Email is already in use");
+			AppUser u = repo.findUserByEmail(updatedEmail);
+			if(u != null && u.getId() != updatedUser.getId()) {
+				throw new UserUpdateException("Username is already in use");
 			}
 			
 		}

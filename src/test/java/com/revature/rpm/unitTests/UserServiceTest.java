@@ -1,13 +1,13 @@
-package com.revature.services;
+package com.revature.rpm.unitTests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,34 +18,31 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.client.HttpClientErrorException.BadRequest;
 
 import com.revature.rpm.entities.AppUser;
 import com.revature.rpm.exceptions.BadRequestException;
 import com.revature.rpm.exceptions.UserCreationException;
 import com.revature.rpm.exceptions.UserNotFoundException;
+import com.revature.rpm.exceptions.UserUpdateException;
 import com.revature.rpm.repositories.UserRepository;
 import com.revature.rpm.services.UserService;
 
+/*
+ * TODO
+ * 
+ * 	- Add unit tests for validateFields(AppUser user)
+ *  - Add unit tests for loadUserByUsername(String username)
+ *  - Add unit tests for cover missed branches based on Jacoco coverage report
+ */
 
-
-/** Test Suite for the UserService class. 
- *  Special thanks to Alonzo Muncy
- *	for his helpful explanations regarding the Unit Testing process.   
- *  
- * @author Brandon Morris (190107 Java-Spark-USF) 2019-04-09
- *  
- * Test Suite for the UserService class.  
+/**
+ * Test Suite for the UserService class.
  */
 @SpringBootTest
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
 	
 	@Mock UserRepository mockRepo;  
-	
-	@Mock AppUser mockUser;
-
-	@Mock List<AppUser> mockUserList;
 
 	@InjectMocks
 	UserService userService;
@@ -57,23 +54,23 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void testFindAllUsers() {
-		when(mockRepo.findAll()).thenReturn(mockUserList);
-		assertEquals(userService.findAllUsers(), mockUserList);
+		List<AppUser> mockList = new ArrayList<>();
+		when(mockRepo.findAll()).thenReturn(mockList);
+		assertEquals(mockList, userService.findAllUsers());
 	}
 	
 	/**
-	 * This test case verifies proper functionality of the UserService.findById() method.
+	 * Verifies proper functionality of the UserService.findById() method.
 	 * A non-null AppUser object is expected to be returned.
 	 */
 	@Test
 	public void testFindUserByIdWithValidId() {
 		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
-		Optional<AppUser> mockedOptional = Optional.of(expectedResult);
-		when(mockRepo.findById(1)).thenReturn(mockedOptional);
+		when(mockRepo.findById(1)).thenReturn(Optional.of(expectedResult));
 	
 		AppUser testResult = userService.findUserById(1);
-		assertNotNull("The AppUser returned should not be a null value", testResult);
-		assertEquals("The AppUser returned should match the mocked one", expectedResult, testResult);
+		assertNotNull(testResult);
+		assertEquals(expectedResult, testResult);
 	}
 	
 	/**
@@ -102,8 +99,12 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void testFindUserByUsernameValidUsername() {
-		when(mockRepo.findUserByUsername("wShatner")).thenReturn(mockUser);
-		assertEquals(mockUser, userService.findUserByUsername("wShatner"));
+		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
+		when(mockRepo.findUserByUsername("mocked")).thenReturn(expectedResult);
+	
+		AppUser testResult = userService.findUserByUsername("mocked");
+		assertNotNull(testResult);
+		assertEquals(expectedResult, testResult);
 	}
 	
 	/**
@@ -117,17 +118,18 @@ public class UserServiceTest {
 	}
 	
 	/**
-	 * 	Tests behavior of UserService's findUserByEmail()
-	 * 	when the user is found in the database.  
+	 * Tests behavior of UserService.findUserByEmail when a valid email is provided that
+	 * matches to a user found in the data source.  
 	 */
 	@Test
 	public void testFindUserByEmailValidEmail() {
-		when(mockRepo.findUserByEmail("wshatner@gmail.com")).thenReturn(mockUser);
-		assertEquals(mockUser, userService.findUserByEmail("wshatner@gmail.com"));
+		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
+		when(mockRepo.findUserByEmail("mocked@email.com")).thenReturn(expectedResult);
+		assertEquals(expectedResult, userService.findUserByEmail("mocked@email.com"));
 	}
 	
 	/**
-	 * 	Tests behavior of UserService's findUserByEmail() when passed an invalid email value.
+	 * Tests behavior of UserService.findUserByEmail when passed an invalid email value.
 	 * A BadRequestException is expected to be thrown.
 	 */
 	@Test(expected=BadRequestException.class)
@@ -137,9 +139,8 @@ public class UserServiceTest {
 	}
 	
 	/**
-	 * 	Tests the addUser() of the UserService
-	 * 	when the given user does not already exists
-	 * 	in the database. 
+	 * Tests behavior of UserService.addUser when passed a valid user object whose
+	 * provided username nor email is already used within the data source. 
 	 */
 	@Test
 	public void testAddUserIfUserNotInDatabase() {
@@ -149,37 +150,25 @@ public class UserServiceTest {
 	}
 	
 	
-	/**	
-	 * 	Tests the addUser() of the UserService 
-	 * 	when the given username already exists
-	 * 	in the database. 
-	 * 	
-	 * 	When the UserService's addUser() is invoked, 
-	 *  the simulated method call findUserByUsername() 
-	 *  is fed an arbitrary string as the username,
-	 *  and the mocked AppUser object is returned.   
-	 * 	
-	 *  Then we simulate the mock AppUser's getUsername() 
-	 *  and return another arbitrary string.   
-	 */ 
-	@Test(expected=UserNotFoundException.class)
+	/**
+	 * Tests behavior of UserService.addUser when passed a valid user object whose
+	 * provided username is already used within the data source. 
+	 */
+	@Test(expected=UserCreationException.class)
 	public void testAddUserIfUsernameAlreadyExists() {
-		when(userService.findUserByUsername("William"))
-		.thenReturn(mockUser);
-		when(mockUser.getUsername()).thenReturn("William"); 
-		
-		assertEquals(null, userService.addUser(mockUser));
+		AppUser mockedUser = new AppUser(0, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
+		when(mockRepo.findUserByUsername("mocked")).thenReturn(new AppUser());
+		userService.addUser(mockedUser);
+		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 	
 	
-	/** 
-	 * Tests the UserService.addUser functionality when a new user object is provided that has an email
-	 * that is already present in the data source. A UserCreationException is expected to be thrown and
-	 * it is expected that the no methods of the UserRepository are invoked.
+	/**
+	 * Tests behavior of UserService.addUser when passed a valid user object whose
+	 * provided email is already used within the data source. 
 	 */
 	@Test(expected=UserCreationException.class)
 	public void testAddUserIfEmailAlreadyExists() {
-		
 		AppUser mockedUser = new AppUser(0, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
 		when(mockRepo.findUserByEmail("mocked@email.com")).thenReturn(new AppUser());
 		userService.addUser(mockedUser);
@@ -192,7 +181,7 @@ public class UserServiceTest {
 	 * UserRepository are invoked.
 	 */
 	@Test(expected=BadRequestException.class)
-	public void testUpdateUserNull() {
+	public void testUpdateInvalidUser() {
 		userService.updateUser(null, false);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
@@ -206,6 +195,63 @@ public class UserServiceTest {
 		AppUser validMockUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
 		when(mockRepo.findById(validMockUser.getId())).thenReturn(Optional.of(validMockUser));
 		assertTrue(userService.updateUser(validMockUser, false));
+	}
+	
+	/**
+	 * Tests UserService.updateUser when a valid user object is provided which attempting to update their 
+	 * username which is not taken
+	 */
+	@Test
+	public void testUpdateUserValidChangingUsernameNotTaken() {
+		AppUser persistedUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "old-mocked", "mocked", "USER");
+		AppUser validMockUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "new-mocked", "mocked", "USER");
+		when(mockRepo.findById(validMockUser.getId())).thenReturn(Optional.of(persistedUser));
+		when(mockRepo.findUserByUsername("new-mocked")).thenReturn(null);
+		assertTrue(userService.updateUser(validMockUser, false));
+	}
+	
+	/**
+	 * Tests UserService.updateUser when a valid user object is provided which attempting to update their 
+	 * username which is taken
+	 */
+	@Test(expected=UserUpdateException.class)
+	public void testUpdateUserValidChangingUsernameTaken() {
+		AppUser persistedUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "old-mocked", "mocked", "USER");
+		AppUser validMockUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "new-mocked", "mocked", "USER");
+		AppUser userWithTakenUsername = new AppUser(2, "Existing", "User", "existing@email.com", "new-mocked", "password", "USER");
+		when(mockRepo.findById(validMockUser.getId())).thenReturn(Optional.of(persistedUser));
+		when(mockRepo.findUserByUsername(validMockUser.getUsername())).thenReturn(userWithTakenUsername);
+		userService.updateUser(validMockUser, false);
+		verify(mockRepo, times(0)).save(Mockito.any());
+	}
+	
+	/**
+	 * Tests UserService.updateUser when a valid user object is provided which attempting to update their 
+	 * username which is not taken
+	 */
+	@Test
+	public void testUpdateUserValidChangingEmailNotTaken() {
+		AppUser persistedUser = new AppUser(1, "Mocked", "User", "old-mocked@email.com", "mocked", "mocked", "USER");
+		AppUser validMockUser = new AppUser(1, "Mocked", "User", "new-mocked@email.com", "mocked", "mocked", "USER");
+		when(mockRepo.findById(validMockUser.getId())).thenReturn(Optional.of(persistedUser));
+		when(mockRepo.findUserByEmail("new-mocked@email.com")).thenReturn(null);
+		assertTrue(userService.updateUser(validMockUser, false));
+	}
+	
+	/**
+	 * Tests UserService.updateUser when a valid user object is provided which attempting to update their 
+	 * username which is taken
+	 */
+	@Test(expected=UserUpdateException.class)
+	public void testUpdateUserValidChangingEmailTaken() {
+		AppUser persistedUser = new AppUser(1, "Mocked", "User", "old-mocked@email.com", "mocked", "mocked", "USER");
+		AppUser validMockUser = new AppUser(1, "Mocked", "User", "new-mocked@email.com", "mocked", "mocked", "USER");
+		AppUser userWithTakenEmail = new AppUser(2, "Existing", "User", "new-mocked@email.com", "existing", "password", "USER");
+		when(mockRepo.findById(validMockUser.getId())).thenReturn(Optional.of(persistedUser));
+		when(mockRepo.findUserByEmail("new-mocked@email.com")).thenReturn(userWithTakenEmail);
+		userService.updateUser(validMockUser, false);
+		System.out.println("\n\n\n\n");
+		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 	
 	/**
