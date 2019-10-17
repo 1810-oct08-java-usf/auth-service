@@ -22,7 +22,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.revature.rpm.dtos.UserPrincipal;
 import com.revature.rpm.entities.AppUser;
 import com.revature.rpm.exceptions.BadRequestException;
 import com.revature.rpm.exceptions.UserCreationException;
@@ -31,16 +30,23 @@ import com.revature.rpm.exceptions.UserUpdateException;
 import com.revature.rpm.repositories.UserRepository;
 import com.revature.rpm.services.UserService;
 
-/*
- * TODO
- * 
- *  - Add unit tests for loadUserByUsername(String username)
- *  - Add unit tests for cover missed branches based on Jacoco coverage report
- *  - Format documentation
- */
-
 /**
- * Test Suite for the UserService class.
+ * Test Suite for the UserService class. Methods unit tested in this suite include:<br>
+ * <br>
+ * - findAllUsers: List&lt;AppUser&gt;<br>
+ * - findUserById: AppUser<br>
+ * - findUserByUsername: AppUser<br>
+ * - findUserByEmail: AppUser<br>
+ * - addUser: AppUser<br>
+ * - updateUser: boolean<br>
+ * - deleteUserById: boolean<br>
+ * - isUsernameAvailable: boolean<br>
+ * - isEmailAddressAvailable: boolean<br>
+ * - validateFields: boolean<br>
+ * - loadUserByUsername: UserPrincipal<br>
+ * <br>
+ * Current code coverage: 100%<br>
+ * Current branch coverage: 100%
  */
 @SpringBootTest
 @RunWith(MockitoJUnitRunner.class)
