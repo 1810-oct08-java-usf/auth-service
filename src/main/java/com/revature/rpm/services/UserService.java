@@ -76,12 +76,12 @@ public class UserService implements UserDetailsService {
 	@Transactional(readOnly=true, isolation=Isolation.READ_COMMITTED)
 	public AppUser findUserById(int id) {
 		
-		if(id <= 0) {
+		if (id <= 0) {
 			throw new BadRequestException("Invalid id value provided");
 		}
 		
 		Optional<AppUser> _user = repo.findById(id);
-		if(!_user.isPresent()) {
+		if (!_user.isPresent()) {
 			throw new UserNotFoundException("No user found with provided id");
 		}
 		
@@ -106,13 +106,13 @@ public class UserService implements UserDetailsService {
 	@Transactional(readOnly=true, isolation=Isolation.READ_COMMITTED)
 	public AppUser findUserByUsername(String username) {
 		
-		if(username == null || username.equals("")) {
+		if (username == null || username.equals("")) {
 			throw new BadRequestException("Invalid username value provided");
 		}
 		
 		AppUser retrievedUser = repo.findUserByUsername(username);
 		
-		if(retrievedUser == null) {
+		if (retrievedUser == null) {
 			throw new UserNotFoundException("No user found with provided username");
 		}
 		
@@ -139,13 +139,13 @@ public class UserService implements UserDetailsService {
 	@Transactional(readOnly=true, isolation=Isolation.READ_COMMITTED)
 	public AppUser findUserByEmail(String email) {
 		
-		if(email == null || email.equals("")) {
+		if (email == null || email.equals("")) {
 			throw new BadRequestException("Invalid email value provided");
 		}
 		
 		AppUser retrievedUser = repo.findUserByEmail(email);
 		
-		if(retrievedUser == null) {
+		if (retrievedUser == null) {
 			throw new UserNotFoundException("No user found with provided email");
 		}
 		
@@ -168,15 +168,15 @@ public class UserService implements UserDetailsService {
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public AppUser addUser(AppUser newUser) {
 		
-		if(!validateFields(newUser)) {
+		if (!validateFields(newUser)) {
 			throw new BadRequestException("Invalid user object provided");
 		}
 		
-		if(!isUsernameAvailable(newUser.getUsername())) {
+		if (!isUsernameAvailable(newUser.getUsername())) {
 			throw new UserCreationException("Username already in use");
 		} 
 		
-		if(!isEmailAddressAvailable(newUser.getEmail())) {
+		if (!isEmailAddressAvailable(newUser.getEmail())) {
 			throw new UserCreationException("Email address already in use");
 		}
 		
@@ -207,20 +207,23 @@ public class UserService implements UserDetailsService {
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public boolean updateUser(AppUser updatedUser, boolean updateRole) {
 		
-		if(!validateFields(updatedUser)) {
+		if (!validateFields(updatedUser)) {
 			throw new BadRequestException("Invalid user object provided");
 		}
 		
-		AppUser userBeforeUpdate = findUserById(updatedUser.getId());
-		if(userBeforeUpdate == null) {
-			throw new UserNotFoundException("No user found with provided id");
+		AppUser userBeforeUpdate = null;
+		
+		try {
+			 userBeforeUpdate = findUserById(updatedUser.getId());
+		} catch (UserNotFoundException unfe) {
+			throw new UserUpdateException(unfe.getMessage());
 		}
 		
 		String persistedUsername = userBeforeUpdate.getUsername();
 		String updatedUsername = updatedUser.getUsername();
-		if(!persistedUsername.equals(updatedUsername)) {
+		if (!persistedUsername.equals(updatedUsername)) {
 			AppUser u = repo.findUserByUsername(updatedUsername);
-			if(u != null && u.getId() != updatedUser.getId()) {
+			if (u != null) {
 				throw new UserUpdateException("Username is already in use");
 			}
 			
@@ -229,9 +232,9 @@ public class UserService implements UserDetailsService {
 		
 		String persistedEmail = userBeforeUpdate.getEmail();
 		String updatedEmail = updatedUser.getEmail();
-		if(!persistedEmail.equals(updatedEmail)) {
+		if (!persistedEmail.equals(updatedEmail)) {
 			AppUser u = repo.findUserByEmail(updatedEmail);
-			if(u != null && u.getId() != updatedUser.getId()) {
+			if (u != null) {
 				throw new UserUpdateException("Username is already in use");
 			}
 			
@@ -239,7 +242,7 @@ public class UserService implements UserDetailsService {
 
 		String persistedRole = userBeforeUpdate.getRole();
 		String updatedRole = updatedUser.getRole();
-		if(!updateRole && !updatedRole.equals(persistedRole)) {
+		if (!updateRole && !updatedRole.equals(persistedRole)) {
 			throw new UserUpdateException("Could not update user role");
 		}
 		
@@ -267,59 +270,19 @@ public class UserService implements UserDetailsService {
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public boolean deleteUserById(int id) {
 		
-		if(id <= 0) {
+		if (id <= 0) {
 			throw new BadRequestException("Invalid id value provided");
 		}
 		
 		Optional<AppUser> _user = repo.findById(id);
 		
-		if(!_user.isPresent()) {
+		if (!_user.isPresent()) {
 			throw new UserNotFoundException("No user found with provided id");
 		}
 		
 		repo.delete(_user.get());
 		return true;
 		
-	}
-	
-	/**
-	 * Overrides Spring Security's UserDetailService interface method to return a user from the 
-	 * data repository with the provided username.
-	 * 
-	 *  @param username
-	 *  	The username of a user requesting authentication
-	 *  
-	 *  @return UserDetails
-	 *  	Provides core user information used by Spring Security for authentication
-	 *  
-	 *  @throws BadRequestException
-	 * 		if the username provided is invalid
-	 *  
-	 *  @throws UsernameNotFoundException
-	 *  	Throws this if there is no user found with the given username.
-	 */
-	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		
-		if(username == null || username.equals("")) {
-			throw new BadRequestException("Invalid username valud provided");
-		}
-		
-		AppUser retrievedUser = repo.findUserByUsername(username);
-		
-		if(retrievedUser == null) {
-			throw new UsernameNotFoundException("Username: " + username + " not found");
-		}
-		
-		String userPw = retrievedUser.getPassword();
-		String encodedPw = encoder.encode(userPw);
-		String userRole = retrievedUser.getRole();
-		retrievedUser.setPassword(encodedPw);
-	
-		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(userRole);
-
-		return new UserPrincipal(retrievedUser, username, encodedPw, grantedAuthorities);
-
 	}
 	
 	/**
@@ -371,13 +334,53 @@ public class UserService implements UserDetailsService {
 	 * @return true if valid, false if invalid
 	 */
 	public boolean validateFields(AppUser user) {
-		if(user == null) return false;
-		if(user.getFirstName() == null || user.getFirstName().equals("")) return false;
-		if(user.getLastName() == null || user.getLastName().equals("")) return false;
-		if(user.getUsername() == null || user.getUsername().equals("")) return false;
-		if(user.getPassword() == null || user.getPassword().equals("")) return false;
-		if(user.getEmail() == null || user.getEmail().equals("")) return false;
-		if(user.getRole() == null || user.getRole().equals("")) return false;
+		if (user == null) return false;
+		if (user.getFirstName() == null || user.getFirstName().equals("")) return false;
+		if (user.getLastName() == null || user.getLastName().equals("")) return false;
+		if (user.getUsername() == null || user.getUsername().equals("")) return false;
+		if (user.getPassword() == null || user.getPassword().equals("")) return false;
+		if (user.getEmail() == null || user.getEmail().equals("")) return false;
+		if (user.getRole() == null || user.getRole().equals("")) return false;
 		return true;
+	}
+	
+	/**
+	 * Overrides Spring Security's UserDetailService interface method to return a user from the 
+	 * data repository with the provided username.
+	 * 
+	 *  @param username
+	 *  	The username of a user requesting authentication
+	 *  
+	 *  @return UserDetails
+	 *  	Provides core user information used by Spring Security for authentication
+	 *  
+	 *  @throws BadRequestException
+	 * 		if the username provided is invalid
+	 *  
+	 *  @throws UsernameNotFoundException
+	 *  	Throws this if there is no user found with the given username.
+	 */
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		
+		if (username == null || username.equals("")) {
+			throw new BadRequestException("Invalid username valud provided");
+		}
+		
+		AppUser retrievedUser = repo.findUserByUsername(username);
+		
+		if (retrievedUser == null) {
+			throw new UsernameNotFoundException("Username: " + username + " not found");
+		}
+		
+		String userPw = retrievedUser.getPassword();
+		String encodedPw = encoder.encode(userPw);
+		String userRole = retrievedUser.getRole();
+		retrievedUser.setPassword(encodedPw);
+	
+		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(userRole);
+
+		return new UserPrincipal(retrievedUser, username, encodedPw, grantedAuthorities);
+
 	}
 }
