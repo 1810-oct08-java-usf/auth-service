@@ -191,7 +191,7 @@ public class UserService implements UserDetailsService {
 	 * 		is attempted without the proper boolean flag passed to the method
 	 */
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
-	public boolean updateUser(AppUser updatedUser, UserPrincipal requester) {
+	public boolean updateUser(AppUser updatedUser, AppUser requester) {
 		
 		if (requester == null) {
 			throw new BadRequestException("Invalid requester object provided");
@@ -201,7 +201,7 @@ public class UserService implements UserDetailsService {
 			throw new BadRequestException("Invalid user object provided");
 		}
 		
-		if (updatedUser.getId() != requester.getAppUser().getId() && !requester.getAppUser().getRole().equals("ADMIN")) {
+		if (updatedUser.getId() != requester.getId() && !requester.getRole().equals("ADMIN")) {
 			throw new SecurityException("Illegal update request made by " + requester.getUsername());
 		}
 
@@ -236,7 +236,7 @@ public class UserService implements UserDetailsService {
 
 		String persistedRole = userBeforeUpdate.getRole();
 		String updatedRole = updatedUser.getRole();
-		if (!requester.getAppUser().getRole().equals("ADMIN") && !updatedRole.equals(persistedRole)) {
+		if (!requester.getRole().equals("ADMIN") && !updatedRole.equals(persistedRole)) {
 			throw new UserUpdateException("Could not update user role");
 		}
 		

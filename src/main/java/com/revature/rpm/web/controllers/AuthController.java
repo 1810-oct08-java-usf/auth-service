@@ -178,7 +178,7 @@ public class AuthController {
 	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	public boolean updateUser(@Valid @RequestBody AppUser updatedUser, HttpServletRequest req) {
 		UserPrincipal principal = (UserPrincipal) req.getAttribute("principal");
-		return userService.updateUser(updatedUser, principal);
+		return userService.updateUser(updatedUser, principal.getAppUser());
 	}
 
 	/**

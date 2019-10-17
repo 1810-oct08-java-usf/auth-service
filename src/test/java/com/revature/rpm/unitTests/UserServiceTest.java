@@ -303,8 +303,8 @@ public class UserServiceTest {
 	@Test(expected = BadRequestException.class)
 	public void testUpdateNullUserAndNullRequester() {
 		AppUser nullMockUser = null;
-		UserPrincipal nullPrincipal = null;
-		userService.updateUser(nullMockUser, nullPrincipal);
+		AppUser nullRequester = null;
+		userService.updateUser(nullMockUser, nullRequester);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -316,22 +316,21 @@ public class UserServiceTest {
 	@Test(expected = BadRequestException.class)
 	public void testUpdateUserWithNullIdAndNullRequester() {
 		AppUser invalidMockUser = new AppUser(null, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
-		UserPrincipal nullPrincipal = null;
-		userService.updateUser(invalidMockUser, nullPrincipal);
+		AppUser nullRequester = null;
+		userService.updateUser(invalidMockUser, nullRequester);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
-	
+
 	/**
 	 * Tests the UserService.updateUser functionality when a user object with a null
-	 * id and a valid requester are provided. A BadRequestException is expected to be
-	 * thrown, and it is verified that UserRepository.save is never invoked.
+	 * id and a valid requester are provided. A BadRequestException is expected to
+	 * be thrown, and it is verified that UserRepository.save is never invoked.
 	 */
 	@Test(expected = BadRequestException.class)
 	public void testUpdateUserWithNullIdAndValidRequester() {
 		AppUser invalidMockUser = new AppUser(null, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
 		AppUser requestingUser = new AppUser(3, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "USER");
-		UserPrincipal principal = new UserPrincipal(requestingUser, "mocked", "mocked", new ArrayList<>());
-		userService.updateUser(invalidMockUser, principal);
+		userService.updateUser(invalidMockUser, requestingUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -343,8 +342,8 @@ public class UserServiceTest {
 	@Test(expected = BadRequestException.class)
 	public void testUpdateValidUserAndNullRequester() {
 		AppUser mockUserForUpdate = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
-		UserPrincipal nullPrincipal = null;
-		userService.updateUser(mockUserForUpdate, nullPrincipal);
+		AppUser nullRequester = null;
+		userService.updateUser(mockUserForUpdate, nullRequester);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -357,8 +356,7 @@ public class UserServiceTest {
 	public void testUpdateNullUserAndValidRequester() {
 		AppUser requestingUser = new AppUser(3, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "USER");
 		AppUser nullMockUser = null;
-		UserPrincipal principal = new UserPrincipal(requestingUser, "mocked", "mocked", new ArrayList<>());
-		userService.updateUser(nullMockUser, principal);
+		userService.updateUser(nullMockUser, requestingUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -371,8 +369,7 @@ public class UserServiceTest {
 	public void testUpdateValidUserFromUnauthRequester() {
 		AppUser requestingUser = new AppUser(3, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "USER");
 		AppUser mockUserForUpdate = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
-		UserPrincipal principal = new UserPrincipal(requestingUser, "mocked", "mocked", new ArrayList<>());
-		userService.updateUser(mockUserForUpdate, principal);
+		userService.updateUser(mockUserForUpdate, requestingUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -386,12 +383,11 @@ public class UserServiceTest {
 		AppUser requestingUser = new AppUser(3, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "ADMIN");
 		AppUser persistedUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "USER");
 		AppUser mockUserForUpdate = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
-		UserPrincipal principal = new UserPrincipal(requestingUser, "mocked", "mocked", new ArrayList<>());
 		when(mockRepo.findById(mockUserForUpdate.getId())).thenReturn(Optional.of(persistedUser));
-		boolean actualResult = userService.updateUser(mockUserForUpdate, principal);
+		boolean actualResult = userService.updateUser(mockUserForUpdate, requestingUser);
 		assertTrue(actualResult);
 	}
-	
+
 	/**
 	 * Tests the UserService.updateUser functionality when a valid user object is
 	 * provided by an authorized requester. No username, email, or role updates are
@@ -403,9 +399,8 @@ public class UserServiceTest {
 		AppUser requestingUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "USER");
 		AppUser persistedUser = requestingUser;
 		AppUser mockUserForUpdate = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
-		UserPrincipal principal = new UserPrincipal(requestingUser, "mocked", "mocked", new ArrayList<>());
 		when(mockRepo.findById(mockUserForUpdate.getId())).thenReturn(Optional.of(persistedUser));
-		boolean actualResult = userService.updateUser(mockUserForUpdate, principal);
+		boolean actualResult = userService.updateUser(mockUserForUpdate, requestingUser);
 		assertTrue(actualResult);
 	}
 
@@ -415,11 +410,11 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void testUpdateUserValidNotChangingUsernameEmailOrRole() {
-		AppUser persistedUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "USER");
+		AppUser requestingUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "USER");
+		AppUser persistedUser = requestingUser;
 		AppUser validMockUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", "USER");
-		UserPrincipal principal = new UserPrincipal(persistedUser, "mocked", "mocked", new ArrayList<>());
 		when(mockRepo.findById(validMockUser.getId())).thenReturn(Optional.of(persistedUser));
-		assertTrue(userService.updateUser(validMockUser, principal));
+		assertTrue(userService.updateUser(validMockUser, requestingUser));
 	}
 
 	/**
@@ -428,12 +423,12 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void testUpdateUserValidChangingUsernameNotTaken() {
-		AppUser persistedUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "old-mocked", "mocked", "USER");
+		AppUser requestingUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "USER");
+		AppUser persistedUser = requestingUser;
 		AppUser validMockUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "new-mocked", "mocked", "USER");
-		UserPrincipal principal = new UserPrincipal(persistedUser, "mocked", "mocked", new ArrayList<>());
 		when(mockRepo.findById(validMockUser.getId())).thenReturn(Optional.of(persistedUser));
 		when(mockRepo.findUserByUsername("new-mocked")).thenReturn(null);
-		assertTrue(userService.updateUser(validMockUser, principal));
+		assertTrue(userService.updateUser(validMockUser, requestingUser));
 	}
 
 	/**
@@ -442,15 +437,14 @@ public class UserServiceTest {
 	 */
 	@Test(expected = UserUpdateException.class)
 	public void testUpdateUserValidChangingUsernameTaken() {
-		AppUser persistedUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "old-mocked", "mocked", "USER");
+		AppUser requestingUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "USER");
+		AppUser persistedUser = requestingUser;
 		AppUser validMockUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "new-mocked", "mocked", "USER");
-		AppUser userWithTakenUsername = new AppUser(2, "Existing", "User", "existing@email.com", "new-mocked",
-				"password", "USER");
-		UserPrincipal principal = new UserPrincipal(persistedUser, "mocked", "mocked", new ArrayList<>());
+		AppUser userWithUsername = new AppUser(2, "Existing", "User", "existing@email.com", "existing", "pw", "USER");
 
 		when(mockRepo.findById(validMockUser.getId())).thenReturn(Optional.of(persistedUser));
-		when(mockRepo.findUserByUsername(validMockUser.getUsername())).thenReturn(userWithTakenUsername);
-		userService.updateUser(validMockUser, principal);
+		when(mockRepo.findUserByUsername(validMockUser.getUsername())).thenReturn(userWithUsername);
+		userService.updateUser(validMockUser, requestingUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -460,12 +454,12 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void testUpdateUserValidChangingEmailNotTaken() {
-		AppUser persistedUser = new AppUser(1, "Mocked", "User", "old-mocked@email.com", "mocked", "mocked", "USER");
+		AppUser requestingUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "USER");
+		AppUser persistedUser = requestingUser;
 		AppUser validMockUser = new AppUser(1, "Mocked", "User", "new-mocked@email.com", "mocked", "mocked", "USER");
-		UserPrincipal principal = new UserPrincipal(persistedUser, "mocked", "mocked", new ArrayList<>());
 		when(mockRepo.findById(validMockUser.getId())).thenReturn(Optional.of(persistedUser));
 		when(mockRepo.findUserByEmail("new-mocked@email.com")).thenReturn(null);
-		assertTrue(userService.updateUser(validMockUser, principal));
+		assertTrue(userService.updateUser(validMockUser, requestingUser));
 	}
 
 	/**
@@ -474,27 +468,27 @@ public class UserServiceTest {
 	 */
 	@Test(expected = UserUpdateException.class)
 	public void testUpdateUserValidChangingEmailTaken() {
-		AppUser persistedUser = new AppUser(1, "Mocked", "User", "old-mocked@email.com", "mocked", "mocked", "USER");
+		AppUser requestingUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "USER");
+		AppUser persistedUser = requestingUser;
 		AppUser validMockUser = new AppUser(1, "Mocked", "User", "new-mocked@email.com", "mocked", "mocked", "USER");
 		AppUser userWithEmail = new AppUser(2, "Existing", "User", "new-mocked@email.com", "mocked", "mocked", "USER");
-		UserPrincipal principal = new UserPrincipal(persistedUser, "mocked", "mocked", new ArrayList<>());
 		when(mockRepo.findById(validMockUser.getId())).thenReturn(Optional.of(persistedUser));
 		when(mockRepo.findUserByEmail("new-mocked@email.com")).thenReturn(userWithEmail);
-		userService.updateUser(validMockUser, principal);
+		userService.updateUser(validMockUser, requestingUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
 	/**
 	 * Tests behavior of UserService.updateUser when passed an AppUser object whose
-	 * id does not match any records found in the data source. The expected result
-	 * is for the method to throw a UserUpdateException and that the
-	 * UserRepository.save method is never invoked.
+	 * id does not match any records found in the data source. The requester must be
+	 * a valid user with a role of ADMIN. The expected result is for the method to throw a
+	 * UserUpdateException and that the UserRepository.save method is never invoked.
 	 */
 	@Test(expected = UserUpdateException.class)
 	public void testUpdateUserWithAnUnknownId() {
-		AppUser unknownMockedUser = new AppUser(9, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "USER");
-		UserPrincipal principal = new UserPrincipal(unknownMockedUser, "mocked", "mocked", new ArrayList<>());
-		userService.updateUser(unknownMockedUser, principal);
+		AppUser requestingUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "ADMIN");
+		AppUser unknownMockedUser = new AppUser(9, "unknown", "mock", "mocked@email.com", "mocked", "mocked", "USER");
+		userService.updateUser(unknownMockedUser, requestingUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -506,11 +500,11 @@ public class UserServiceTest {
 	 */
 	@Test(expected = UserUpdateException.class)
 	public void testUpdateUserRoleWithInvalidAuth() {
-		AppUser persistedUser = new AppUser(9, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "USER");
+		AppUser requestingUser = new AppUser(9, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "USER");
+		AppUser persistedUser = requestingUser;
 		AppUser mockedUser = new AppUser(9, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "ADMIN");
-		UserPrincipal principal = new UserPrincipal(persistedUser, "mocked", "mocked", new ArrayList<>());
 		when(mockRepo.findById(mockedUser.getId())).thenReturn(Optional.of(persistedUser));
-		userService.updateUser(mockedUser, principal);
+		userService.updateUser(mockedUser, requestingUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -522,11 +516,11 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void testUpdateUserRoleWithValidAuth() {
-		AppUser persistedUser = new AppUser(9, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "ADMIN");
-		AppUser mockedUser = new AppUser(9, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "ADMIN");
-		UserPrincipal principal = new UserPrincipal(persistedUser, "mocked", "mocked", new ArrayList<>());
+		AppUser requestingUser = new AppUser(9, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", "ADMIN");
+		AppUser persistedUser = requestingUser;
+		AppUser mockedUser = new AppUser(9, "updated", "mock", "mocked@email.com", "mocked", "mocked", "ADMIN");
 		when(mockRepo.findById(mockedUser.getId())).thenReturn(Optional.of(persistedUser));
-		boolean actualResult = userService.updateUser(mockedUser, principal);
+		boolean actualResult = userService.updateUser(mockedUser, requestingUser);
 		assertTrue(actualResult);
 	}
 
