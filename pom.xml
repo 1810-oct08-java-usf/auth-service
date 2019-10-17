@@ -147,12 +147,13 @@
 					<destFile>${sonar.jacoco.reportPath}</destFile>
 					<append>true</append>
 					<excludes>
-						<exclude>com/revature/RpmAuthServiceApplication.class</exclude>
-						
-						<exclude>com/revature/exceptions/*</exclude>
-						<exclude>com/revature/models/*</exclude>
-						<exclude>com/revature/security/*</exclude>
-						<exclude>com/revature/swagger/*</exclude>
+						<exclude>com/revature/rpm/RpmAuthServiceApplication.class</exclude>
+						<exclude>com/revature/rpm/exceptions/*</exclude>
+						<exclude>com/revature/rpm/util/*</exclude>
+						<exclude>com/revature/rpm/entities/*</exclude>
+						<exclude>com/revature/rpm/dtos/*</exclude>
+						<exclude>com/revature/rpm/security/util/*</exclude>
+						<exclude>com/revature/rpm/security/config/*</exclude>
 					</excludes>
 				</configuration>
 				<executions>
