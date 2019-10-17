@@ -35,22 +35,19 @@ import com.revature.rpm.services.UserService;
  * 		1) Currently, users can edit any other user if using Postman or curl.
  * 		   There needs to be a way to ensure that a user record can only be 
  * 		   updated by a user a matching id, or an admin.
- * 
- * 		2) Should we implement method-level security, instead of using the 
- * 		   HttpSecurity object in the SecurityCredentialsConfig.class? Delete
- * 		   mapping for this controller already uses it.
+
  */
 
 /**
- * This controller contains all CRUD functionality for the users
- * and is mapped to handle all requests to /users.
+ * This controller contains all CRUD functionality for the users and is mapped
+ * to handle all requests to /users.
  * 
  */
 @RestController
 @RequestMapping("/users")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AuthController {
-	
+
 	private UserService userService;
 
 	@Autowired
@@ -59,71 +56,87 @@ public class AuthController {
 	}
 
 	/**
-	 * This method will get all users
+	 * Serves as a front-facing endpoint for fetching all users from the data
+	 * source. Requesters to this endpoint must possess a role of ADMIN.
 	 * 
-	 * @return All users
+	 * @return all users from the data source
 	 */
-	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<AppUser> getAllUsers() {
 		return userService.findAllUsers();
 	}
 
 	/**
-	 * This method will get the user with the specified id
+	 * Serves as a front-facing endpoint for fetching a user with the specified id.
+	 * Requesters to this endpoint must possess a role of ADMIN.
 	 * 
 	 * @param id
-	 * @return The user with specified id
-	 * @throws UserNotFoundException
+	 * 
+	 * @return The user with specified id, otherwise an exception will be thrown
+	 *         from the service layer and handled using this controller's exception
+	 *         handler.
 	 */
-	@GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public AppUser getUserById(@PathVariable int id) {
 		return userService.findUserById(id);
 	}
 
 	/**
-	 * This method will get the user with the specified username
+	 * Serves as a front-facing endpoint for fetching a user with the specified
+	 * username. Requesters to this endpoint must possess a role of ADMIN.
 	 * 
 	 * @param username
-	 * @return The user with specified username
-	 * @throws UserNotFoundException
+	 * 
+	 * @return The user with specified username, otherwise an exception will be
+	 *         thrown from the service layer and handled using this controller's
+	 *         exception handler.
 	 */
-	@GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public AppUser getUserByUsername(@PathVariable String username) {
 		return userService.findUserByUsername(username);
 	}
 
 	/**
-	 * This method will return the user with the specified email
+	 * Serves as a front-facing endpoint for fetching a user with the specified
+	 * email. Requesters to this endpoint must possess a role of ADMIN.
 	 * 
 	 * @param email
-	 * @return The user with the specified email
-	 * @throws UserNotFoundException
+	 * 
+	 * @return The user with the specified email, otherwise an exception will be
+	 *         thrown from the service layer and handled using this controller's
+	 *         exception handler.
 	 */
-	@GetMapping(value = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping(value = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public AppUser getUserByEmail(@PathVariable String email) {
 		return userService.findUserByEmail(email);
 	}
 
 	/**
-	 * Used for checking the availability of user fields where uniqueness is enforced.
+	 * Serves as a front-facing endpoint for checking the availability of user
+	 * fields where uniqueness is enforced.
 	 * 
-	 * @param field
-	 * 		Specifies the field (i.e. username, email) being checked for availability
+	 * @param field Specifies the field (i.e. username, email) being checked for
+	 *              availability
 	 * 
-	 * @param value
-	 * 		The value being checked for uniqueness
+	 * @param value The value being checked for uniqueness
 	 * 
-	 * @return true if available, false if not
+	 * @return True if available, false if not
+	 * 
+	 * @throws BadRequestException
 	 */
-	@GetMapping(value="/available", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/available", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public boolean isAvailable(@RequestParam String field, @RequestParam String value) {
-		
-		switch(field) {
+
+		switch (field) {
 		case "username":
 			return userService.isUsernameAvailable(value);
 		case "email":
@@ -131,18 +144,20 @@ public class AuthController {
 		default:
 			throw new BadRequestException("Invalid field value specified");
 		}
-		
+
 	}
-	
+
 	/**
-	 * This is the method for registering a new user
+	 * Serves as a front-facing endpoint for registering a new user.
 	 * 
 	 * @param user
-	 * @return The user who was just registered
-	 * @throws UserCreationException
+	 * 
+	 * @return The user who was just registered, otherwise an exception will be
+	 *         thrown from the service layer and handled using this controller's
+	 *         exception handler.
 	 */
-	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
+	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public AppUser registerUser(@RequestBody AppUser user) {
 		return userService.addUser(user);
 	}
@@ -150,53 +165,50 @@ public class AuthController {
 	/**
 	 * This method will update a user with the newly provided information
 	 * 
-	 * @param frontEndUser This is the user information that is taken from the front
-	 *                     end. The password is sent with two fields, the first being
-	 *                     the users current password and the next being the password the
-	 *                     user wants to have. There is now a parser in order separate the 
-	 *                     passwords and put them into an array.
-	 * @param auth
-	 * @return frontEndUser This is the updated frontEndUser with information filled
-	 *         in from the back
-	 * @return null if any of the fields are blank
-	 * @throws UserNotFoundException
-	 * @author Tevin Thomas, Donald Henderson, Glory Umeasalugo, Tan Ho, Mohamad Hijazi (1905-Java-Nick)
+	 * @param updatedUser
+	 * 
+	 * @return True if the user was successfully updated, otherwise an exception
+	 *         will be thrown from the service layer and handled using this
+	 *         controller's exception handler.
+	 * 
 	 */
-	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
+	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	public boolean updateUser(@Valid @RequestBody AppUser updatedUser) {
 		return userService.updateUser(updatedUser, false);
 	}
 
 	/**
-	 * Method takes in a user object and updates it to ROLE_ADMIN
-	 * or ROLE_USER based on the Admin's choice. 
-	 * 
-	 * User changing the roles must be ROLE_ADMIN
-	 * 
+	 * Method takes in a user object and updates it to based on the Admin's choice.
+	 * Requesters to this endpoint must possess the role of ADMIN.
 	 * 
 	 * @param user
-	 * @param auth
-	 * @return AppUser
+	 * 
+	 * @return true if the user was successfully updated, otherwise an exception
+	 *         will be thrown from the service layer and handled using this
+	 *         controller's exception handler.
 	 * 
 	 */
+	@ResponseStatus(HttpStatus.OK)
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping(value = "/id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ResponseStatus(HttpStatus.OK)
 	public boolean updateUserRole(@RequestBody AppUser user) {
 		return userService.updateUser(user, true);
-	}	
+	}
 
 	/**
 	 * This method will delete a user given that user's id. This method is only
 	 * accessible to users with the ADMIN role
 	 * 
 	 * @param id
-	 * @throws UserNotFoundException
+	 * 
+	 * @return True if the user is successfully deleted, otherwise an exception will
+	 *         be thrown from the service layer and handled using this controller's
+	 *         exception handler.
 	 */
+	@ResponseStatus(HttpStatus.OK)
 	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping(value = "/id/{id}")
-	@ResponseStatus(HttpStatus.OK)
 	public boolean deleteUser(@PathVariable int id) {
 		return userService.deleteUserById(id);
 	}
@@ -205,10 +217,11 @@ public class AuthController {
 	 * This handles any UserNotFoundException thrown in the AuthController.
 	 * 
 	 * @param unfe
+	 * 
 	 * @return This method will return an error of type UserErrorResponse
 	 */
-	@ExceptionHandler({UserNotFoundException.class})
 	@ResponseStatus(HttpStatus.NOT_FOUND)
+	@ExceptionHandler({ UserNotFoundException.class })
 	public UserErrorResponse handleUserNotFoundException(UserNotFoundException unfe) {
 		UserErrorResponse error = new UserErrorResponse();
 		error.setStatus(HttpStatus.NOT_FOUND.value());
@@ -232,7 +245,7 @@ public class AuthController {
 		error.setTimestamp(System.currentTimeMillis());
 		return error;
 	}
-	
+
 	/**
 	 * This handles any BadRequestException thrown in the AuthController.
 	 * 
@@ -248,7 +261,7 @@ public class AuthController {
 		error.setTimestamp(System.currentTimeMillis());
 		return error;
 	}
-	
+
 	/**
 	 * This handles any UserUpdateException thrown in the AuthController.
 	 * 
