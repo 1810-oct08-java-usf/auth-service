@@ -2,6 +2,7 @@ package com.revature.rpm.web.controllers;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.revature.rpm.dtos.UserErrorResponse;
+import com.revature.rpm.dtos.UserPrincipal;
 import com.revature.rpm.entities.AppUser;
 import com.revature.rpm.exceptions.BadRequestException;
 import com.revature.rpm.exceptions.UserCreationException;
@@ -174,26 +176,9 @@ public class AuthController {
 	 */
 	@ResponseStatus(HttpStatus.OK)
 	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-	public boolean updateUser(@Valid @RequestBody AppUser updatedUser) {
-		return userService.updateUser(updatedUser, false);
-	}
-
-	/**
-	 * Method takes in a user object and updates it to based on the Admin's choice.
-	 * Requesters to this endpoint must possess the role of ADMIN.
-	 * 
-	 * @param user
-	 * 
-	 * @return true if the user was successfully updated, otherwise an exception
-	 *         will be thrown from the service layer and handled using this
-	 *         controller's exception handler.
-	 * 
-	 */
-	@ResponseStatus(HttpStatus.OK)
-	@PreAuthorize("hasRole('ADMIN')")
-	@PutMapping(value = "/id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public boolean updateUserRole(@RequestBody AppUser user) {
-		return userService.updateUser(user, true);
+	public boolean updateUser(@Valid @RequestBody AppUser updatedUser, HttpServletRequest req) {
+		UserPrincipal principal = (UserPrincipal) req.getAttribute("principal");
+		return userService.updateUser(updatedUser, principal);
 	}
 
 	/**
