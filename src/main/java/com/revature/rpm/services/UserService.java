@@ -201,7 +201,7 @@ public class UserService implements UserDetailsService {
 			throw new BadRequestException("Invalid user object provided");
 		}
 		
-		if (updatedUser.getId().equals(requester.getId()) && !requester.getRole().equals("ADMIN")) {
+		if (!updatedUser.getId().equals(requester.getId()) && !requester.getRole().equals("ADMIN")) {
 			throw new SecurityException("Illegal update request made by " + requester.getUsername());
 		}
 

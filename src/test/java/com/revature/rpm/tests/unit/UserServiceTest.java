@@ -1,4 +1,4 @@
-package com.revature.rpm.unitTests;
+package com.revature.rpm.tests.unit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
