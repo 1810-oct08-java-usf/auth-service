@@ -354,10 +354,10 @@ public class UserService implements UserDetailsService {
 	 *                                   the given username.
 	 */
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String username) {
 
 		if (username == null || username.equals("")) {
-			throw new BadRequestException("Invalid username valud provided");
+			throw new BadRequestException("Invalid username value provided");
 		}
 
 		AppUser retrievedUser = repo.findUserByUsername(username);
