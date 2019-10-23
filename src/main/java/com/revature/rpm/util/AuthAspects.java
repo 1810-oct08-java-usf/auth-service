@@ -40,8 +40,9 @@ public class AuthAspects {
 	@Before("logAll()")
 	public void logMethodStart(JoinPoint jp) {
 		String methodSig = jp.getTarget().getClass().toString() + "." + jp.getSignature().getName();
+		String argStr = Arrays.toString(jp.getArgs());
 		logger.info("{} invoked at {}", methodSig, LocalTime.now());
-		logger.info("Input arguments: {}", Arrays.toString(jp.getArgs()));
+		logger.info("Input arguments: {}", argStr);
 	}
 	
 	 /**

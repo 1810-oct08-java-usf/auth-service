@@ -1,4 +1,4 @@
-package com.revature.rpm.unitTests;
+package com.revature.rpm.tests.unit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -902,7 +903,8 @@ public class UserServiceTest {
 		String username = "valid-known";
 		when(mockRepo.findUserByUsername(username)).thenReturn(retrievedUser);
 		when(mockEncoder.encode(retrievedUser.getPassword())).thenReturn(encodedMockPw);
-		userService.loadUserByUsername(username);
+		UserDetails result = userService.loadUserByUsername(username);
+		assertNotNull(result);
 	}
 
 }

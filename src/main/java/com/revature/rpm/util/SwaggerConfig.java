@@ -33,7 +33,7 @@ public class SwaggerConfig {
 		      "Apache 2.0", "http://www.apache.org/licenses/LICENSE-2.0");
 		  
 		  private static final Set<String> DEFAULT_PRODUCES_AND_CONSUMES =
-			      new HashSet<String>(Arrays.asList("application/json",
+			      new HashSet<>(Arrays.asList("application/json",
 			          "application/xml"));
 		  
 		  /**

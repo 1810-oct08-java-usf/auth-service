@@ -52,6 +52,12 @@ public class AppUser implements Serializable{
 	
 	public AppUser() {
 		super();
+		firstName = "";
+		lastName = "";
+		email = "";
+		username = "";
+		password = "";
+		role = "LOCKED";
 	}
 
 	public AppUser(Integer id, String firstName, String lastName, String email, String username, String password,

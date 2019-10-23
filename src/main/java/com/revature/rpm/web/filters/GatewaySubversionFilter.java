@@ -48,6 +48,9 @@ public class GatewaySubversionFilter extends GenericFilterBean {
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
 		
+		final String GATEWAY_SUBVERTED = "gateway-subverted";
+		final String REQUEST_TYPE = "request-type";
+		
 		HttpServletRequest httpReq = (HttpServletRequest) req;
 		HttpServletResponse httpResp = (HttpServletResponse) resp;
 		
@@ -56,14 +59,14 @@ public class GatewaySubversionFilter extends GenericFilterBean {
 		try {
 
 			if (httpReq.getRequestURI().contains("/actuator")) {
-				httpReq.setAttribute("gateway-subverted", true);
-				httpReq.setAttribute("request-type", "health-check");
+				httpReq.setAttribute(GATEWAY_SUBVERTED, true);
+				httpReq.setAttribute(REQUEST_TYPE, "health-check");
 			} else if (validateHeader(headerZuul)) {
-				httpReq.setAttribute("gateway-subverted", false);
-				httpReq.setAttribute("request-type", "resource");
+				httpReq.setAttribute(GATEWAY_SUBVERTED, false);
+				httpReq.setAttribute(REQUEST_TYPE, "resource");
 			} else {
-				httpReq.setAttribute("gateway-subverted", true);
-				httpReq.setAttribute("request-type", "resource");
+				httpReq.setAttribute(GATEWAY_SUBVERTED, true);
+				httpReq.setAttribute(REQUEST_TYPE, "resource");
 				SecurityContextHolder.clearContext();
 				httpResp.setStatus(401);
 				throw new GatewaySubversionException("No gateway header found on request.");
