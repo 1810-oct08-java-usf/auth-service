@@ -68,7 +68,7 @@ public class UserService implements UserDetailsService {
 	 * 
 	 * @throws UserNotFoundException if there is no user found with the provided id
 	 */
-	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+	@Transactional(readOnly = true)
 	public AppUser findUserById(int id) {
 
 		if (id <= 0) {
@@ -95,7 +95,7 @@ public class UserService implements UserDetailsService {
 	 * @throws UserNotFoundException if there is no user found with the provided
 	 *                               username
 	 */
-	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+	@Transactional(readOnly = true)
 	public AppUser findUserByUsername(String username) {
 
 		if (username == null || username.equals("")) {
@@ -125,7 +125,7 @@ public class UserService implements UserDetailsService {
 	 * @throws UserNotFoundException if there is no user found with the provided
 	 *                               email
 	 */
-	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+	@Transactional(readOnly = true)
 	public AppUser findUserByEmail(String email) {
 
 		if (email == null || email.equals("")) {
@@ -201,7 +201,7 @@ public class UserService implements UserDetailsService {
 			throw new BadRequestException("Invalid user object provided");
 		}
 		
-		if (updatedUser.getId() != requester.getId() && !requester.getRole().equals("ADMIN")) {
+		if (updatedUser.getId().equals(requester.getId()) && !requester.getRole().equals("ADMIN")) {
 			throw new SecurityException("Illegal update request made by " + requester.getUsername());
 		}
 
@@ -282,6 +282,7 @@ public class UserService implements UserDetailsService {
 	 * 
 	 * @return true if present, false if not
 	 */
+	@Transactional(readOnly = true)
 	public boolean isUsernameAvailable(String username) {
 
 		try {
@@ -301,6 +302,7 @@ public class UserService implements UserDetailsService {
 	 * 
 	 * @return true if present, false if not
 	 */
+	@Transactional(readOnly = true)
 	public boolean isEmailAddressAvailable(String email) {
 
 		try {
