@@ -9,7 +9,7 @@ import java.util.Objects;
  * @author Alonzo Muncy (190107 Java-Spark-USF)
  *
  */
-public class UserErrorResponse implements Serializable {
+public class ErrorResponse implements Serializable {
 
 	private static final long serialVersionUID = -780898122370684787L;
 	
@@ -17,9 +17,15 @@ public class UserErrorResponse implements Serializable {
 	private String message;
 	private long timestamp;
 	
-	public UserErrorResponse() {}
+	public ErrorResponse() {}
 	
-	public UserErrorResponse(int status, String message, long timestamp) {
+	public ErrorResponse(int status, long timestamp) {
+		super();
+		this.status = status;
+		this.timestamp = timestamp;
+	}
+	
+	public ErrorResponse(int status, String message, long timestamp) {
 		super();
 		this.status = status;
 		this.message = message;
@@ -61,9 +67,9 @@ public class UserErrorResponse implements Serializable {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof UserErrorResponse))
+		if (!(obj instanceof ErrorResponse))
 			return false;
-		UserErrorResponse other = (UserErrorResponse) obj;
+		ErrorResponse other = (ErrorResponse) obj;
 		return Objects.equals(message, other.message) && status == other.status && timestamp == other.timestamp;
 	}
 
