@@ -4,7 +4,6 @@ auth-service
 eureka-service
 config-service
 zuul-service
-configuration-repo
 
 /.metadata/
 
@@ -104,6 +103,15 @@ hibernate.cfg.xml
 
 # sonarlint modules
 .sonarlint
+
+# config files (bootstrap.yml will stay on repo, but no need to update it)
+bootstrap.yml
+application.yml
+
+# Target Directory
+target/
+
+.vscode/
 
 # hook-deps
 .hook-deps/
