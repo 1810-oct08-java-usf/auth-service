@@ -1,7 +1,9 @@
 package com.revature.rpm.security.config;
 
+import com.revature.rpm.web.filters.AuthFilter;
+import com.revature.rpm.web.filters.GatewaySubversionFilter;
+import com.revature.rpm.web.filters.TokenFilter;
 import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
@@ -14,128 +16,165 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.revature.rpm.web.filters.AuthFilter;
-import com.revature.rpm.web.filters.GatewaySubversionFilter;
-import com.revature.rpm.web.filters.TokenFilter;
-
-/**
- * Provides the configuration for the Spring Security framework.
- */
+/** Provides configuration for Spring Security. */
 @EnableWebSecurity
 public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 
-	@Lazy
-	@Autowired
-	private UserDetailsService userDetailsService;
+  @Lazy @Autowired private UserDetailsService userDetailsService;
 
-	@Autowired
-	private JwtConfig jwtConfig;
+  @Autowired private JwtConfig jwtConfig;
 
-	@Autowired
-	private ZuulConfig zuulConfig;
+  @Autowired private ZuulConfig zuulConfig;
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http
-				/*
-				 * Disables the protection against Cross-Site Request Forgery (CSRF), otherwise
-				 * requests cannot be made to this business service from the zuul-service.
-				 */
-				.csrf().disable()
+  /**
+   * Applies custom configuration settings to Spring Security.
+   *
+   * @param http - Configures security for specific HTTP requests.
+   */
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http
+        /*
+         * Disables the protection against Cross-Site Request Forgery (CSRF), otherwise
+         * requests cannot be made to this business service from the zuul-service.
+         */
+        .csrf()
+        .disable()
 
-				/*
-				 * Necessary to prevent Spring Security from blocking frames that will be loaded
-				 * for the H2 console (will be removed once a external datasource is
-				 * implemented).
-				 */
-				.headers().frameOptions().disable().and()
+        /*
+         * Necessary to prevent Spring Security from blocking frames that will be loaded
+         * for the H2 console (will be removed once a external datasource is
+         * implemented).
+         */
+        .headers()
+        .frameOptions()
+        .disable()
+        .and()
 
-				/*
-				 * Ensure that a stateless session is used; session will not be used to store
-				 * user information/state.
-				 */
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+        /*
+         * Ensure that a stateless session is used; session will not be used to store
+         * user information/state.
+         */
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and()
 
-				/*
-				 * Handle any exceptions thrown during authentication by sending a response
-				 * status of unauthorized (401).
-				 */
-				.exceptionHandling()
-				.authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)).and()
-				
-				/*
-				 * Registering filters:
-				 * 
-				 * 		- CustomAuthenticationFilter
-				 * 		- JwtUsernameAndPasswordAuthenticationFilter
-				 * 		- JwtTokenAuthenticationFilter
-				 */
-	            .addFilterBefore(new GatewaySubversionFilter(zuulConfig), AuthFilter.class)
-				.addFilter(new AuthFilter(authenticationManager(), jwtConfig))
-				.addFilterAfter(new TokenFilter(jwtConfig), AuthFilter.class)
-				
-				/*
-				 * Allows for the access to specific endpoints to be restricted and for others
-				 * to be unrestricted
-				 */
-				.authorizeRequests()
+        /*
+         * Handle any exceptions thrown during authentication by sending a response
+         * status of unauthorized (401).
+         */
+        .exceptionHandling()
+        .authenticationEntryPoint(
+            (req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+        .and()
 
-				/*
-				 *  Allow unrestricted access to:
-				 *  
-				 *  	- POST requests to 
-				 *  	- POST requests to 
-				 *  	- GET requests to /users/
-				 *  	- GET requests to /users/usernameAvailable
-				 *  	- GET requests to /actuator/info (needed for ELB)
-				 *  	- GET requests to /actuator/routes (needed for ELB)
-				 *  	- All requests to Swagger API doc endpoints (will be restricted in production)
-				 */
-				.mvcMatchers(HttpMethod.POST, "/auth").permitAll()
-				.mvcMatchers(HttpMethod.POST, "/users").permitAll()
-				
-				.mvcMatchers(HttpMethod.GET, "/users/emailInUse/**").permitAll()
-				.mvcMatchers(HttpMethod.GET, "/users/usernameAvailable/**").permitAll()
-				
-				.mvcMatchers(HttpMethod.GET, "/actuator/info").permitAll()
-				.mvcMatchers(HttpMethod.GET, "/actuator/routes").permitAll()
-				
-				.mvcMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security", "/swagger-ui.html", "/webjars/**").permitAll()
+        /*
+         * Registering filters:
+         *
+         * 		- CustomAuthenticationFilter
+         * 		- JwtUsernameAndPasswordAuthenticationFilter
+         * 		- JwtTokenAuthenticationFilter
+         */
+        .addFilterBefore(new GatewaySubversionFilter(zuulConfig), AuthFilter.class)
+        .addFilter(new AuthFilter(authenticationManager(), jwtConfig))
+        .addFilterAfter(new TokenFilter(jwtConfig), AuthFilter.class)
 
+        /*
+         * Allows for the access to specific endpoints to be restricted and for others
+         * to be unrestricted
+         */
+        .authorizeRequests()
 
-				/*
-				 *  Allow only admins to access:
-				 *  	
-				 *  	- All requests to /h2-console
-				 *  	- GET requests to /auth/users
-				 *  	- POST requests to /auth/users/admin
-				 */
-				.mvcMatchers("/h2-console/**").hasRole("ADMIN")
-				.mvcMatchers(HttpMethod.GET, "/users/**").hasRole("ADMIN")
-				.mvcMatchers(HttpMethod.POST, "/users/admin").hasRole("ADMIN")
-				
-				
-				// All other requests must be authenticated
-				.anyRequest().authenticated();
-	}
+        /*
+         *  Allow unrestricted access to:
+         *
+         *  	- POST requests to
+         *  	- POST requests to
+         *  	- GET requests to /users/
+         *  	- GET requests to /users/usernameAvailable
+         *  	- GET requests to /actuator/info (needed for ELB)
+         *  	- GET requests to /actuator/routes (needed for ELB)
+         *  	- All requests to Swagger API doc endpoints (will be restricted in production)
+         */
+        .mvcMatchers(HttpMethod.POST, "/auth")
+        .permitAll()
+        .mvcMatchers(HttpMethod.POST, "/users")
+        .permitAll()
+        .mvcMatchers(HttpMethod.GET, "/users/emailInUse/**")
+        .permitAll()
+        .mvcMatchers(HttpMethod.GET, "/users/usernameAvailable/**")
+        .permitAll()
+        .mvcMatchers(HttpMethod.GET, "/actuator/info")
+        .permitAll()
+        .mvcMatchers(HttpMethod.GET, "/actuator/routes")
+        .permitAll()
+        .mvcMatchers(
+            "/v2/api-docs",
+            "/configuration/ui",
+            "/swagger-resources",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/webjars/**")
+        .permitAll()
 
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-	}
+        /*
+         *  Allow only admins to access:
+         *
+         *  	- All requests to /h2-console
+         *  	- GET requests to /auth/users
+         *  	- POST requests to /auth/users/admin
+         */
+        .mvcMatchers("/h2-console/**")
+        .hasRole("ADMIN")
+        .mvcMatchers(HttpMethod.GET, "/users/**")
+        .hasRole("ADMIN")
+        .mvcMatchers(HttpMethod.POST, "/users/admin")
+        .hasRole("ADMIN")
 
-	@Bean
-	public JwtConfig jwtConfig() {
-		return new JwtConfig();
-	}
-	
-	@Bean
-	public ZuulConfig zuulConfig() {
-		return new ZuulConfig();
-	}
+        // All other requests must be authenticated
+        .anyRequest()
+        .authenticated();
+  }
 
-	@Bean
-	public BCryptPasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+  /**
+   * Defines configuration as having an in memory Authentication Manager that can process
+   * authentication requests and uses userDetailsService to provide customized authentication.
+   *
+   * @param auth - An AuthenticationManagementBuilter that can process authentication requests and
+   *     can be easily customized.
+   */
+  @Override
+  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+  }
+
+  /**
+   * A Spring bean that retrieves an instance of JwtConfig when invoked.
+   *
+   * @return a new instance of JwtConfig.
+   */
+  @Bean
+  public JwtConfig jwtConfig() {
+    return new JwtConfig();
+  }
+
+  /**
+   * A Spring bean that retrieves an instance of ZuleConfig when invoked.
+   *
+   * @return a new instance of ZuulConfig.
+   */
+  @Bean
+  public ZuulConfig zuulConfig() {
+    return new ZuulConfig();
+  }
+
+  /**
+   * A Spring bean that retrieves an instance of BCryptPasswordEncoder when invoked.
+   *
+   * @return a new instance of BCryptPasswordEncoder.
+   */
+  @Bean
+  public BCryptPasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 }

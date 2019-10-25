@@ -2,58 +2,85 @@ package com.revature.rpm.security.config;
 
 import org.springframework.beans.factory.annotation.Value;
 
-/**
- * Provides configuration which will be used during Zuul Header Authentication.
- * 
- * @author Sean Doyle (1810-Oct22-Java-USF)
- */
+/** Provides configuration for Zuul Header Authentication. */
 public class ZuulConfig {
 
-	/*
-	 * Indicates the name of the HTTP header that will contain the prefix and Zuul
-	 * header as a value
-	 */
-	@Value("${security.zsign.header:RPM_ZUUL_ACCESS_HEADER}")
-	private String header;
+  /**
+   * Indicates the name of the HTTP header that will contain the prefix and Zuul header as a value.
+   */
+  @Value("${security.zsign.header:RPM_ZUUL_ACCESS_HEADER}")
+  private String header;
 
-	/*
-	 * Indicates the salt value that will be combined with the secret to form the
-	 * hash that will be transferred with the request
-	 */
-	@Value("${security.zsign.salt}")
-	private String salt;
-	/*
-	 * TODO This should be refactored to use an environment variable
-	 */
-	// Used as a key with the encryption algorithm SHA-512 to generate hash
-	@Value("${security.zsign.secret}")
-	private String secret;
+  /**
+   * Indicates the salt value that will be combined with the secret to form the hash that will be
+   * transferred with the request.
+   */
+  @Value("${security.zsign.salt}")
+  private String salt;
 
-	public ZuulConfig() {
-	}
+  /*
+   * TODO This should be refactored to use an environment variable
+   */
 
-	public String getHeader() {
-		return header;
-	}
+  /** A secret key that's used with the SHA-512 algorithm to generate a hash. */
+  @Value("${security.zsign.secret}")
+  private String secret;
 
-	public void setHeader(String header) {
-		this.header = header;
-	}
+  public ZuulConfig() {
+    super();
+  }
 
-	public String getSalt() {
-		return salt;
-	}
+  /**
+   * header getter method.
+   *
+   * @return header associated with this instance of ZuulConfig.
+   */
+  public String getHeader() {
+    return header;
+  }
 
-	public void setSalt(String salt) {
-		this.salt = salt;
-	}
+  /**
+   * header setter method.
+   *
+   * @param header - New header.
+   */
+  public void setHeader(String header) {
+    this.header = header;
+  }
 
-	public String getSecret() {
-		return secret;
-	}
+  /**
+   * salt getter method.
+   *
+   * @return salt associated with this instance of ZuulConfig.
+   */
+  public String getSalt() {
+    return salt;
+  }
 
-	public void setSecret(String secret) {
-		this.secret = secret;
-	}
+  /**
+   * salt setter method.
+   *
+   * @param salt - New salt.
+   */
+  public void setSalt(String salt) {
+    this.salt = salt;
+  }
 
+  /**
+   * secret getter method.
+   *
+   * @return secret associated with this instance of ZuulConfig.
+   */
+  public String getSecret() {
+    return secret;
+  }
+
+  /**
+   * secret setter method.
+   *
+   * @param secret - New secret.
+   */
+  public void setSecret(String secret) {
+    this.secret = secret;
+  }
 }
