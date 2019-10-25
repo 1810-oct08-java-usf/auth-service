@@ -4,72 +4,112 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * This is a data object for the errors
- * 
- * @author Alonzo Muncy (190107 Java-Spark-USF)
- *
+ * Stores a status, message, and timestamp so they can be transfered back as a single unit upon an
+ * exception being thrown.
  */
 public class UserErrorResponse implements Serializable {
 
-	private static final long serialVersionUID = -780898122370684787L;
-	
-	private int status;
-	private String message;
-	private long timestamp;
-	
-	public UserErrorResponse() {}
-	
-	public UserErrorResponse(int status, String message, long timestamp) {
-		super();
-		this.status = status;
-		this.message = message;
-		this.timestamp = timestamp;
-	}
+  private static final long serialVersionUID = -780898122370684787L;
 
-	public int getStatus() {
-		return status;
-	}
+  private int status;
+  private String message;
+  private long timestamp;
 
-	public void setStatus(int status) {
-		this.status = status;
-	}
+  public UserErrorResponse() {}
 
-	public String getMessage() {
-		return message;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
-	public long getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(message, status, timestamp);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof UserErrorResponse))
-			return false;
-		UserErrorResponse other = (UserErrorResponse) obj;
-		return Objects.equals(message, other.message) && status == other.status && timestamp == other.timestamp;
-	}
-
-	@Override
-	public String toString() {
-		return "UserErrorResponse [status=" + status + ", message=" + message + ", timestamp=" + timestamp + "]";
-	}
-	
+  public UserErrorResponse(int status, String message, long timestamp) {
+    super();
+    this.status = status;
+    this.message = message;
+    this.timestamp = timestamp;
+  }
+  /**
+   * status getter method.
+   *
+   * @return status associated with this instance of UserErrorRespponse.
+   */
+  public int getStatus() {
+    return status;
+  }
+  /**
+   * status setter method.
+   *
+   * @param status - New status.
+   */
+  public void setStatus(int status) {
+    this.status = status;
+  }
+  /**
+   * message getter method.
+   *
+   * @return message associated with this instance of UserErrorRespponse.
+   */
+  public String getMessage() {
+    return message;
+  }
+  /**
+   * message setter method.
+   *
+   * @param message - New message.
+   */
+  public void setMessage(String message) {
+    this.message = message;
+  }
+  /**
+   * timestamp getter method.
+   *
+   * @return timestamp associated with this instance of UserErrorRespponse.
+   */
+  public long getTimestamp() {
+    return timestamp;
+  }
+  /**
+   * timestamp setter method.
+   *
+   * @param timestamp - New timestamp.
+   */
+  public void setTimestamp(long timestamp) {
+    this.timestamp = timestamp;
+  }
+  /**
+   * Overridden method allowing for hash codes to be genreated for UserErrorResponse objects.
+   *
+   * @return hash of a UserErrorResponse object given its message, status and timestamp as
+   *     parameters.
+   */
+  @Override
+  public int hashCode() {
+    return Objects.hash(message, status, timestamp);
+  }
+  /**
+   * Overriden method that determines if objects are equivalent to an instance of UserErrorResponse.
+   *
+   * @return boolean denoting the equivalence of the objects.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (!(obj instanceof UserErrorResponse)) return false;
+    UserErrorResponse other = (UserErrorResponse) obj;
+    return Objects.equals(message, other.message)
+        && status == other.status
+        && timestamp == other.timestamp;
+  }
+  /**
+   * Overriden method allowing UserErrorResponse objects to be converted to strings.
+   *
+   * @return a stringified UserErrorResponse with each field name and its value appended as a
+   *     string.
+   */
+  @Override
+  public String toString() {
+    return "UserErrorResponse [status="
+        + status
+        + ", message="
+        + message
+        + ", timestamp="
+        + timestamp
+        + "]";
+  }
 }
