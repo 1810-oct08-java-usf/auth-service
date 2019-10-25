@@ -94,14 +94,10 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 				.mvcMatchers(HttpMethod.POST, "/auth").permitAll()
 				.mvcMatchers(HttpMethod.POST, "/users").permitAll()
 				
-				.mvcMatchers(HttpMethod.GET, "/users/emailInUse/**").permitAll()
-				.mvcMatchers(HttpMethod.GET, "/users/usernameAvailable/**").permitAll()
-				
 				.mvcMatchers(HttpMethod.GET, "/actuator/info").permitAll()
 				.mvcMatchers(HttpMethod.GET, "/actuator/routes").permitAll()
 				
 				.mvcMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security", "/swagger-ui.html", "/webjars/**").permitAll()
-
 
 				/*
 				 *  Allow only admins to access:
@@ -112,11 +108,10 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 				 */
 				.mvcMatchers("/h2-console/**").hasRole("ADMIN")
 				.mvcMatchers(HttpMethod.GET, "/users/**").hasRole("ADMIN")
-				.mvcMatchers(HttpMethod.POST, "/users/admin").hasRole("ADMIN")
-				
 				
 				// All other requests must be authenticated
 				.anyRequest().authenticated();
+		
 	}
 
 	@Override
