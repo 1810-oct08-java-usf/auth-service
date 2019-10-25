@@ -71,9 +71,9 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
         /*
          * Registering filters:
          *
-         * 		- CustomAuthenticationFilter
-         * 		- JwtUsernameAndPasswordAuthenticationFilter
-         * 		- JwtTokenAuthenticationFilter
+         *   - CustomAuthenticationFilter
+         *   - JwtUsernameAndPasswordAuthenticationFilter
+         *   - JwtTokenAuthenticationFilter
          */
         .addFilterBefore(new GatewaySubversionFilter(zuulConfig), AuthFilter.class)
         .addFilter(new AuthFilter(authenticationManager(), jwtConfig))
@@ -88,13 +88,13 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
         /*
          *  Allow unrestricted access to:
          *
-         *  	- POST requests to
-         *  	- POST requests to
-         *  	- GET requests to /users/
-         *  	- GET requests to /users/usernameAvailable
-         *  	- GET requests to /actuator/info (needed for ELB)
-         *  	- GET requests to /actuator/routes (needed for ELB)
-         *  	- All requests to Swagger API doc endpoints (will be restricted in production)
+         *   - POST requests to
+         *   - POST requests to
+         *   - GET requests to /users/
+         *   - GET requests to /users/usernameAvailable
+         *   - GET requests to /actuator/info (needed for ELB)
+         *   - GET requests to /actuator/routes (needed for ELB)
+         *   - All requests to Swagger API doc endpoints (will be restricted in production)
          */
         .mvcMatchers(HttpMethod.POST, "/auth")
         .permitAll()
@@ -120,9 +120,9 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
         /*
          *  Allow only admins to access:
          *
-         *  	- All requests to /h2-console
-         *  	- GET requests to /auth/users
-         *  	- POST requests to /auth/users/admin
+         *   - All requests to /h2-console
+         *   - GET requests to /auth/users
+         *   - POST requests to /auth/users/admin
          */
         .mvcMatchers("/h2-console/**")
         .hasRole("ADMIN")

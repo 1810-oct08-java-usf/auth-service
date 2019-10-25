@@ -33,6 +33,7 @@ public class JwtConfig {
   public String getHeader() {
     return header;
   }
+
   /**
    * prefix getter method.
    *
