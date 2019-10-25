@@ -133,7 +133,7 @@ public class AppUser implements Serializable {
    *
    * @return lastName associated with this instance of AppUser.
    */
-  public String getlastName() {
+  public String getLastName() {
     return lastName;
   }
 
@@ -142,7 +142,7 @@ public class AppUser implements Serializable {
    *
    * @param lastName - New lastName.
    */
-  public void setlastName(String lastName) {
+  public void setLastName(String lastName) {
     this.lastName = lastName;
   }
 
