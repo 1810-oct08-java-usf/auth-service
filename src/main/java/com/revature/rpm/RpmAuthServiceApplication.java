@@ -16,7 +16,7 @@ public class RpmAuthServiceApplication {
   /**
    * Bootstrap and launch application and return the running application context.
    *
-   * @param args - an array of Strings corresponding to arguments from the command line.
+   * @param args - An array of Strings corresponding to arguments from the command line.
    */
   public static void main(String[] args) {
     SpringApplication.run(RpmAuthServiceApplication.class, args);
