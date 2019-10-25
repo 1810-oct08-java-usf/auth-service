@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.revature.rpm.dtos.UserErrorResponse;
+import com.revature.rpm.dtos.ErrorResponse;
 import com.revature.rpm.dtos.UserPrincipal;
 import com.revature.rpm.entities.AppUser;
 import com.revature.rpm.exceptions.BadRequestException;
@@ -207,8 +207,8 @@ public class AuthController {
 	 */
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	@ExceptionHandler({ UserNotFoundException.class })
-	public UserErrorResponse handleUserNotFoundException(UserNotFoundException unfe) {
-		UserErrorResponse error = new UserErrorResponse();
+	public ErrorResponse handleUserNotFoundException(UserNotFoundException unfe) {
+		ErrorResponse error = new ErrorResponse();
 		error.setStatus(HttpStatus.NOT_FOUND.value());
 		error.setMessage(unfe.getMessage());
 		error.setTimestamp(System.currentTimeMillis());
@@ -223,8 +223,8 @@ public class AuthController {
 	 */
 	@ExceptionHandler
 	@ResponseStatus(HttpStatus.CONFLICT)
-	public UserErrorResponse handleUserCreationException(UserCreationException uce) {
-		UserErrorResponse error = new UserErrorResponse();
+	public ErrorResponse handleUserCreationException(UserCreationException uce) {
+		ErrorResponse error = new ErrorResponse();
 		error.setStatus(HttpStatus.CONFLICT.value());
 		error.setMessage(uce.getMessage());
 		error.setTimestamp(System.currentTimeMillis());
@@ -239,8 +239,8 @@ public class AuthController {
 	 */
 	@ExceptionHandler
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public UserErrorResponse handleBadRequestException(BadRequestException bre) {
-		UserErrorResponse error = new UserErrorResponse();
+	public ErrorResponse handleBadRequestException(BadRequestException bre) {
+		ErrorResponse error = new ErrorResponse();
 		error.setStatus(HttpStatus.BAD_REQUEST.value());
 		error.setMessage(bre.getMessage());
 		error.setTimestamp(System.currentTimeMillis());
@@ -255,8 +255,8 @@ public class AuthController {
 	 */
 	@ExceptionHandler
 	@ResponseStatus(HttpStatus.CONFLICT)
-	public UserErrorResponse handleUserUpdateException(UserUpdateException uue) {
-		UserErrorResponse error = new UserErrorResponse();
+	public ErrorResponse handleUserUpdateException(UserUpdateException uue) {
+		ErrorResponse error = new ErrorResponse();
 		error.setStatus(HttpStatus.CONFLICT.value());
 		error.setMessage(uue.getMessage());
 		error.setTimestamp(System.currentTimeMillis());
