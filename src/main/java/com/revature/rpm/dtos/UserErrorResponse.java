@@ -17,12 +17,20 @@ public class UserErrorResponse implements Serializable {
 
   public UserErrorResponse() {}
 
+  /**
+   * Constructor for UserErrorResponse that takes in a status, message and timestamp.
+   *
+   * @param status - Status to assign.
+   * @param message - Message to assign.
+   * @param timestamp - Timestamp to assign.
+   */
   public UserErrorResponse(int status, String message, long timestamp) {
     super();
     this.status = status;
     this.message = message;
     this.timestamp = timestamp;
   }
+
   /**
    * status getter method.
    *
@@ -31,6 +39,7 @@ public class UserErrorResponse implements Serializable {
   public int getStatus() {
     return status;
   }
+
   /**
    * status setter method.
    *
@@ -39,6 +48,7 @@ public class UserErrorResponse implements Serializable {
   public void setStatus(int status) {
     this.status = status;
   }
+
   /**
    * message getter method.
    *
@@ -47,6 +57,7 @@ public class UserErrorResponse implements Serializable {
   public String getMessage() {
     return message;
   }
+
   /**
    * message setter method.
    *
@@ -55,6 +66,7 @@ public class UserErrorResponse implements Serializable {
   public void setMessage(String message) {
     this.message = message;
   }
+
   /**
    * timestamp getter method.
    *
@@ -63,6 +75,7 @@ public class UserErrorResponse implements Serializable {
   public long getTimestamp() {
     return timestamp;
   }
+
   /**
    * timestamp setter method.
    *
@@ -71,6 +84,7 @@ public class UserErrorResponse implements Serializable {
   public void setTimestamp(long timestamp) {
     this.timestamp = timestamp;
   }
+
   /**
    * Overridden method allowing for hash codes to be genreated for UserErrorResponse objects.
    *
@@ -81,6 +95,7 @@ public class UserErrorResponse implements Serializable {
   public int hashCode() {
     return Objects.hash(message, status, timestamp);
   }
+
   /**
    * Overriden method that determines if objects are equivalent to an instance of UserErrorResponse.
    *
@@ -88,14 +103,21 @@ public class UserErrorResponse implements Serializable {
    */
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (!(obj instanceof UserErrorResponse)) return false;
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof UserErrorResponse)) {
+      return false;
+    }
     UserErrorResponse other = (UserErrorResponse) obj;
     return Objects.equals(message, other.message)
         && status == other.status
         && timestamp == other.timestamp;
   }
+
   /**
    * Overriden method allowing UserErrorResponse objects to be converted to strings.
    *

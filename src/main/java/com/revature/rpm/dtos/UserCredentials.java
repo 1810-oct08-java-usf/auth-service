@@ -16,6 +16,7 @@ public class UserCredentials {
   public String getUsername() {
     return username;
   }
+
   /**
    * username setter method.
    *
@@ -24,6 +25,7 @@ public class UserCredentials {
   public void setUsername(String username) {
     this.username = username;
   }
+
   /**
    * password getter method.
    *
@@ -32,6 +34,7 @@ public class UserCredentials {
   public String getPassword() {
     return password;
   }
+
   /**
    * passwrd setter method.
    *
@@ -40,6 +43,7 @@ public class UserCredentials {
   public void setPassword(String password) {
     this.password = password;
   }
+
   /**
    * Overridden method allowing for hash codes to be genreated for UserCredential objects.
    *
@@ -49,6 +53,7 @@ public class UserCredentials {
   public int hashCode() {
     return Objects.hash(password, username);
   }
+
   /**
    * Overriden method that determines if objects are equivalent to an instance of UserCredentials.
    *
@@ -56,12 +61,19 @@ public class UserCredentials {
    */
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (!(obj instanceof UserCredentials)) return false;
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof UserCredentials)) {
+      return false;
+    }
     UserCredentials other = (UserCredentials) obj;
     return Objects.equals(password, other.password) && Objects.equals(username, other.username);
   }
+
   /**
    * Overriden method allowing UserCredentials objects to be converted to strings.
    *

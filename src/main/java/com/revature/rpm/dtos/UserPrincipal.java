@@ -20,10 +20,10 @@ public class UserPrincipal extends User {
    * setters aren't visible, the username and password are still retrievable because of the User
    * superclass.
    *
-   * @param appUser - A user to store in the principal
-   * @param username - A user's username
-   * @param password - A user's password
-   * @param authorities - A collection of objects that can be any type provided they extend
+   * @param appUser - A user to store in the principal.
+   * @param username - A user's username.
+   * @param password - A user's password.
+   * @param authorities - A collection of objects that can be any type provided they extend.
    *     GrantedAuthority. Used for authentication.
    */
   public UserPrincipal(
@@ -34,6 +34,7 @@ public class UserPrincipal extends User {
     super(username, password, authorities);
     this.appUser = appUser;
   }
+
   /**
    * appUser getter method.
    *
