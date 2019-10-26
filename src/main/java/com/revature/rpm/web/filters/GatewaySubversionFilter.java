@@ -35,10 +35,12 @@ import com.revature.rpm.exceptions.GatewaySubversionException;
  */
 public class GatewaySubversionFilter extends GenericFilterBean {
 	
+	private String header;
 	private String salt;
 	private String secret;
 
-	public GatewaySubversionFilter(String salt, String secret) {
+	public GatewaySubversionFilter(String header, String salt, String secret) {
+		this.header = header;
 		this.salt = salt;
 		this.secret = secret;
 	}
@@ -53,8 +55,8 @@ public class GatewaySubversionFilter extends GenericFilterBean {
 		HttpServletRequest httpReq = (HttpServletRequest) req;
 		HttpServletResponse httpResp = (HttpServletResponse) resp;
 
-		String gatewayToken = httpReq.getHeader("X-RPM-Gateway");
-		System.out.println("header value: " + gatewayToken);
+		String gatewayToken = httpReq.getHeader(header);
+		
 		try {
 
 			if (httpReq.getRequestURI().contains("/actuator")) {

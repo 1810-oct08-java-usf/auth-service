@@ -86,7 +86,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				 * 		- JwtUsernameAndPasswordAuthenticationFilter
 				 * 		- JwtTokenAuthenticationFilter
 				 */
-	            .addFilterBefore(new GatewaySubversionFilter(gatewaySalt, gatewaySecret), AuthFilter.class)
+	            .addFilterBefore(new GatewaySubversionFilter(gatewayHeader, gatewaySalt, gatewaySecret), AuthFilter.class)
 				.addFilter(new AuthFilter(authenticationManager(), accessHeader, accessPrefix, accessSecret, accessExpiration))
 				.addFilterAfter(new ResourceAccessFilter(accessHeader, accessPrefix, accessSecret), AuthFilter.class)
 				
@@ -99,22 +99,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				/*
 				 *  Allow unrestricted access to:
 				 *  
-				 *  	- POST requests to 
-				 *  	- POST requests to 
-				 *  	- GET requests to /users/
-				 *  	- GET requests to /users/usernameAvailable
-				 *  	- GET requests to /actuator/info (needed for ELB)
-				 *  	- GET requests to /actuator/routes (needed for ELB)
-				 *  	- All requests to Swagger API doc endpoints (will be restricted in production)
+				 *  	- POST requests to /users - for user registration
+				 *  	- GET requests to /users/isAvailable - for username and email availability requests
+				 *  	- GET requests to /actuator/info - for AWS Elastic Load Balancer target group monitoring
+				 *  	- GET requests to /actuator/routes - for AWS Elastic Load Balancer target group monitoring
 				 */
-				.mvcMatchers(HttpMethod.POST, "/auth").permitAll()
 				.mvcMatchers(HttpMethod.POST, "/users").permitAll()
+				.mvcMatchers(HttpMethod.GET, "/users/isAvailable").permitAll()
 				
 				.mvcMatchers(HttpMethod.GET, "/actuator/info").permitAll()
 				.mvcMatchers(HttpMethod.GET, "/actuator/routes").permitAll()
 				
-				.mvcMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security", "/swagger-ui.html", "/webjars/**").permitAll()
-
 				/*
 				 *  Allow only admins to access:
 				 *  	
