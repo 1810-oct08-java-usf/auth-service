@@ -19,7 +19,6 @@ import org.springframework.web.filter.GenericFilterBean;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.rpm.dtos.ErrorResponse;
 import com.revature.rpm.exceptions.GatewaySubversionException;
-import com.revature.rpm.security.config.ZuulConfig;
 
 /*
  * TODO
@@ -35,46 +34,50 @@ import com.revature.rpm.security.config.ZuulConfig;
  * first intercepted.
  */
 public class GatewaySubversionFilter extends GenericFilterBean {
+	
+	private String salt;
+	private String secret;
 
-	private ZuulConfig zuulConfig;
-
-	/**
-	 * Constructor for CustomAuthenticationFilter that instantiates the ZuulConfig
-	 * field.
-	 *
-	 * @param zuulConfig Provides configuration for validating that requests came
-	 *                   through Zuul
-	 */
-	public GatewaySubversionFilter(ZuulConfig zuulConfig) {
-		this.zuulConfig = zuulConfig;
+	public GatewaySubversionFilter(String salt, String secret) {
+		this.salt = salt;
+		this.secret = secret;
 	}
 
 	@Override
-	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
-			throws IOException, ServletException {
-
+	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
+		logger.debug("Request intercepted by GatewaySubversionFilter");
+		
 		final String GATEWAY_SUBVERTED = "gateway-subverted";
 		final String REQUEST_TYPE = "request-type";
 
 		HttpServletRequest httpReq = (HttpServletRequest) req;
 		HttpServletResponse httpResp = (HttpServletResponse) resp;
 
-		String headerZuul = httpReq.getHeader("X-RPM-Gateway");
-
+		String gatewayToken = httpReq.getHeader("X-RPM-Gateway");
+		System.out.println("header value: " + gatewayToken);
 		try {
 
 			if (httpReq.getRequestURI().contains("/actuator")) {
+				
+				logger.debug("Health-check request detected");
 				httpReq.setAttribute(GATEWAY_SUBVERTED, true);
 				httpReq.setAttribute(REQUEST_TYPE, "health-check");
-			} else if (validateHeader(headerZuul)) {
+				
+			} else if (validateGatewayHeader(gatewayToken)) {
+				
+				logger.debug("Request contains a valid gateway header token");
 				httpReq.setAttribute(GATEWAY_SUBVERTED, false);
 				httpReq.setAttribute(REQUEST_TYPE, "resource");
+				
 			} else {
+
+				logger.warn("No gateway header found on request");
 				httpReq.setAttribute(GATEWAY_SUBVERTED, true);
 				httpReq.setAttribute(REQUEST_TYPE, "resource");
 				SecurityContextHolder.clearContext();
 				httpResp.setStatus(401);
 				throw new GatewaySubversionException("No gateway header found on request.");
+				
 			}
 
 		} catch (GatewaySubversionException gse) {
@@ -87,46 +90,36 @@ public class GatewaySubversionFilter extends GenericFilterBean {
 	}
 
 	/**
-	 * Method to perform a SHA-512 hash.
-	 * 
-	 * @param password Represents the password which will be hashed
+	 * Validates that the provided gateway header value is authentic. 
+	 *
+	 * @param header
 	 */
-	public String getHash(String password) {
-
-		String generatedPassword = null;
+	public boolean validateGatewayHeader(String header) {
+		
+		if (header == null || header.equals("")) {
+			return false;
+		}
+		
+		StringBuilder hash = new StringBuilder();
 
 		try {
 
 			MessageDigest md = MessageDigest.getInstance("SHA-512");
-			md.update(zuulConfig.getSalt().getBytes(StandardCharsets.UTF_8));
-			byte[] bytes = md.digest(password.getBytes(StandardCharsets.UTF_8));
-			StringBuilder sb = new StringBuilder();
+			md.update(salt.getBytes(StandardCharsets.UTF_8));
+			byte[] bytes = md.digest(secret.getBytes(StandardCharsets.UTF_8));
+
+			
 
 			for (int i = 0; i < bytes.length; i++) {
-				sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+				hash.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
 			}
-
-			generatedPassword = sb.toString();
+			
 
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
 
-		return generatedPassword;
-	}
-
-	/**
-	 * Method to check if the header value matches the expected value, using the
-	 * ZuulConfig object.
-	 *
-	 * @param header The retrieved header from the request object
-	 */
-	public boolean validateHeader(String header) {
-		if (header == null) {
-			return false;
-		}
-		
-		return header.equals("test-value");
+		return header.equals(hash.toString());
 
 	}
 

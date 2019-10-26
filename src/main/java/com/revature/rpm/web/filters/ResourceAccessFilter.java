@@ -1,21 +1,21 @@
 package com.revature.rpm.web.filters;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import com.revature.rpm.security.config.JwtConfig;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 
 /**
  * A filter used to intercept all requests and validate the JWT, if present, in
@@ -23,19 +23,16 @@ import com.revature.rpm.security.config.JwtConfig;
  * 
  * @author Wezley Singleton
  */
-public class TokenFilter extends OncePerRequestFilter {
+public class ResourceAccessFilter extends OncePerRequestFilter {
 
-	private final JwtConfig jwtConfig;
-
-	/**
-	 * Constructor for JwtTokenAuthenticationFilter that instantiates the JwtConfig
-	 * field.
-	 *
-	 * @param jwtConfig
-	 *            Provides configuration for validating JWTs
-	 */
-	public TokenFilter(JwtConfig jwtConfig) {
-		this.jwtConfig = jwtConfig;
+	private String header;
+	private String prefix;
+	private String secret;
+	
+	public ResourceAccessFilter(String header, String prefix, String secret) {
+		this.header = header;
+		this.prefix = prefix;
+		this.secret = secret;
 	}
 
 	/**
@@ -55,23 +52,26 @@ public class TokenFilter extends OncePerRequestFilter {
 	 *            filter in the chain.
 	 */
 	@Override
-	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp, FilterChain chain)
-			throws ServletException, IOException {
-
+	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp, FilterChain chain) throws ServletException, IOException {
+		
+		logger.info("Request intercepted by ResourceAccessFilter");
 	
-		String header = req.getHeader(jwtConfig.getHeader());
+		String headerValue = req.getHeader(header);
 
-		if (header == null || !header.startsWith(jwtConfig.getPrefix())) {
+		if (headerValue == null || !headerValue.startsWith(prefix)) {
+			logger.info("No resource access header value found on request");
 			chain.doFilter(req, resp);
 			return;
 		}
 
-		String token = header.replaceAll(jwtConfig.getPrefix(), "");
+		logger.info("Resource access header detected, obtaining token value");
+		String token = headerValue.replaceAll(prefix, "");
 
 		try {
 
+			logger.info("Parsing token for resource access claims");
 			Claims claims = Jwts.parser()
-					.setSigningKey(jwtConfig.getSecret().getBytes())
+					.setSigningKey(secret.getBytes())
 					.parseClaimsJws(token)
 					.getBody();
 
@@ -86,12 +86,16 @@ public class TokenFilter extends OncePerRequestFilter {
 																				  .map(SimpleGrantedAuthority::new)
 																				  .collect(Collectors.toList());
 				
+				logger.info("Resource access scopes determined, setting security context");
 				UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null, grantedAuthorities);
 				SecurityContextHolder.getContext().setAuthentication(auth);
 			}
 
 		} catch (Exception e) {
+			
+			logger.warn("Error parsing resource access token for claim information");
 			SecurityContextHolder.clearContext();
+			
 		}
 
 		chain.doFilter(req, resp);

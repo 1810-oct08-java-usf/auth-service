@@ -16,9 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.rpm.dtos.UserCredentials;
 import com.revature.rpm.dtos.UserPrincipal;
-
-import com.revature.rpm.security.config.JwtConfig;
-import com.revature.rpm.security.util.JwtGenerator;
+import com.revature.rpm.security.util.ResourceAccessTokenGenerator;
 
 /**
  * Filter used for authenticating a login request using the provided username and password. Upon 
@@ -30,10 +28,12 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
 	 * user credentials
 	 */
 	private AuthenticationManager authManager;
-	/**
-	 * Class for determining properties of generated JWTs.
-	 */
-	private JwtConfig jwtConfig;
+	
+	private String accessHeader;
+	private String accessPrefix;
+	private String accessSecret;
+	private long accessExpiration;
+	
 
 	/**
 	 * Constructor for the JwtUsernameAndPasswordAuthenticationFilter that
@@ -48,9 +48,12 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
 	 * @param jwtConfig
 	 *		Provides the configuration for how JWT tokens are created/validated.
 	 */
-	public AuthFilter(AuthenticationManager authManager, JwtConfig jwtConfig) {
+	public AuthFilter(AuthenticationManager authManager, String header, String prefix, String secret, String exp) {
 		this.authManager = authManager;
-		this.jwtConfig = jwtConfig;
+		this.accessHeader = header;
+		this.accessPrefix = prefix;
+		this.accessSecret = secret;
+		this.accessExpiration = Long.parseLong(exp);
 	}
 
 	/**
@@ -65,21 +68,21 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
 	 * 2. Create an authentication token (contains user credentials) which will be used by the AuthenticationManager.<br>
 	 * 3. Leverage AuthenticationManager to authenticate the user.
 	 * 
-	 * @param request 
+	 * @param req 
 	 * 		Provides information regarding the HTTP request.
 	 * 
-	 * @param response 
+	 * @param resp 
 	 * 		Provides information regarding the HTTP response.
 	 * 
 	 * @return Authentication 
 	 * 		Represents the token for an authenticated principal
 	 */
 	@Override
-	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
+	public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse resp) {
 
 		try {
 			
-			UserCredentials creds = new ObjectMapper().readValue(request.getInputStream(), UserCredentials.class);
+			UserCredentials creds = new ObjectMapper().readValue(req.getInputStream(), UserCredentials.class);
 			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(creds.getUsername(),
 					creds.getPassword(), Collections.emptyList());
 			return authManager.authenticate(authToken);
@@ -102,10 +105,10 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
 	 * Token is then added to the response header from JwtConfig with corresponding
 	 * prefix. 
 	 * 
-	 * @param request 
+	 * @param req 
 	 * 		Provides information regarding the HTTP request.
 	 * 
-	 * @param response 
+	 * @param resp 
 	 * 		Provides information regarding the HTTP response.
 	 * 
 	 * @param chain 
@@ -115,12 +118,17 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
 	 *      Represents the principle user which was successfully authenticated.
 	 */
 	@Override
-	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-			Authentication auth) throws IOException, ServletException {
-
-		String token = JwtGenerator.createJwt(auth,jwtConfig);
-		response.getWriter().write(new ObjectMapper().writeValueAsString(((UserPrincipal)auth.getPrincipal()).getAppUser()));
-		response.addHeader(jwtConfig.getHeader(), jwtConfig.getPrefix() + token);
+	protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse resp, FilterChain chain, 
+			Authentication auth) throws IOException, ServletException 
+	{
+		System.out.println(accessExpiration);
+		System.out.println(accessSecret);
+		String token = ResourceAccessTokenGenerator.createJwt(auth, accessExpiration, accessSecret);
+	
+		resp.setContentType("application/json");
+		resp.addHeader(accessHeader, accessPrefix + token);
+		resp.getWriter().write(new ObjectMapper().writeValueAsString(((UserPrincipal)auth.getPrincipal()).getAppUser()));
+	
 	}	
 	
 }

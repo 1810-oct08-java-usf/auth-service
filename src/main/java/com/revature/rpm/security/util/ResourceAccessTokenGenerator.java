@@ -10,9 +10,7 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-import com.revature.rpm.security.config.JwtConfig;
-
-public class JwtGenerator {
+public class ResourceAccessTokenGenerator {
 
 	/**
 	 * Method used for generating a JWT based upon an authentication object. 
@@ -35,7 +33,7 @@ public class JwtGenerator {
 	 * 		the JWT (no prefix present)
 	 */
 
-	public static String createJwt(Authentication auth, JwtConfig jwtConfig) {
+	public static String createJwt(Authentication auth, long expiration, String secret) {
 		System.out.println("creating new JWT for: " + auth.getName());
 
 		SignatureAlgorithm sigAlg = SignatureAlgorithm.HS512;
@@ -53,15 +51,15 @@ public class JwtGenerator {
 														   .map(GrantedAuthority::getAuthority)
 														   .collect(Collectors.toList()))
 				.setIssuedAt(new Date(nowMillis))
-				.setExpiration(new Date(nowMillis + jwtConfig.getExpiration()))
-				.signWith(sigAlg, jwtConfig.getSecret().getBytes());
+				.setExpiration(new Date(nowMillis + expiration))
+				.signWith(sigAlg, secret.getBytes());
 
 		System.out.println("JWT successfully created");
 
 		return builder.compact();
 	}
 
-	private JwtGenerator() {
+	private ResourceAccessTokenGenerator() {
 		super();
 	}
 

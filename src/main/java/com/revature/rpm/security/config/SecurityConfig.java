@@ -3,6 +3,7 @@ package com.revature.rpm.security.config;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
@@ -16,23 +17,38 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.revature.rpm.web.filters.AuthFilter;
 import com.revature.rpm.web.filters.GatewaySubversionFilter;
-import com.revature.rpm.web.filters.TokenFilter;
+import com.revature.rpm.web.filters.ResourceAccessFilter;
 
 /**
  * Provides the configuration for the Spring Security framework.
  */
 @EnableWebSecurity
-public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+	
+	@Value("${rpm.gateway.header:X-RPM-Gateway}")
+	private String gatewayHeader;
+	
+	@Value("${rpm.gateway.salt:local-deploy}")
+	private String gatewaySalt;
 
+	@Value("${rpm.gateway.secret:local-deploy}")
+	private String gatewaySecret;
+	
+	@Value("${rpm.security.auth.header:Authorization}")
+	private String accessHeader;
+	
+	@Value("${rpm.security.auth.prefix:Bearer }")
+	private String accessPrefix;
+	
+	@Value("${rpm.security.auth.secret:local-deploy}")
+	private String accessSecret;
+	
+	@Value("${rpm.security.auth.expiration:#{24*60*60*1000}}")
+	private String accessExpiration;
+	
 	@Lazy
 	@Autowired
 	private UserDetailsService userDetailsService;
-
-	@Autowired
-	private JwtConfig jwtConfig;
-
-	@Autowired
-	private ZuulConfig zuulConfig;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -70,9 +86,9 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 				 * 		- JwtUsernameAndPasswordAuthenticationFilter
 				 * 		- JwtTokenAuthenticationFilter
 				 */
-	            .addFilterBefore(new GatewaySubversionFilter(zuulConfig), AuthFilter.class)
-				.addFilter(new AuthFilter(authenticationManager(), jwtConfig))
-				.addFilterAfter(new TokenFilter(jwtConfig), AuthFilter.class)
+	            .addFilterBefore(new GatewaySubversionFilter(gatewaySalt, gatewaySecret), AuthFilter.class)
+				.addFilter(new AuthFilter(authenticationManager(), accessHeader, accessPrefix, accessSecret, accessExpiration))
+				.addFilterAfter(new ResourceAccessFilter(accessHeader, accessPrefix, accessSecret), AuthFilter.class)
 				
 				/*
 				 * Allows for the access to specific endpoints to be restricted and for others
@@ -120,17 +136,8 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public JwtConfig jwtConfig() {
-		return new JwtConfig();
-	}
-	
-	@Bean
-	public ZuulConfig zuulConfig() {
-		return new ZuulConfig();
-	}
-
-	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+	
 }
