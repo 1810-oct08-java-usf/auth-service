@@ -145,17 +145,17 @@ public class UserService implements UserDetailsService {
   }
 
   /**
-   * Validates a user's fields and updates their values if they're valid. Also checks the updateRole
+   * Validates a user's fields and updates their values if they're valid. Also checks the requester
    * parameter to ensure the user requesting the update has permission to alter the role as well.
    *
    * @param updatedUser - An updated user whose changes have not been persisted.
-   * @param updateRole - Determines whether or not a role can be updated by the user issuing the
+   * @param requester - Determines whether or not a role can be updated by the user issuing the
    *     request.
    * @return True if the update was successful. Otherwise an exception is thrown.
    * @throws BadRequestException <br>
-   *    - If updateRole is null. <br>
-   *    - If any field of the updatedUser fails validation. <br>
-   *    - If updatedUser is null.
+   *     - If requester is null. <br>
+   *     - If any field of the updatedUser fails validation. <br>
+   *     - If updatedUser is null.
    * @throws UserUpdateException <br>
    *     - If no user with a matching ID is found. <br>
    *     - If the updated username is already taken. <br>
