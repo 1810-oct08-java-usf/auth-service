@@ -1,4 +1,4 @@
-package com.revature.rpm.util;
+package com.revature.rpm.aspects;
 
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  */
 @Aspect
 @Component
-public class AuthAspects {
+public class LoggingAspect {
 	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	

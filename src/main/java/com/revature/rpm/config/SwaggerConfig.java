@@ -1,4 +1,4 @@
-package com.revature.rpm.util;
+package com.revature.rpm.config;
 
 import java.util.Arrays;
 import java.util.HashSet;

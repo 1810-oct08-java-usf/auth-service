@@ -1,8 +1,10 @@
-package com.revature.rpm.security.util;
+package com.revature.rpm.util;
 
 import java.sql.Date;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -11,6 +13,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 public class ResourceAccessTokenGenerator {
+	
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**
 	 * Method used for generating a JWT based upon an authentication object. 
@@ -33,17 +37,13 @@ public class ResourceAccessTokenGenerator {
 	 * 		the JWT (no prefix present)
 	 */
 
-	public static String createJwt(Authentication auth, long expiration, String secret) {
-		System.out.println("creating new JWT for: " + auth.getName());
+	public String createJwt(Authentication auth, long expiration, String secret) {
+		
+		logger.info("Generating resource access token for principal: " + auth.getName());
 
 		SignatureAlgorithm sigAlg = SignatureAlgorithm.HS512;
 		long nowMillis = System.currentTimeMillis();
 
-		/*
-		 * Converts info in .claim() to list of strings 
-		 * 
-		 * IMPORTANT: this affects the way we get them back in the Gateway
-		 */
 		JwtBuilder builder = Jwts.builder()
 				.setSubject(auth.getName())
 				.setIssuer("revature")
@@ -54,13 +54,9 @@ public class ResourceAccessTokenGenerator {
 				.setExpiration(new Date(nowMillis + expiration))
 				.signWith(sigAlg, secret.getBytes());
 
-		System.out.println("JWT successfully created");
+		logger.info("Successfully generated resource access token for principal: " + auth.getName());
 
 		return builder.compact();
-	}
-
-	private ResourceAccessTokenGenerator() {
-		super();
 	}
 
 }

@@ -14,6 +14,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.revature.rpm.config.ResourceAccessTokenConfig;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
@@ -29,10 +31,10 @@ public class ResourceAccessFilter extends OncePerRequestFilter {
 	private String prefix;
 	private String secret;
 	
-	public ResourceAccessFilter(String header, String prefix, String secret) {
-		this.header = header;
-		this.prefix = prefix;
-		this.secret = secret;
+	public ResourceAccessFilter(ResourceAccessTokenConfig tokenConfig) {
+		this.header = tokenConfig.getAccessHeader();
+		this.prefix = tokenConfig.getAccessPrefix();
+		this.secret = tokenConfig.getAccessSecret();
 	}
 
 	/**
