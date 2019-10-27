@@ -18,10 +18,6 @@ public class ZuulConfig {
   @Value("${security.zsign.salt}")
   private String salt;
 
-  /*
-   * TODO This should be refactored to use an environment variable
-   */
-
   /** A secret key that's used with the SHA-512 algorithm to generate a hash. */
   @Value("${security.zsign.secret}")
   private String secret;
