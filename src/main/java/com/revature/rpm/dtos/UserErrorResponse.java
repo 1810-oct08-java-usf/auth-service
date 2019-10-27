@@ -97,8 +97,9 @@ public class UserErrorResponse implements Serializable {
   }
 
   /**
-   * Overridden method that determines if objects are equivalent to an instance of UserErrorResponse.
-   * 
+   * Overridden method that determines if objects are equivalent to an instance of
+   * UserErrorResponse.
+   *
    * @param obj - Object to compare.
    * @return boolean denoting the equivalence of the objects.
    */
