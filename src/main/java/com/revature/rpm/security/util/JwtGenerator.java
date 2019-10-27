@@ -39,7 +39,7 @@ public class JwtGenerator {
     /*
      * Converts info in .claim() to list of strings
      *
-     * IMPORTANT: this affects the way we get them back in the Gateway
+     * IMPORTANT: this affects the way we get them back in the Gateway.
      */
     JwtBuilder builder =
         Jwts.builder()
