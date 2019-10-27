@@ -232,6 +232,7 @@ public class AppUser implements Serializable {
   /**
    * Overridden method that determines if objects are equivalent to an instance of AppUser.
    *
+   * @param obj - Object to compare.
    * @return boolean denoting the equivalence of the objects.
    */
   @Override
