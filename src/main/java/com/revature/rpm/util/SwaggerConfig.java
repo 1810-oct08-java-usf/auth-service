@@ -42,8 +42,6 @@ public class SwaggerConfig {
   /**
    * When the v2/api-docs end point is hit, it will retrieve information about the project service
    * in relation to only the controller class, build the JSON documentation, and display it.
-   *
-   * @author Bronwen Hughes (1810-Oct22-Java-USF)
    */
   @Bean
   public Docket api() {
