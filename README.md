@@ -1,2 +1,7 @@
 # auth-service
-The objective of the auth-service is to handle all CRUD functionality for RPM users as well as authentication. It utilizes Spring Security to check if the user has a validation token in the header. If a token is present, they will be allowed to access this service. Otherwise, they will be given a '401 Unauthorized' status code. The controller of this service will contain all of the endpoints for updating, registering, and deleting users.
+
+The purpose of this service is serve as the primary authentication server for the RPM microservice ecosystem. The authentication scheme being leveraged currently is the OAuth2 Abstract Protocol Flow leveraging refresh tokens. All requests related to authentication are handled by `/auth/**` endpoints. The below diagram details the authentication flow process:
+
+ABSTRACT-PROTOCOL-FLOW-DIAGRAM goes here
+
+Additionally, this service maintains the user pool for registered users of the RPM system. All requests related related to user creation, fetching, and mutation are handled by `/users/**` endpoints. Method-level security is enabled on all of these endpoints to ensure that only authenticated and authorized users have the ability to perform operations on the user pool.
