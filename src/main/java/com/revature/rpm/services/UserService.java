@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,13 +16,14 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.revature.rpm.dtos.UserPrincipal;
 import com.revature.rpm.entities.AppUser;
+import com.revature.rpm.entities.UserRole;
 import com.revature.rpm.exceptions.BadRequestException;
 import com.revature.rpm.exceptions.UserCreationException;
 import com.revature.rpm.exceptions.UserNotFoundException;
 import com.revature.rpm.exceptions.UserUpdateException;
 import com.revature.rpm.repositories.UserRepository;
+import com.revature.rpm.tokens.ScopeMapper;
 
 /*
  * TODO
@@ -38,12 +40,14 @@ import com.revature.rpm.repositories.UserRepository;
 @Service
 public class UserService implements UserDetailsService {
 
-	private BCryptPasswordEncoder encoder;
 	private UserRepository repo;
+	private ScopeMapper scopeMapper;
+	private BCryptPasswordEncoder encoder;
 
 	@Autowired
-	public UserService(UserRepository repo, BCryptPasswordEncoder encoder) {
+	public UserService(UserRepository repo, ScopeMapper mapper, BCryptPasswordEncoder encoder) {
 		this.repo = repo;
+		this.scopeMapper = mapper;
 		this.encoder = encoder;
 	}
 
@@ -166,7 +170,7 @@ public class UserService implements UserDetailsService {
 			throw new UserCreationException("Email address already in use");
 		}
 
-		newUser.setRole("ROLE_USER");
+		newUser.setRole(UserRole.ROLE_USER);
 		return repo.save(newUser);
 
 	}
@@ -201,7 +205,7 @@ public class UserService implements UserDetailsService {
 			throw new BadRequestException("Invalid user object provided");
 		}
 		
-		if (!updatedUser.getId().equals(requester.getId()) && !requester.getRole().equals("ADMIN")) {
+		if (!updatedUser.getId().equals(requester.getId()) && !requester.getRole().equals(UserRole.ROLE_ADMIN)) {
 			throw new SecurityException("Illegal update request made by " + requester.getUsername());
 		}
 
@@ -234,9 +238,9 @@ public class UserService implements UserDetailsService {
 			
 		}
 
-		String persistedRole = userBeforeUpdate.getRole();
-		String updatedRole = updatedUser.getRole();
-		if (!requester.getRole().equals("ADMIN") && !updatedRole.equals(persistedRole)) {
+		UserRole persistedRole = userBeforeUpdate.getRole();
+		UserRole updatedRole = updatedUser.getRole();
+		if (!requester.getRole().equals(UserRole.ROLE_ADMIN) && !updatedRole.equals(persistedRole)) {
 			throw new UserUpdateException("Could not update user role");
 		}
 		
@@ -316,7 +320,7 @@ public class UserService implements UserDetailsService {
 	}
 
 	/**
-	 * Checks to see if the provided user objcet has valid fields.
+	 * Checks to see if the provided user object has valid fields.
 	 * 
 	 * @param user
 	 * @return true if valid, false if invalid
@@ -334,7 +338,7 @@ public class UserService implements UserDetailsService {
 			return false;
 		if (user.getEmail() == null || user.getEmail().equals(""))
 			return false;
-		if (user.getRole() == null || user.getRole().equals(""))
+		if (user.getRole() == null)
 			return false;
 		return true;
 	}
@@ -368,12 +372,15 @@ public class UserService implements UserDetailsService {
 
 		String userPw = retrievedUser.getPassword();
 		String encodedPw = encoder.encode(userPw);
-		String userRole = retrievedUser.getRole();
 		retrievedUser.setPassword(encodedPw);
 
-		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(userRole);
+		UserRole userRole = retrievedUser.getRole();
+		System.out.println(userRole);
+		System.out.println(scopeMapper);
+		String grantedScopes = scopeMapper.mapScopesBasedUponRole(userRole);
+		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(grantedScopes);
 
-		return new UserPrincipal(retrievedUser, username, encodedPw, grantedAuthorities);
+		return new User(username, encodedPw, grantedAuthorities);
 
 	}
 }
