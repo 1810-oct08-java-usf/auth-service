@@ -3,10 +3,12 @@ package com.revature.rpm.config;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -14,7 +16,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.revature.rpm.util.ResourceAccessTokenGenerator;
+import com.revature.rpm.tokens.TokenGenerator;
+import com.revature.rpm.tokens.TokenParser;
 import com.revature.rpm.web.filters.AuthFilter;
 import com.revature.rpm.web.filters.GatewaySubversionFilter;
 import com.revature.rpm.web.filters.ResourceAccessFilter;
@@ -23,7 +26,11 @@ import com.revature.rpm.web.filters.ResourceAccessFilter;
  * Provides the configuration for the Spring Security framework.
  */
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+	
+	@Value("${rpm.security.secret:local-deploy}")
+	private String tokenSecret;
 	
 	private UserDetailsService userDetailsService;
 	
@@ -69,8 +76,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				 * 		- JwtTokenAuthenticationFilter
 				 */
 	            .addFilterBefore(new GatewaySubversionFilter(gatewayTokenConfig()), AuthFilter.class)
-				.addFilter(new AuthFilter(authenticationManager(), resourceAccessTokenGenerator(), resourceAccessTokenConfig()))
-				.addFilterAfter(new ResourceAccessFilter(resourceAccessTokenConfig()), AuthFilter.class)
+				.addFilter(new AuthFilter(authenticationManager(),tokenGenerator()))
+				.addFilterAfter(new ResourceAccessFilter(tokenParser()), AuthFilter.class)
 				
 				/*
 				 * Allows for the access to specific endpoints to be restricted and for others
@@ -100,7 +107,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				 *  	- POST requests to /auth/users/admin
 				 */
 				.mvcMatchers("/h2-console/**").hasRole("ADMIN")
-				.mvcMatchers(HttpMethod.GET, "/users/**").hasRole("ADMIN")
 				
 				// All other requests must be authenticated
 				.anyRequest().authenticated();
@@ -117,13 +123,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new BCryptPasswordEncoder();
 	}
 	
-	@Bean ResourceAccessTokenGenerator resourceAccessTokenGenerator() {
-		return new ResourceAccessTokenGenerator();
+	@Bean
+	public TokenGenerator tokenGenerator() {
+		return new TokenGenerator(tokenSecret);
 	}
 	
 	@Bean
-	public ResourceAccessTokenConfig resourceAccessTokenConfig() {
-		return new ResourceAccessTokenConfig();
+	public TokenParser tokenParser() {
+		return new TokenParser(tokenSecret);
 	}
 	
 	@Bean
