@@ -17,7 +17,6 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
 	</properties>
 
 
@@ -151,6 +150,7 @@
 						<exclude>com/revature/rpm/dtos/*</exclude>
 						<exclude>com/revature/rpm/entities/*</exclude>
 						<exclude>com/revature/rpm/exceptions/*</exclude>
+						<exclude>com/revature/rpm/repositories/*</exclude>
 					</excludes>
 				</configuration>
 				<executions>
