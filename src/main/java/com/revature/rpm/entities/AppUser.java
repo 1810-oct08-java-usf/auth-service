@@ -1,10 +1,11 @@
 package com.revature.rpm.entities;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,9 +18,7 @@ import javax.validation.constraints.Pattern;
  */
 @Entity
 @Table(name="RPM_USERS")
-public class AppUser implements Serializable{
-
-	private static final long serialVersionUID = -2361806217291440694L;
+public class AppUser {
 
 	@Id
 	@Column(name="RPM_USER_ID")
@@ -47,8 +46,8 @@ public class AppUser implements Serializable{
 	@Column(name="RPM_USER_PW")
 	private String password;
 	
-	@Column(name="RPM_USER_ROLE")
-	private String role;
+	@Enumerated(EnumType.STRING)
+	private UserRole role;
 	
 	public AppUser() {
 		super();
@@ -57,11 +56,11 @@ public class AppUser implements Serializable{
 		email = "";
 		username = "";
 		password = "";
-		role = "LOCKED";
+		role = UserRole.ROLE_LOCKED;
 	}
 
 	public AppUser(Integer id, String firstName, String lastName, String email, String username, String password,
-			String role) {
+			UserRole role) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -120,11 +119,11 @@ public class AppUser implements Serializable{
 		this.password = password;
 	}
 
-	public String getRole() {
+	public UserRole getRole() {
 		return role;
 	}
 
-	public void setRole(String role) {
+	public void setRole(UserRole role) {
 		this.role = role;
 	}
 
