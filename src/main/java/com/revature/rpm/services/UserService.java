@@ -1,8 +1,14 @@
 package com.revature.rpm.services;
 
+import com.revature.rpm.dtos.UserPrincipal;
+import com.revature.rpm.entities.AppUser;
+import com.revature.rpm.exceptions.BadRequestException;
+import com.revature.rpm.exceptions.UserCreationException;
+import com.revature.rpm.exceptions.UserNotFoundException;
+import com.revature.rpm.exceptions.UserUpdateException;
+import com.revature.rpm.repositories.UserRepository;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -15,365 +21,323 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.revature.rpm.dtos.UserPrincipal;
-import com.revature.rpm.entities.AppUser;
-import com.revature.rpm.exceptions.BadRequestException;
-import com.revature.rpm.exceptions.UserCreationException;
-import com.revature.rpm.exceptions.UserNotFoundException;
-import com.revature.rpm.exceptions.UserUpdateException;
-import com.revature.rpm.repositories.UserRepository;
-
-/*
- * TODO
- * 
- * - encrypt user passwords prior to persistence (should not break security functionality)
- */
-
 /**
- * This class contains methods that should be accessed by the controller to find
- * and edit users. Validation is included to ensure requests are proper,
- * otherwise an exception will be thrown detailing the validation rule that was
- * violated.
+ * A middle-man that sits between the controller and the repository (DAO) performing validation on
+ * all user input received by the auth controller.
  */
 @Service
 public class UserService implements UserDetailsService {
 
-	private BCryptPasswordEncoder encoder;
-	private UserRepository repo;
+  private BCryptPasswordEncoder encoder;
+  private UserRepository repo;
 
-	@Autowired
-	public UserService(UserRepository repo, BCryptPasswordEncoder encoder) {
-		this.repo = repo;
-		this.encoder = encoder;
-	}
+  @Autowired
+  public UserService(UserRepository repo, BCryptPasswordEncoder encoder) {
+    this.repo = repo;
+    this.encoder = encoder;
+  }
 
-	/**
-	 * Retrieves a list of all users from the data repository
-	 * 
-	 * @return a list of all users present in the data source
-	 */
-	@Transactional(readOnly = true, isolation = Isolation.SERIALIZABLE)
-	public List<AppUser> findAllUsers() {
-		return repo.findAll();
-	}
+  /**
+   * Retrieves a list of all users from the database.
+   *
+   * @return A List containing all registered users.
+   */
+  @Transactional(readOnly = true, isolation = Isolation.SERIALIZABLE)
+  public List<AppUser> findAllUsers() {
+    return repo.findAll();
+  }
 
-	/**
-	 * Retrieves a single user object from the data repository with a match id
-	 * 
-	 * @param id the id of the sought user
-	 * 
-	 * @return the user with the specified id
-	 * 
-	 * @throws BadRequestException   if the id provided is invalid
-	 * 
-	 * @throws UserNotFoundException if there is no user found with the provided id
-	 */
-	@Transactional(readOnly = true)
-	public AppUser findUserById(int id) {
+  /**
+   * Performs validation on the provided ID and fetches the user if the ID is valid.
+   *
+   * @param id - The ID of the user to fetch.
+   * @return The user with the specified ID.
+   * @throws BadRequestException if the provided ID is invalid.
+   * @throws UserNotFoundException if there no user with the specified ID is found.
+   */
+  @Transactional(readOnly = true)
+  public AppUser findUserById(int id) {
 
-		if (id <= 0) {
-			throw new BadRequestException("Invalid id value provided");
-		}
+    if (id <= 0) {
+      throw new BadRequestException("Invalid id value provided");
+    }
 
-		Optional<AppUser> _user = repo.findById(id);
-		if (!_user.isPresent()) {
-			throw new UserNotFoundException("No user found with provided id");
-		}
+    Optional<AppUser> _user = repo.findById(id);
+    if (!_user.isPresent()) {
+      throw new UserNotFoundException("No user found with provided id");
+    }
 
-		return _user.get();
-	}
+    return _user.get();
+  }
 
-	/**
-	 * Retrieves a single user object from the data repository with a match username
-	 * 
-	 * @param username the username of the sought user
-	 * 
-	 * @return the user with the specified username
-	 * 
-	 * @throws BadRequestException   if the username provided is invalid
-	 * 
-	 * @throws UserNotFoundException if there is no user found with the provided
-	 *                               username
-	 */
-	@Transactional(readOnly = true)
-	public AppUser findUserByUsername(String username) {
+  /**
+   * Validates the provided username and fetches the user if the username is valid.
+   *
+   * @param username - The username of the user to fetch.
+   * @return The user with the specified username.
+   * @throws BadRequestException if the provided username is invalid.
+   * @throws UserNotFoundException if no user with the specified username is found.
+   */
+  @Transactional(readOnly = true)
+  public AppUser findUserByUsername(String username) {
 
-		if (username == null || username.equals("")) {
-			throw new BadRequestException("Invalid username value provided");
-		}
+    if (username == null || username.equals("")) {
+      throw new BadRequestException("Invalid username value provided");
+    }
 
-		AppUser retrievedUser = repo.findUserByUsername(username);
+    AppUser retrievedUser = repo.findUserByUsername(username);
 
-		if (retrievedUser == null) {
-			throw new UserNotFoundException("No user found with provided username");
-		}
+    if (retrievedUser == null) {
+      throw new UserNotFoundException("No user found with provided username");
+    }
 
-		return retrievedUser;
+    return retrievedUser;
+  }
 
-	}
+  /**
+   * Validates the provided email address and fetches the user if the address is valid.
+   *
+   * @param email - The email address of the sought user.
+   * @return The user with the specified email.
+   * @throws BadRequestException if the provided email address is invalid.
+   * @throws UserNotFoundException if no user with the specified email address is found.
+   */
+  @Transactional(readOnly = true)
+  public AppUser findUserByEmail(String email) {
 
-	/**
-	 * Retrieves a single user object from the data repository with a match id.
-	 * Throws a BadReq
-	 * 
-	 * @param email the email of the sought user
-	 * 
-	 * @return the user with the specified email
-	 * 
-	 * @throws BadRequestException   if the email provided is invalid
-	 * 
-	 * @throws UserNotFoundException if there is no user found with the provided
-	 *                               email
-	 */
-	@Transactional(readOnly = true)
-	public AppUser findUserByEmail(String email) {
+    if (email == null || email.equals("")) {
+      throw new BadRequestException("Invalid email value provided");
+    }
 
-		if (email == null || email.equals("")) {
-			throw new BadRequestException("Invalid email value provided");
-		}
+    AppUser retrievedUser = repo.findUserByEmail(email);
 
-		AppUser retrievedUser = repo.findUserByEmail(email);
+    if (retrievedUser == null) {
+      throw new UserNotFoundException("No user found with provided email");
+    }
 
-		if (retrievedUser == null) {
-			throw new UserNotFoundException("No user found with provided email");
-		}
+    return retrievedUser;
+  }
 
-		return retrievedUser;
+  /**
+   * Validates a new user and creates the user in the database if the user's fields are valid.
+   *
+   * @param newUser - The new user to create in the database.
+   * @return The persisted user with its generated id.
+   * @throws BadRequestException if an invalid user is provided.
+   */
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public AppUser addUser(AppUser newUser) {
 
-	}
+    if (!validateFields(newUser)) {
+      throw new BadRequestException("Invalid user object provided");
+    }
 
-	/**
-	 * Attempts to add a new user to the data repository.
-	 * 
-	 * @param newUser the new user to be added to the data repository
-	 * 
-	 * @return the persisted user object with its generated id
-	 * 
-	 * @throws BadRequestException if an invalid user object is provided
-	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public AppUser addUser(AppUser newUser) {
+    if (!isUsernameAvailable(newUser.getUsername())) {
+      throw new UserCreationException("Username already in use");
+    }
 
-		if (!validateFields(newUser)) {
-			throw new BadRequestException("Invalid user object provided");
-		}
+    if (!isEmailAddressAvailable(newUser.getEmail())) {
+      throw new UserCreationException("Email address already in use");
+    }
 
-		if (!isUsernameAvailable(newUser.getUsername())) {
-			throw new UserCreationException("Username already in use");
-		}
+    newUser.setRole("ROLE_USER");
+    return repo.save(newUser);
+  }
 
-		if (!isEmailAddressAvailable(newUser.getEmail())) {
-			throw new UserCreationException("Email address already in use");
-		}
+  /**
+   * Validates a user's fields and updates their values if they're valid. Also checks the requester
+   * parameter to ensure the user requesting the update has permission to alter the role as well.
+   *
+   * @param updatedUser - An updated user whose changes have not been persisted.
+   * @param requester - Determines whether or not a role can be updated by the user issuing the
+   *     request.
+   * @return True if the update was successful. Otherwise an exception is thrown.
+   * @throws BadRequestException <br>
+   *     - If requester is null. <br>
+   *     - If any field of the updatedUser fails validation. <br>
+   *     - If updatedUser is null.
+   * @throws UserUpdateException <br>
+   *     - If no user with a matching ID is found. <br>
+   *     - If the updated username is already taken. <br>
+   *     - If the updated email is already taken. <br>
+   * @throws SecurityException if a user attempts to update their role without admin privileges.
+   */
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public boolean updateUser(AppUser updatedUser, AppUser requester) {
 
-		newUser.setRole("ROLE_USER");
-		return repo.save(newUser);
+    if (requester == null) {
+      throw new BadRequestException("Invalid requester object provided");
+    }
 
-	}
+    if (!validateFields(updatedUser) || updatedUser.getId() == null) {
+      throw new BadRequestException("Invalid user object provided");
+    }
 
-	/**
-	 * Attempts to update the user in the data repository.
-	 * 
-	 * @param updatedUser
-	 * 		the user object to be used for updating the data source
-	 * 
-	 * @param updateRole
-	 * 		a flag used to determine if role updating is allowed
-	 * 
-	 * @return
-	 * 		true, if the update was successful; otherwise an exception is thrown
-	 * 
-	 * @throws BadRequestException
-	 * 		if an invalid user object is provided
-	 * 
-	 * @throws UserUpdateException
-	 * 		if the updated username or email is already in use or if a role change
-	 * 		is attempted without the proper boolean flag passed to the method
-	 */
-	@Transactional(propagation=Propagation.REQUIRES_NEW)
-	public boolean updateUser(AppUser updatedUser, AppUser requester) {
-		
-		if (requester == null) {
-			throw new BadRequestException("Invalid requester object provided");
-		}
-		
-		if (!validateFields(updatedUser) || updatedUser.getId() == null) {
-			throw new BadRequestException("Invalid user object provided");
-		}
-		
-		if (!updatedUser.getId().equals(requester.getId()) && !requester.getRole().equals("ADMIN")) {
-			throw new SecurityException("Illegal update request made by " + requester.getUsername());
-		}
+    if (!updatedUser.getId().equals(requester.getId()) && !requester.getRole().equals("ADMIN")) {
+      throw new SecurityException("Illegal update request made by " + requester.getUsername());
+    }
 
-		AppUser userBeforeUpdate = null;
-		
-		try {
-			 userBeforeUpdate = findUserById(updatedUser.getId());
-		} catch (UserNotFoundException unfe) {
-			throw new UserUpdateException(unfe.getMessage());
-		}
-		
-		String persistedUsername = userBeforeUpdate.getUsername();
-		String updatedUsername = updatedUser.getUsername();
-		if (!persistedUsername.equals(updatedUsername)) {
-			AppUser u = repo.findUserByUsername(updatedUsername);
-			if (u != null) {
-				throw new UserUpdateException("Username is already in use");
-			}
-			
-		}
-		
-		
-		String persistedEmail = userBeforeUpdate.getEmail();
-		String updatedEmail = updatedUser.getEmail();
-		if (!persistedEmail.equals(updatedEmail)) {
-			AppUser u = repo.findUserByEmail(updatedEmail);
-			if (u != null) {
-				throw new UserUpdateException("Username is already in use");
-			}
-			
-		}
+    AppUser userBeforeUpdate = null;
 
-		String persistedRole = userBeforeUpdate.getRole();
-		String updatedRole = updatedUser.getRole();
-		if (!requester.getRole().equals("ADMIN") && !updatedRole.equals(persistedRole)) {
-			throw new UserUpdateException("Could not update user role");
-		}
-		
-		repo.save(updatedUser);
-		
-		return true;
-		
-	}
+    try {
+      userBeforeUpdate = findUserById(updatedUser.getId());
+    } catch (UserNotFoundException unfe) {
+      throw new UserUpdateException(unfe.getMessage());
+    }
 
-	/**
-	 * Attempts to delete a user from the data repository using the provided id
-	 * 
-	 * @param id the id of the user for deletion
-	 * 
-	 * @return true, if the delete was successful; otherwise an exception is thrown
-	 * 
-	 * @throws BadRequestException   if the provided id is invalid
-	 * 
-	 * @throws UserNotFoundException if not user is found with the provided id
-	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public boolean deleteUserById(int id) {
+    String persistedUsername = userBeforeUpdate.getUsername();
+    String updatedUsername = updatedUser.getUsername();
+    if (!persistedUsername.equals(updatedUsername)) {
+      AppUser u = repo.findUserByUsername(updatedUsername);
+      if (u != null) {
+        throw new UserUpdateException("Username is already in use");
+      }
+    }
 
-		if (id <= 0) {
-			throw new BadRequestException("Invalid id value provided");
-		}
+    String persistedEmail = userBeforeUpdate.getEmail();
+    String updatedEmail = updatedUser.getEmail();
+    if (!persistedEmail.equals(updatedEmail)) {
+      AppUser u = repo.findUserByEmail(updatedEmail);
+      if (u != null) {
+        throw new UserUpdateException("Username is already in use");
+      }
+    }
 
-		Optional<AppUser> _user = repo.findById(id);
+    String persistedRole = userBeforeUpdate.getRole();
+    String updatedRole = updatedUser.getRole();
+    if (!requester.getRole().equals("ADMIN") && !updatedRole.equals(persistedRole)) {
+      throw new UserUpdateException("Could not update user role");
+    }
 
-		if (!_user.isPresent()) {
-			throw new UserNotFoundException("No user found with provided id");
-		}
+    repo.save(updatedUser);
 
-		repo.delete(_user.get());
-		return true;
+    return true;
+  }
 
-	}
+  /**
+   * Validates an ID value and checks if a user with a matching ID already exists. If so, they're
+   * deleted from the database.
+   *
+   * @param id - The ID of the user to delete.
+   * @return True, if the delete was successful. Otherwise, an exception is thrown.
+   * @throws BadRequestException if the provided ID is invalid.
+   * @throws UserNotFoundException if no user with the specified ID is found.
+   */
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public boolean deleteUserById(int id) {
 
-	/**
-	 * Checks to see if there is a user record with the provided username
-	 * 
-	 * @param username the username being checked for availability
-	 * 
-	 * @return true if present, false if not
-	 */
-	@Transactional(readOnly = true)
-	public boolean isUsernameAvailable(String username) {
+    if (id <= 0) {
+      throw new BadRequestException("Invalid id value provided");
+    }
 
-		try {
-			findUserByUsername(username);
-		} catch (UserNotFoundException unfe) {
-			return true;
-		}
+    Optional<AppUser> _user = repo.findById(id);
 
-		return false;
+    if (!_user.isPresent()) {
+      throw new UserNotFoundException("No user found with provided id");
+    }
 
-	}
+    repo.delete(_user.get());
+    return true;
+  }
 
-	/**
-	 * Checks to see if there is a user record with the provided email
-	 * 
-	 * @param email the email being checked for availability
-	 * 
-	 * @return true if present, false if not
-	 */
-	@Transactional(readOnly = true)
-	public boolean isEmailAddressAvailable(String email) {
+  /**
+   * Checks whether or not a username is available.
+   *
+   * @param username - The username to check.
+   * @return True if present. Otherwise, false.
+   */
+  @Transactional(readOnly = true)
+  public boolean isUsernameAvailable(String username) {
 
-		try {
-			findUserByEmail(email);
-		} catch (UserNotFoundException unfe) {
-			return true;
-		}
+    try {
+      findUserByUsername(username);
+    } catch (UserNotFoundException unfe) {
+      return true;
+    }
 
-		return false;
+    return false;
+  }
 
-	}
+  /**
+   * Checks whether a user with the provided email already exists in the database.
+   *
+   * @param email - The email to check.
+   * @return True if present. Otherwise, false.
+   */
+  @Transactional(readOnly = true)
+  public boolean isEmailAddressAvailable(String email) {
 
-	/**
-	 * Checks to see if the provided user objcet has valid fields.
-	 * 
-	 * @param user
-	 * @return true if valid, false if invalid
-	 */
-	public boolean validateFields(AppUser user) {
-		if (user == null)
-			return false;
-		if (user.getFirstName() == null || user.getFirstName().equals(""))
-			return false;
-		if (user.getLastName() == null || user.getLastName().equals(""))
-			return false;
-		if (user.getUsername() == null || user.getUsername().equals(""))
-			return false;
-		if (user.getPassword() == null || user.getPassword().equals(""))
-			return false;
-		if (user.getEmail() == null || user.getEmail().equals(""))
-			return false;
-		if (user.getRole() == null || user.getRole().equals(""))
-			return false;
-		return true;
-	}
+    try {
+      findUserByEmail(email);
+    } catch (UserNotFoundException unfe) {
+      return true;
+    }
 
-	/**
-	 * Overrides Spring Security's UserDetailService interface method to return a
-	 * user from the data repository with the provided username.
-	 * 
-	 * @param username The username of a user requesting authentication
-	 * 
-	 * @return UserDetails Provides core user information used by Spring Security
-	 *         for authentication
-	 * 
-	 * @throws BadRequestException       if the username provided is invalid
-	 * 
-	 * @throws UsernameNotFoundException Throws this if there is no user found with
-	 *                                   the given username.
-	 */
-	@Override
-	public UserDetails loadUserByUsername(String username) {
+    return false;
+  }
 
-		if (username == null || username.equals("")) {
-			throw new BadRequestException("Invalid username value provided");
-		}
+  /**
+   * Performs validation on all user fields.
+   *
+   * @param user - a user with fields that require validation.
+   * @return True if valid and false otherwise.
+   */
+  public boolean validateFields(AppUser user) {
+    if (user == null) {
+      return false;
+    }
+    if (user.getFirstName() == null || user.getFirstName().equals("")) {
+      return false;
+    }
+    if (user.getLastName() == null || user.getLastName().equals("")) {
+      return false;
+    }
+    if (user.getUsername() == null || user.getUsername().equals("")) {
+      return false;
+    }
+    if (user.getPassword() == null || user.getPassword().equals("")) {
+      return false;
+    }
+    if (user.getEmail() == null || user.getEmail().equals("")) {
+      return false;
+    }
+    if (user.getRole() == null || user.getRole().equals("")) {
+      return false;
+    }
+    return true;
+  }
 
-		AppUser retrievedUser = repo.findUserByUsername(username);
+  /**
+   * Overrides Spring Security's UserDetailService interface method to return a user from the data
+   * repository with the provided username.
+   *
+   * @param username - The username of a user requesting authentication.
+   * @return UserDetails that provide core user information used by Spring Security for
+   *     authentication
+   * @throws BadRequestException if the provided username is invalid.
+   * @throws UsernameNotFoundException = if no user with the specified username is found.
+   */
+  @Override
+  public UserDetails loadUserByUsername(String username) {
 
-		if (retrievedUser == null) {
-			throw new UsernameNotFoundException("Username: " + username + " not found");
-		}
+    if (username == null || username.equals("")) {
+      throw new BadRequestException("Invalid username value provided");
+    }
 
-		String userPw = retrievedUser.getPassword();
-		String encodedPw = encoder.encode(userPw);
-		String userRole = retrievedUser.getRole();
-		retrievedUser.setPassword(encodedPw);
+    AppUser retrievedUser = repo.findUserByUsername(username);
 
-		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(userRole);
+    if (retrievedUser == null) {
+      throw new UsernameNotFoundException("Username: " + username + " not found");
+    }
 
-		return new UserPrincipal(retrievedUser, username, encodedPw, grantedAuthorities);
+    String userPw = retrievedUser.getPassword();
+    String encodedPw = encoder.encode(userPw);
+    String userRole = retrievedUser.getRole();
+    retrievedUser.setPassword(encodedPw);
 
-	}
+    List<GrantedAuthority> grantedAuthorities =
+        AuthorityUtils.commaSeparatedStringToAuthorityList(userRole);
+
+    return new UserPrincipal(retrievedUser, username, encodedPw, grantedAuthorities);
+  }
 }
