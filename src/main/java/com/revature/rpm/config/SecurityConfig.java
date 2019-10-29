@@ -18,7 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.revature.rpm.tokens.TokenGenerator;
 import com.revature.rpm.tokens.TokenParser;
-import com.revature.rpm.web.filters.AuthFilter;
+import com.revature.rpm.web.filters.AuthenticationFilter;
 import com.revature.rpm.web.filters.GatewaySubversionFilter;
 import com.revature.rpm.web.filters.ResourceAccessFilter;
 
@@ -71,13 +71,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				/*
 				 * Registering filters:
 				 * 
-				 * 		- CustomAuthenticationFilter
-				 * 		- JwtUsernameAndPasswordAuthenticationFilter
-				 * 		- JwtTokenAuthenticationFilter
+				 * 		- GatewaySubversionFilter
+				 * 		- AuthenticationFilter
+				 * 		- ResourceAccessFilter
 				 */
-	            .addFilterBefore(new GatewaySubversionFilter(gatewayTokenConfig()), AuthFilter.class)
-				.addFilter(new AuthFilter(authenticationManager(),tokenGenerator()))
-				.addFilterAfter(new ResourceAccessFilter(tokenParser()), AuthFilter.class)
+	            .addFilterBefore(new GatewaySubversionFilter(gatewayTokenConfig()), AuthenticationFilter.class)
+				.addFilter(new AuthenticationFilter(authenticationManager(),tokenGenerator()))
+				.addFilterAfter(new ResourceAccessFilter(tokenParser()), AuthenticationFilter.class)
 				
 				/*
 				 * Allows for the access to specific endpoints to be restricted and for others

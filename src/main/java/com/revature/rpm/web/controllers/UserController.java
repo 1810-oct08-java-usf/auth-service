@@ -47,7 +47,7 @@ public class UserController {
 
 	/**
 	 * Serves as a front-facing endpoint for fetching all users from the data
-	 * source. Requesters to this endpoint must possess a role of ADMIN.
+	 * source.
 	 * 
 	 * @return all users from the data source
 	 */
@@ -60,13 +60,12 @@ public class UserController {
 
 	/**
 	 * Serves as a front-facing endpoint for fetching a user with the specified id.
-	 * Requesters to this endpoint must possess a role of ADMIN.
 	 * 
 	 * @param id
 	 * 
 	 * @return The user with specified id, otherwise an exception will be thrown
 	 *         from the service layer and handled using this controller's exception
-	 *         handler.
+	 *         handler. 
 	 */
 	@ResponseStatus(HttpStatus.OK)
 	@PreAuthorize("hasAuthority('get_users_by_id')")
@@ -77,7 +76,7 @@ public class UserController {
 
 	/**
 	 * Serves as a front-facing endpoint for fetching a user with the specified
-	 * username. Requesters to this endpoint must possess a role of ADMIN.
+	 * username.
 	 * 
 	 * @param username
 	 * 
@@ -94,7 +93,7 @@ public class UserController {
 
 	/**
 	 * Serves as a front-facing endpoint for fetching a user with the specified
-	 * email. Requesters to this endpoint must possess a role of ADMIN.
+	 * email.
 	 * 
 	 * @param email
 	 * 
@@ -155,7 +154,7 @@ public class UserController {
 	}
 
 	/**
-	 * This method will update a user with the newly provided information
+	 * This method will update a user with the newly provided information.
 	 * 
 	 * @param updatedUser
 	 * 
@@ -174,8 +173,7 @@ public class UserController {
 	}
 
 	/**
-	 * This method will delete a user given that user's id. This method is only
-	 * accessible to users with the ADMIN role
+	 * This method will delete a user given that user's id.
 	 * 
 	 * @param id
 	 * 

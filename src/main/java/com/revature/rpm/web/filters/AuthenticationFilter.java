@@ -29,7 +29,7 @@ import com.revature.rpm.tokens.TokenType;
  * and password. Upon successful authentication a JWT will be passed back to the
  * client via a HTTP response header.
  */
-public class AuthFilter extends UsernamePasswordAuthenticationFilter {
+public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 	/**
 	 * Spring Security's AuthenticationManager which is used to validate the user
@@ -50,7 +50,7 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
 	 * @param jwtConfig   Provides the configuration for how JWT tokens are
 	 *                    created/validated.
 	 */
-	public AuthFilter(AuthenticationManager authManager, TokenGenerator tokenGen) {
+	public AuthenticationFilter(AuthenticationManager authManager, TokenGenerator tokenGen) {
 		this.authManager = authManager;
 		this.tokenGenerator = tokenGen;
 	}
