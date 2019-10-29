@@ -7,9 +7,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,15 +29,6 @@ import com.revature.rpm.exceptions.UserNotFoundException;
 import com.revature.rpm.exceptions.UserUpdateException;
 import com.revature.rpm.services.UserService;
 
-/*
- * TODO 
- * 
- * 		1) Currently, users can edit any other user if using Postman or curl.
- * 		   There needs to be a way to ensure that a user record can only be 
- * 		   updated by a user a matching id, or an admin.
-
- */
-
 /**
  * This controller contains all CRUD functionality for the users and is mapped
  * to handle all requests to /users.
@@ -47,13 +36,12 @@ import com.revature.rpm.services.UserService;
  */
 @RestController
 @RequestMapping("/users")
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class AuthController {
+public class UserController {
 
 	private UserService userService;
 
 	@Autowired
-	public AuthController(UserService service) {
+	public UserController(UserService service) {
 		this.userService = service;
 	}
 
@@ -64,8 +52,8 @@ public class AuthController {
 	 * @return all users from the data source
 	 */
 	@ResponseStatus(HttpStatus.OK)
-	@PreAuthorize("hasRole('ADMIN')")
-	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('get_all_users')")
+	@GetMapping(produces = "application/json")
 	public List<AppUser> getAllUsers() {
 		return userService.findAllUsers();
 	}
@@ -81,8 +69,8 @@ public class AuthController {
 	 *         handler.
 	 */
 	@ResponseStatus(HttpStatus.OK)
-	@PreAuthorize("hasRole('ADMIN')")
-	@GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('get_users_by_id')")
+	@GetMapping(value = "/id/{id}", produces = "application/json")
 	public AppUser getUserById(@PathVariable int id) {
 		return userService.findUserById(id);
 	}
@@ -98,8 +86,8 @@ public class AuthController {
 	 *         exception handler.
 	 */
 	@ResponseStatus(HttpStatus.OK)
-	@PreAuthorize("hasRole('ADMIN')")
-	@GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('get_users_by_username')")
+	@GetMapping(value = "/username/{username}", produces = "application/json")
 	public AppUser getUserByUsername(@PathVariable String username) {
 		return userService.findUserByUsername(username);
 	}
@@ -115,8 +103,8 @@ public class AuthController {
 	 *         exception handler.
 	 */
 	@ResponseStatus(HttpStatus.OK)
-	@PreAuthorize("hasRole('ADMIN')")
-	@GetMapping(value = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('get_users_by_email')")
+	@GetMapping(value = "/email/{email}", produces = "application/json")
 	public AppUser getUserByEmail(@PathVariable String email) {
 		return userService.findUserByEmail(email);
 	}
@@ -134,8 +122,9 @@ public class AuthController {
 	 * 
 	 * @throws BadRequestException
 	 */
-	@GetMapping(value = "/available", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasAuthority('check_availability')")
+	@GetMapping(value = "/available", produces = "text/plain")
 	public boolean isAvailable(@RequestParam String field, @RequestParam String value) {
 
 		switch (field) {
@@ -159,7 +148,8 @@ public class AuthController {
 	 *         exception handler.
 	 */
 	@ResponseStatus(HttpStatus.CREATED)
-	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('create_users')")
+	@PostMapping(consumes = "application/json", produces = "application/json")
 	public AppUser registerUser(@RequestBody AppUser user) {
 		return userService.addUser(user);
 	}
@@ -175,10 +165,12 @@ public class AuthController {
 	 * 
 	 */
 	@ResponseStatus(HttpStatus.OK)
-	@PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('mutate_users')")
+	@PutMapping(produces = "text/plain", consumes = "application/json")
 	public boolean updateUser(@Valid @RequestBody AppUser updatedUser, HttpServletRequest req) {
 		UserPrincipal principal = (UserPrincipal) req.getAttribute("principal");
-		return userService.updateUser(updatedUser, principal.getAppUser());
+		AppUser requestingUser = userService.findUserByUsername(principal.getUsername());
+		return userService.updateUser(updatedUser, requestingUser);
 	}
 
 	/**
@@ -192,8 +184,8 @@ public class AuthController {
 	 *         exception handler.
 	 */
 	@ResponseStatus(HttpStatus.OK)
-	@PreAuthorize("hasRole('ADMIN')")
-	@DeleteMapping(value = "/id/{id}")
+	@PreAuthorize("hasAuthority('delete_users')")
+	@DeleteMapping(value = "/id/{id}", produces = "text/plain")
 	public boolean deleteUser(@PathVariable int id) {
 		return userService.deleteUserById(id);
 	}

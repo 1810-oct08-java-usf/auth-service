@@ -1,6 +1,7 @@
 package com.revature.rpm.web.filters;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 import javax.servlet.FilterChain;
@@ -13,13 +14,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.revature.rpm.config.ResourceAccessTokenConfig;
 import com.revature.rpm.dtos.UserCredentials;
 import com.revature.rpm.dtos.UserPrincipal;
-import com.revature.rpm.util.ResourceAccessTokenGenerator;
+import com.revature.rpm.tokens.GenericTokenDetails;
+import com.revature.rpm.tokens.TokenGenerator;
+import com.revature.rpm.tokens.TokenType;
 
 /**
  * Filter used for authenticating a login request using the provided username
@@ -33,13 +36,8 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
 	 * credentials
 	 */
 	private AuthenticationManager authManager;
-	private ResourceAccessTokenGenerator tokenGenerator;
-
-	private String accessHeader;
-	private String accessPrefix;
-	private String accessSecret;
-	private long accessExpiration;
-
+	private TokenGenerator tokenGenerator;
+	
 	/**
 	 * Constructor for the JwtUsernameAndPasswordAuthenticationFilter that
 	 * instantiates the AuthenticationManager and the JwtConfig fields. <br>
@@ -52,13 +50,9 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
 	 * @param jwtConfig   Provides the configuration for how JWT tokens are
 	 *                    created/validated.
 	 */
-	public AuthFilter(AuthenticationManager authManager, ResourceAccessTokenGenerator tokenGen, ResourceAccessTokenConfig tokenConfig) {
+	public AuthFilter(AuthenticationManager authManager, TokenGenerator tokenGen) {
 		this.authManager = authManager;
 		this.tokenGenerator = tokenGen;
-		this.accessHeader = tokenConfig.getAccessHeader();
-		this.accessPrefix = tokenConfig.getAccessPrefix();
-		this.accessSecret = tokenConfig.getAccessSecret();
-		this.accessExpiration = Long.parseLong(tokenConfig.getAccessExpiration());
 	}
 
 	/**
@@ -133,14 +127,35 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
 		
 		logger.info("Authentication successful, generating resource access token");
 		
-		String token = tokenGenerator.createJwt(auth, accessExpiration, accessSecret);
+		User authUser = (User) auth.getPrincipal();
+		
+		UserPrincipal principal = new UserPrincipal();
+		principal.setUsername(authUser.getUsername());
+		principal.setGrantedScopes(authUser.getAuthorities());
+		
+		LocalDateTime creationTime = LocalDateTime.now();
+		principal.setAccessTokenCreatedAt(creationTime.toString());
+		principal.setAccessTokenExpiresAt(creationTime.plusMinutes(30L).toString());
+		
+		GenericTokenDetails tokenConfig = new GenericTokenDetails(authUser.getUsername(), "Revature");
+		tokenConfig.setType(TokenType.REFRESH);
+		tokenConfig.setIat(creationTime);
+		tokenConfig.setExp(creationTime.plusWeeks(1L));
+		tokenConfig.setClaims(principal.getGrantedScopes());
+		
+		String refreshToken = tokenGenerator.generateToken(tokenConfig);
+		principal.setRefreshToken(refreshToken);
 
-		logger.info("Attaching token to response header: " + accessHeader);
+		tokenConfig.setType(TokenType.REFRESH);
+		tokenConfig.setExp(creationTime.plusMinutes(30L));
+		String accessToken = tokenGenerator.generateToken(tokenConfig);
+		principal.setAccessToken(accessToken);
+		
+		logger.info("Attaching token to response Authorization header");
 		
 		resp.setContentType("application/json");
-		resp.addHeader(accessHeader, accessPrefix + token);
-		resp.getWriter()
-				.write(new ObjectMapper().writeValueAsString(((UserPrincipal) auth.getPrincipal()).getAppUser()));
+		resp.addHeader("Authorization", "Bearer " + accessToken);
+		resp.getWriter().write(new ObjectMapper().writeValueAsString(principal));
 
 	}
 
