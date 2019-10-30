@@ -17,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.revature.rpm.tokens.TokenParser;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 
 /**
  * A filter used to intercept all requests and validate the JWT, if present, in
@@ -81,9 +82,27 @@ public class ResourceAccessFilter extends OncePerRequestFilter {
 				
 			}
 
+		} catch (ExpiredJwtException eje) {
+			
+			logger.warn("Provided access token is expired");
+			
+			resp.setStatus(401);
+			resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\", "
+													+ "error=\"invalid_token\", "
+													+ "error_description=\"Access token expired\"");
+			
+			SecurityContextHolder.clearContext();
+			return;
+			
 		} catch (Exception e) {
 			
-			logger.warn("Error parsing resource access token for claim information");
+			logger.error("Error parsing resource access token for claim information");
+			
+			resp.setStatus(400);
+			resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\",\n"
+													+ "error=\"invalid_request\",\n"
+													+ "error_description=\"Error parsing provided access token\"");
+			
 			SecurityContextHolder.clearContext();
 			return;
 			
