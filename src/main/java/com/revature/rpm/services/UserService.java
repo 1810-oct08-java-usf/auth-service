@@ -171,6 +171,10 @@ public class UserService implements UserDetailsService {
 		}
 
 		newUser.setRole(UserRole.ROLE_USER);
+		
+		String encodedPw = encoder.encode(newUser.getPassword());
+		newUser.setPassword(encodedPw);
+		
 		return repo.save(newUser);
 
 	}
@@ -370,17 +374,11 @@ public class UserService implements UserDetailsService {
 			throw new UsernameNotFoundException("Username: " + username + " not found");
 		}
 
-		String userPw = retrievedUser.getPassword();
-		String encodedPw = encoder.encode(userPw);
-		retrievedUser.setPassword(encodedPw);
-
 		UserRole userRole = retrievedUser.getRole();
-		System.out.println(userRole);
-		System.out.println(scopeMapper);
 		String grantedScopes = scopeMapper.mapScopesBasedUponRole(userRole);
 		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(grantedScopes);
 
-		return new User(username, encodedPw, grantedAuthorities);
+		return new User(username, retrievedUser.getPassword(), grantedAuthorities);
 
 	}
 }
