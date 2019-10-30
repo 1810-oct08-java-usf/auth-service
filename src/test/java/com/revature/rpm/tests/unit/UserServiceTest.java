@@ -31,6 +31,7 @@ import com.revature.rpm.exceptions.UserNotFoundException;
 import com.revature.rpm.exceptions.UserUpdateException;
 import com.revature.rpm.repositories.UserRepository;
 import com.revature.rpm.services.UserService;
+import com.revature.rpm.tokens.ScopeMapper;
 
 /**
  * Test Suite for the UserService class. Methods unit tested in this suite
@@ -60,6 +61,9 @@ public class UserServiceTest {
 
 	@Mock
 	BCryptPasswordEncoder mockEncoder;
+	
+	@Mock
+	ScopeMapper mockScopeMapper;
 
 	@InjectMocks
 	UserService userService;
@@ -942,10 +946,9 @@ public class UserServiceTest {
 	public void testLoadUserByUsernameWithValidKnownUsername() {
 		AppUser retrievedUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", "mocked", "mocked",
 				UserRole.ROLE_USER);
-		String encodedMockPw = "$2a$10$mlgYdMtrTQsFjbZAk0i.MeDUzVzaQgoMkGKRiT9DyN8Yrl99ZQeBC";
 		String username = "valid-known";
 		when(mockRepo.findUserByUsername(username)).thenReturn(retrievedUser);
-		when(mockEncoder.encode(retrievedUser.getPassword())).thenReturn(encodedMockPw);
+		when(mockScopeMapper.mapScopesBasedUponRole(retrievedUser.getRole())).thenReturn("fake, list, of, scopes");
 		UserDetails result = userService.loadUserByUsername(username);
 		assertNotNull(result);
 	}
