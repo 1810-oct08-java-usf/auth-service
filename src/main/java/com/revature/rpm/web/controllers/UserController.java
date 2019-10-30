@@ -37,7 +37,7 @@ import com.revature.rpm.services.UserService;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-
+	
 	private UserService userService;
 
 	@Autowired
@@ -122,7 +122,6 @@ public class UserController {
 	 * @throws BadRequestException
 	 */
 	@ResponseStatus(HttpStatus.OK)
-	@PreAuthorize("hasAuthority('check_availability')")
 	@GetMapping(value = "/available", produces = "text/plain")
 	public boolean isAvailable(@RequestParam String field, @RequestParam String value) {
 
@@ -147,7 +146,6 @@ public class UserController {
 	 *         exception handler.
 	 */
 	@ResponseStatus(HttpStatus.CREATED)
-	@PreAuthorize("hasAuthority('create_users')")
 	@PostMapping(consumes = "application/json", produces = "application/json")
 	public AppUser registerUser(@RequestBody AppUser user) {
 		return userService.addUser(user);
