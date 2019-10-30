@@ -62,6 +62,10 @@ public class UserPrincipal {
 	public String getGrantedScopes() {
 		return grantedScopes;
 	}
+	
+	public void setGrantedScopes(String grantedScopes) {
+		this.grantedScopes = grantedScopes;
+	}
 
 	public void setGrantedScopes(Collection<GrantedAuthority> authorities) {
 		
