@@ -93,9 +93,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				 *  	- GET requests to /actuator/info - for AWS Elastic Load Balancer target group monitoring
 				 *  	- GET requests to /actuator/routes - for AWS Elastic Load Balancer target group monitoring
 				 */
-				.mvcMatchers(HttpMethod.POST, "/users").permitAll()
-				.mvcMatchers(HttpMethod.GET, "/users/isAvailable").permitAll()
-				
 				.mvcMatchers(HttpMethod.GET, "/actuator/info").permitAll()
 				.mvcMatchers(HttpMethod.GET, "/actuator/routes").permitAll()
 				
@@ -103,13 +100,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				 *  Allow only admins to access:
 				 *  	
 				 *  	- All requests to /h2-console
-				 *  	- GET requests to /auth/users
-				 *  	- POST requests to /auth/users/admin
 				 */
-				.mvcMatchers("/h2-console/**").hasRole("ADMIN")
-				
-				// All other requests must be authenticated
-				.anyRequest().authenticated();
+				.mvcMatchers("/h2-console/**").hasRole("ADMIN");
 		
 	}
 
