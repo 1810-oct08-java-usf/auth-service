@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.revature.rpm.tokens.TokenParser;
+import com.revature.rpm.tokens.TokenType;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -67,7 +68,7 @@ public class ResourceAccessFilter extends OncePerRequestFilter {
 
 		try {
 
-			Claims tokenClaims = tokenParser.parseClaims(token);
+			Claims tokenClaims = tokenParser.parseClaims(TokenType.ACCESS, token);
 			
 			String username = tokenClaims.getSubject();
 

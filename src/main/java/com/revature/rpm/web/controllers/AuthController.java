@@ -17,6 +17,7 @@ import com.revature.rpm.services.TokenService;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
 
 /**
  * Serves as the main for dealing with token-related operations.
@@ -41,7 +42,7 @@ public class AuthController {
 	 */
 	@GetMapping(value = "/scopes", produces = "text/plain")
 	public String getGrantedScopes(@RequestHeader("access_token") String token) {
-		return tokenService.extractGrantedScopesFromAccessToken(token);
+		return tokenService.extractGrantedScopesFromToken(token);
 	}
 
 	/**
@@ -54,6 +55,31 @@ public class AuthController {
 	@GetMapping(value = "/refresh", produces = "application/json")
 	public UserPrincipal refreshAccessToken(@RequestHeader("refresh_token") String refreshToken) {
 		return tokenService.refreshAccessToken(refreshToken);
+	}
+	
+	/**
+	 * This handles any MalformedJwtException thrown in the AuthController.
+	 * 
+	 * @param sige the thrown exception
+	 * @param resp a facade of the HTTP response object
+	 * 
+	 * @return This method will return an error of type UserErrorResponse
+	 */
+	@ExceptionHandler
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorResponse handleSignatureException(SignatureException sige, HttpServletResponse resp) {
+
+		ErrorResponse error = new ErrorResponse();
+		error.setStatus(HttpStatus.BAD_REQUEST.value());
+		error.setMessage(sige.getMessage());
+		error.setTimestamp(System.currentTimeMillis());
+
+		resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\", " 
+												+ "error=\"invalid_request\", "
+												+ "error_description=\"Invalid token provided\"");
+
+		return error;
+
 	}
 	
 	/**

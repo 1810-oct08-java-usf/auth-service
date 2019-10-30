@@ -14,39 +14,39 @@ public class TokenGenerator {
 	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private String tokenSecret;
+	private String accessSecret;
+	private String refreshSecret;
 	
-	public TokenGenerator(String secret) {
+	public TokenGenerator(String accessSecret, String refreshSecret) {
 		super();
-		this.tokenSecret = secret;
+		this.accessSecret = accessSecret;
+		this.refreshSecret = refreshSecret;
 	}
 	
 	public String generateToken(GenericTokenDetails tokenDetails) {
 
-		SignatureAlgorithm sigAlg = null;
+		Date creationTime = new Date(tokenDetails.getIat().atZone(ZoneOffset.systemDefault()).toInstant().toEpochMilli());
+		Date expirationTime = new Date(tokenDetails.getExp().atZone(ZoneOffset.systemDefault()).toInstant().toEpochMilli());
+		
+		JwtBuilder tokenBuilder = Jwts.builder()
+				  .setSubject(tokenDetails.getSubject())
+				  .setIssuer(tokenDetails.getIss())
+				  .setIssuedAt(creationTime)
+				  .setExpiration(expirationTime)
+				  .claim("scopes", tokenDetails.getClaims());
 		
 		switch (tokenDetails.getType()) {
 		
 		case ACCESS:
 			logger.info("Generating access token for subject: " + tokenDetails.getSubject());
-			sigAlg = SignatureAlgorithm.HS256;
+			tokenBuilder.signWith(SignatureAlgorithm.HS256, accessSecret.getBytes());
 			break;
 		
 		case REFRESH:
 			logger.info("Generating refresh token for subject: " + tokenDetails.getSubject());
-			sigAlg = SignatureAlgorithm.HS512;
-
-		}
-		Date creationTime = new Date(tokenDetails.getIat().atZone(ZoneOffset.systemDefault()).toInstant().toEpochMilli());
-		Date expirationTime = new Date(tokenDetails.getExp().atZone(ZoneOffset.systemDefault()).toInstant().toEpochMilli());
+			tokenBuilder.signWith(SignatureAlgorithm.HS512, refreshSecret.getBytes());
 		
-		JwtBuilder tokenBuilder = Jwts.builder()
-									  .setSubject(tokenDetails.getSubject())
-									  .setIssuer(tokenDetails.getIss())
-									  .setIssuedAt(creationTime)
-									  .setExpiration(expirationTime)
-								  	  .claim("scopes", tokenDetails.getClaims())
-								  	  .signWith(sigAlg, tokenSecret.getBytes());
+		}
 		
 		logger.info("Successfully generated token for subject: " + tokenDetails.getSubject());
 

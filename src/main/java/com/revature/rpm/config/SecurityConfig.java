@@ -29,8 +29,11 @@ import com.revature.rpm.web.filters.ResourceAccessFilter;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
-	@Value("${rpm.security.secret:local-deploy}")
-	private String tokenSecret;
+	@Value("${rpm.security.secret:access-local}")
+	private String accessTokenSecret;
+	
+	@Value("${rpm.security.secret:refresh-local}")
+	private String refreshTokenSecret;
 	
 	private UserDetailsService userDetailsService;
 	
@@ -117,12 +120,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Bean
 	public TokenGenerator tokenGenerator() {
-		return new TokenGenerator(tokenSecret);
+		return new TokenGenerator(accessTokenSecret, refreshTokenSecret);
 	}
 	
 	@Bean
 	public TokenParser tokenParser() {
-		return new TokenParser(tokenSecret);
+		return new TokenParser(accessTokenSecret, refreshTokenSecret);
 	}
 	
 	@Bean
