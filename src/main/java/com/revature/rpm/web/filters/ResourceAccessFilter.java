@@ -100,8 +100,8 @@ public class ResourceAccessFilter extends OncePerRequestFilter {
 			logger.error("Error parsing resource access token for claim information");
 			
 			resp.setStatus(400);
-			resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\",\n"
-													+ "error=\"invalid_request\",\n"
+			resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\","
+													+ "error=\"invalid_request\","
 													+ "error_description=\"Error parsing provided access token\"");
 			
 			SecurityContextHolder.clearContext();
