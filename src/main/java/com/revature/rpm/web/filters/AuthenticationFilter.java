@@ -1,7 +1,6 @@
 package com.revature.rpm.web.filters;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Collections;
 
 import javax.servlet.FilterChain;
@@ -128,28 +127,22 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		logger.info("Authentication successful, generating resource access token");
 		
 		User authUser = (User) auth.getPrincipal();
-		
 		UserPrincipal principal = new UserPrincipal();
-		principal.setUsername(authUser.getUsername());
 		principal.setGrantedScopes(authUser.getAuthorities());
 		
-		LocalDateTime creationTime = LocalDateTime.now();
-		principal.setAccessTokenCreatedAt(creationTime.toString());
-		principal.setAccessTokenExpiresAt(creationTime.plusMinutes(30L).toString());
-		
-		GenericTokenDetails tokenConfig = new GenericTokenDetails(authUser.getUsername(), "Revature");
-		tokenConfig.setType(TokenType.REFRESH);
-		tokenConfig.setIat(creationTime);
-		tokenConfig.setExp(creationTime.plusWeeks(1L));
+		GenericTokenDetails tokenConfig = new GenericTokenDetails(TokenType.REFRESH, "Revature", authUser.getUsername());
 		tokenConfig.setClaims(principal.getGrantedScopes());
 		
 		String refreshToken = tokenGenerator.generateToken(tokenConfig);
-		principal.setRefreshToken(refreshToken);
 
-		tokenConfig.setType(TokenType.REFRESH);
-		tokenConfig.setExp(creationTime.plusMinutes(30L));
+		tokenConfig.setType(TokenType.ACCESS);
 		String accessToken = tokenGenerator.generateToken(tokenConfig);
+		
+		principal.setUsername(authUser.getUsername());
+		principal.setRefreshToken(refreshToken);
 		principal.setAccessToken(accessToken);
+		principal.setAccessTokenCreatedAt(tokenConfig.getIat().toString());
+		principal.setAccessTokenExpiresAt(tokenConfig.getExp().toString());
 		
 		logger.info("Attaching token to response Authorization header");
 		

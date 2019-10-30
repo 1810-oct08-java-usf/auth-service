@@ -12,10 +12,24 @@ public class GenericTokenDetails {
 	private LocalDateTime exp;
 	private String claims;
 	
-	public GenericTokenDetails(String subject, String iss) {
+	public GenericTokenDetails(TokenType type, String iss, String subject) {
 		super();
-		this.subject = subject;
+		this.type = type;
 		this.iss = iss;
+		this.iat = LocalDateTime.now();
+		
+		switch (type) {
+		
+		case ACCESS:
+			this.exp = this.iat.plusMinutes(30L);
+			break;
+			
+		case REFRESH: 
+			this.exp = this.iat.plusWeeks(1L);
+			break;
+			
+		}
+		
 	}
 
 	public TokenType getType() {
@@ -24,6 +38,19 @@ public class GenericTokenDetails {
 	
 	public void setType(TokenType type) {
 		this.type = type;
+		
+		switch (type) {
+		
+		case ACCESS:
+			this.exp = this.iat.plusMinutes(30L);
+			break;
+			
+		case REFRESH: 
+			this.exp = this.iat.plusWeeks(1L);
+			break;
+			
+		}
+		
 	}
 	
 	public String getSubject() {
