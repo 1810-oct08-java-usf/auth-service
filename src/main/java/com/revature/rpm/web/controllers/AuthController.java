@@ -34,27 +34,22 @@ public class AuthController {
 	}
 
 	/**
-	 * Parses and validates the provided access token to provide a simple
-	 * comma-separated list of granted scopes.
-	 * 
-	 * @param accessToken
+	 * Serves as a front-facing endpoint for determining the scopes specified
+	 * within a token
 	 * 
 	 * @return a comma-separated list of granted scopes
 	 */
 	@GetMapping(value = "/scopes", produces = "text/plain")
-	public String getGrantedScopes(@RequestHeader("access_token") String accessToken) {
-		return tokenService.extractGrantedScopesFromAccessToken(accessToken);
+	public String getGrantedScopes(@RequestHeader("access_token") String token) {
+		return tokenService.extractGrantedScopesFromAccessToken(token);
 	}
 
 	/**
-	 * Parses and validates the provided refresh token in order to generate a new
-	 * access token, which is included within both the associated response header as
-	 * well as the response body. Note that the refresh token is not included within
-	 * the response payload.
+	 * Serves as a front-facing endpoint obtaining a new access token using the 
+	 * provided refresh token.
 	 * 
-	 * @param refreshToken
+	 * @return 
 	 * 
-	 * @return UserPrincipal containing the access token and related information
 	 */
 	@GetMapping(value = "/refresh", produces = "application/json")
 	public UserPrincipal refreshAccessToken(@RequestHeader("refresh_token") String refreshToken) {
@@ -78,8 +73,9 @@ public class AuthController {
 		error.setMessage(mje.getMessage());
 		error.setTimestamp(System.currentTimeMillis());
 
-		resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\", " + "error=\"invalid_request\", "
-				+ "error_description=\"Invalid token provided\"");
+		resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\", " 
+												+ "error=\"invalid_request\", "
+												+ "error_description=\"Invalid token provided\"");
 
 		return error;
 
@@ -102,8 +98,9 @@ public class AuthController {
 		error.setMessage(eje.getMessage());
 		error.setTimestamp(System.currentTimeMillis());
 
-		resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\", " + "error=\"invalid_token\", "
-				+ "error_description=\"Access token expired\"");
+		resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\", " 
+												+ "error=\"invalid_token\", "
+												+ "error_description=\"Access token expired\"");
 
 		return error;
 
@@ -126,8 +123,9 @@ public class AuthController {
 		error.setMessage(se.getMessage());
 		error.setTimestamp(System.currentTimeMillis());
 
-		resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\", " + "error=\"invalid_token\", "
-				+ "error_description=\"Token is associated with locked subject\"");
+		resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\", " 
+												+ "error=\"invalid_token\", "
+												+ "error_description=\"Token is associated with locked subject\"");
 
 		return error;
 
