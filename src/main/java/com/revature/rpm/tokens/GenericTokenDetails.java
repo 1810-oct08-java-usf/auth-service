@@ -16,6 +16,7 @@ public class GenericTokenDetails {
 		super();
 		this.type = type;
 		this.iss = iss;
+		this.subject = subject;
 		this.iat = LocalDateTime.now();
 		
 		switch (type) {
