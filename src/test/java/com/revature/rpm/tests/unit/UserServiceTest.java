@@ -66,7 +66,7 @@ public class UserServiceTest {
 	ScopeMapper mockScopeMapper;
 
 	@InjectMocks
-	UserService userService;
+	UserService sut;
 
 	// --------------------------------------------------------------------------------------------------------------------
 
@@ -89,7 +89,7 @@ public class UserServiceTest {
 	public void testFindAllUsers() {
 		List<AppUser> mockList = new ArrayList<>();
 		when(mockRepo.findAll()).thenReturn(mockList);
-		assertEquals(mockList, userService.findAllUsers());
+		assertEquals(mockList, sut.findAllUsers());
 	}
 
 	// --------------------------------------------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ public class UserServiceTest {
 				UserRole.ROLE_USER);
 		when(mockRepo.findById(1)).thenReturn(Optional.of(expectedResult));
 
-		AppUser testResult = userService.findUserById(1);
+		AppUser testResult = sut.findUserById(1);
 		assertNotNull(testResult);
 		assertEquals(expectedResult, testResult);
 	}
@@ -126,7 +126,7 @@ public class UserServiceTest {
 	 */
 	@Test(expected = BadRequestException.class)
 	public void testFindUserByIdWithInvalidId() {
-		userService.findUserById(0);
+		sut.findUserById(0);
 		verify(mockRepo, times(0)).findById(Mockito.anyInt());
 	}
 
@@ -138,7 +138,7 @@ public class UserServiceTest {
 	@Test(expected = UserNotFoundException.class)
 	public void testFindUserByIdWithValidIdNotFound() {
 		when(mockRepo.findById(1)).thenReturn(Optional.ofNullable(null));
-		userService.findUserById(1);
+		sut.findUserById(1);
 	}
 
 	// --------------------------------------------------------------------------------------------------------------------
@@ -163,7 +163,7 @@ public class UserServiceTest {
 				UserRole.ROLE_USER);
 		when(mockRepo.findUserByUsername("mocked")).thenReturn(expectedResult);
 
-		AppUser testResult = userService.findUserByUsername("mocked");
+		AppUser testResult = sut.findUserByUsername("mocked");
 		assertNotNull(testResult);
 		assertEquals(expectedResult, testResult);
 	}
@@ -174,7 +174,7 @@ public class UserServiceTest {
 	 */
 	@Test(expected = BadRequestException.class)
 	public void testFindUserByUsernameInvalidUsername() {
-		userService.findUserByUsername("");
+		sut.findUserByUsername("");
 		verify(mockRepo, times(0)).findUserByUsername(Mockito.anyString());
 	}
 
@@ -184,7 +184,7 @@ public class UserServiceTest {
 	 */
 	@Test(expected = BadRequestException.class)
 	public void testFindUserByUsernameNullUsername() {
-		userService.findUserByUsername(null);
+		sut.findUserByUsername(null);
 		verify(mockRepo, times(0)).findUserByUsername(Mockito.anyString());
 	}
 
@@ -209,7 +209,7 @@ public class UserServiceTest {
 		AppUser expectedResult = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked",
 				UserRole.ROLE_USER);
 		when(mockRepo.findUserByEmail("mocked@email.com")).thenReturn(expectedResult);
-		assertEquals(expectedResult, userService.findUserByEmail("mocked@email.com"));
+		assertEquals(expectedResult, sut.findUserByEmail("mocked@email.com"));
 	}
 
 	/**
@@ -218,7 +218,7 @@ public class UserServiceTest {
 	 */
 	@Test(expected = BadRequestException.class)
 	public void testFindUserByEmailInvalidEmail() {
-		userService.findUserByEmail("");
+		sut.findUserByEmail("");
 		verify(mockRepo, times(0)).findUserByEmail(Mockito.anyString());
 	}
 
@@ -228,7 +228,7 @@ public class UserServiceTest {
 	 */
 	@Test(expected = BadRequestException.class)
 	public void testFindUserByEmailNullEmail() {
-		userService.findUserByEmail(null);
+		sut.findUserByEmail(null);
 		verify(mockRepo, times(0)).findUserByEmail(Mockito.anyString());
 	}
 
@@ -256,7 +256,7 @@ public class UserServiceTest {
 	public void testAddUserIfUserNotInDatabase() {
 		AppUser mockedUser = new AppUser(0, "Mocked", "User", "mocked@email.com", "mocked", "mocked", UserRole.ROLE_USER);
 		when(mockRepo.save(mockedUser)).thenReturn(mockedUser);
-		assertEquals(mockedUser, userService.addUser(mockedUser));
+		assertEquals(mockedUser, sut.addUser(mockedUser));
 	}
 
 	/**
@@ -269,7 +269,7 @@ public class UserServiceTest {
 	public void testAddUserIfUsernameAlreadyExists() {
 		AppUser mockedUser = new AppUser(0, "Mocked", "User", "mocked@email.com", "mocked", "mocked", UserRole.ROLE_USER);
 		when(mockRepo.findUserByUsername("mocked")).thenReturn(new AppUser());
-		userService.addUser(mockedUser);
+		sut.addUser(mockedUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -283,7 +283,7 @@ public class UserServiceTest {
 	public void testAddUserIfEmailAlreadyExists() {
 		AppUser mockedUser = new AppUser(0, "Mocked", "User", "mocked@email.com", "mocked", "mocked", UserRole.ROLE_USER);
 		when(mockRepo.findUserByEmail("mocked@email.com")).thenReturn(new AppUser());
-		userService.addUser(mockedUser);
+		sut.addUser(mockedUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -295,7 +295,7 @@ public class UserServiceTest {
 	@Test(expected = BadRequestException.class)
 	public void testAddInvalidUser() {
 		AppUser nullMockedUser = null;
-		userService.addUser(nullMockedUser);
+		sut.addUser(nullMockedUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -320,7 +320,7 @@ public class UserServiceTest {
 	public void testUpdateNullUserAndNullRequester() {
 		AppUser nullMockUser = null;
 		AppUser nullRequester = null;
-		userService.updateUser(nullMockUser, nullRequester);
+		sut.updateUser(nullMockUser, nullRequester);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -334,7 +334,7 @@ public class UserServiceTest {
 		AppUser invalidMockUser = new AppUser(null, "Mocked", "User", "mocked@email.com", "mocked", "mocked",
 				UserRole.ROLE_USER);
 		AppUser nullRequester = null;
-		userService.updateUser(invalidMockUser, nullRequester);
+		sut.updateUser(invalidMockUser, nullRequester);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -349,7 +349,7 @@ public class UserServiceTest {
 				UserRole.ROLE_USER);
 		AppUser requestingUser = new AppUser(3, "mocked", "mocked", "mocked@email.com", "mocked", "mocked",
 				UserRole.ROLE_USER);
-		userService.updateUser(invalidMockUser, requestingUser);
+		sut.updateUser(invalidMockUser, requestingUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -363,7 +363,7 @@ public class UserServiceTest {
 		AppUser mockUserForUpdate = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked",
 				UserRole.ROLE_USER);
 		AppUser nullRequester = null;
-		userService.updateUser(mockUserForUpdate, nullRequester);
+		sut.updateUser(mockUserForUpdate, nullRequester);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -377,7 +377,7 @@ public class UserServiceTest {
 		AppUser requestingUser = new AppUser(3, "mocked", "mocked", "mocked@email.com", "mocked", "mocked",
 				UserRole.ROLE_USER);
 		AppUser nullMockUser = null;
-		userService.updateUser(nullMockUser, requestingUser);
+		sut.updateUser(nullMockUser, requestingUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -392,7 +392,7 @@ public class UserServiceTest {
 				UserRole.ROLE_USER);
 		AppUser mockUserForUpdate = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked",
 				UserRole.ROLE_USER);
-		userService.updateUser(mockUserForUpdate, requestingUser);
+		sut.updateUser(mockUserForUpdate, requestingUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -410,7 +410,7 @@ public class UserServiceTest {
 		AppUser mockUserForUpdate = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked",
 				UserRole.ROLE_USER);
 		when(mockRepo.findById(mockUserForUpdate.getId())).thenReturn(Optional.of(persistedUser));
-		boolean actualResult = userService.updateUser(mockUserForUpdate, requestingUser);
+		boolean actualResult = sut.updateUser(mockUserForUpdate, requestingUser);
 		assertTrue(actualResult);
 	}
 
@@ -428,7 +428,7 @@ public class UserServiceTest {
 		AppUser mockUserForUpdate = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked",
 				UserRole.ROLE_USER);
 		when(mockRepo.findById(mockUserForUpdate.getId())).thenReturn(Optional.of(persistedUser));
-		boolean actualResult = userService.updateUser(mockUserForUpdate, requestingUser);
+		boolean actualResult = sut.updateUser(mockUserForUpdate, requestingUser);
 		assertTrue(actualResult);
 	}
 
@@ -443,7 +443,7 @@ public class UserServiceTest {
 		AppUser persistedUser = requestingUser;
 		AppUser validMockUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", UserRole.ROLE_USER);
 		when(mockRepo.findById(validMockUser.getId())).thenReturn(Optional.of(persistedUser));
-		assertTrue(userService.updateUser(validMockUser, requestingUser));
+		assertTrue(sut.updateUser(validMockUser, requestingUser));
 	}
 
 	/**
@@ -459,7 +459,7 @@ public class UserServiceTest {
 				UserRole.ROLE_USER);
 		when(mockRepo.findById(validMockUser.getId())).thenReturn(Optional.of(persistedUser));
 		when(mockRepo.findUserByUsername("new-mocked")).thenReturn(null);
-		assertTrue(userService.updateUser(validMockUser, requestingUser));
+		assertTrue(sut.updateUser(validMockUser, requestingUser));
 	}
 
 	/**
@@ -478,7 +478,7 @@ public class UserServiceTest {
 
 		when(mockRepo.findById(validMockUser.getId())).thenReturn(Optional.of(persistedUser));
 		when(mockRepo.findUserByUsername(validMockUser.getUsername())).thenReturn(userWithUsername);
-		userService.updateUser(validMockUser, requestingUser);
+		sut.updateUser(validMockUser, requestingUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -495,7 +495,7 @@ public class UserServiceTest {
 				UserRole.ROLE_USER);
 		when(mockRepo.findById(validMockUser.getId())).thenReturn(Optional.of(persistedUser));
 		when(mockRepo.findUserByEmail("new-mocked@email.com")).thenReturn(null);
-		assertTrue(userService.updateUser(validMockUser, requestingUser));
+		assertTrue(sut.updateUser(validMockUser, requestingUser));
 	}
 
 	/**
@@ -513,7 +513,7 @@ public class UserServiceTest {
 				UserRole.ROLE_USER);
 		when(mockRepo.findById(validMockUser.getId())).thenReturn(Optional.of(persistedUser));
 		when(mockRepo.findUserByEmail("new-mocked@email.com")).thenReturn(userWithEmail);
-		userService.updateUser(validMockUser, requestingUser);
+		sut.updateUser(validMockUser, requestingUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -530,7 +530,7 @@ public class UserServiceTest {
 				UserRole.ROLE_ADMIN);
 		AppUser unknownMockedUser = new AppUser(9, "unknown", "mock", "mocked@email.com", "mocked", "mocked",
 				UserRole.ROLE_USER);
-		userService.updateUser(unknownMockedUser, requestingUser);
+		sut.updateUser(unknownMockedUser, requestingUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -547,7 +547,7 @@ public class UserServiceTest {
 		AppUser persistedUser = requestingUser;
 		AppUser mockedUser = new AppUser(9, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", UserRole.ROLE_ADMIN);
 		when(mockRepo.findById(mockedUser.getId())).thenReturn(Optional.of(persistedUser));
-		userService.updateUser(mockedUser, requestingUser);
+		sut.updateUser(mockedUser, requestingUser);
 		verify(mockRepo, times(0)).save(Mockito.any());
 	}
 
@@ -564,7 +564,7 @@ public class UserServiceTest {
 		AppUser persistedUser = requestingUser;
 		AppUser mockedUser = new AppUser(9, "updated", "mock", "mocked@email.com", "mocked", "mocked", UserRole.ROLE_ADMIN);
 		when(mockRepo.findById(mockedUser.getId())).thenReturn(Optional.of(persistedUser));
-		boolean actualResult = userService.updateUser(mockedUser, requestingUser);
+		boolean actualResult = sut.updateUser(mockedUser, requestingUser);
 		assertTrue(actualResult);
 	}
 
@@ -590,7 +590,7 @@ public class UserServiceTest {
 	public void testDeleteUserByIdValidId() {
 		AppUser mockedUser = new AppUser(1, "Mocked", "User", "mocked@email.com", "mocked", "mocked", UserRole.ROLE_USER);
 		when(mockRepo.findById(1)).thenReturn(Optional.of(mockedUser));
-		assertTrue(userService.deleteUserById(1));
+		assertTrue(sut.deleteUserById(1));
 	}
 
 	/**
@@ -601,7 +601,7 @@ public class UserServiceTest {
 	 */
 	@Test(expected = BadRequestException.class)
 	public void testDeleteUserByIdInvalidId() {
-		userService.deleteUserById(0);
+		sut.deleteUserById(0);
 		verify(mockRepo, times(0)).delete(Mockito.any());
 	}
 
@@ -617,7 +617,7 @@ public class UserServiceTest {
 		Optional<AppUser> mockedOptional = Optional.ofNullable(mockedUser);
 		when(mockRepo.findById(1)).thenReturn(mockedOptional);
 
-		userService.deleteUserById(1);
+		sut.deleteUserById(1);
 		verify(mockRepo, times(0)).delete(mockedUser);
 	}
 
@@ -641,7 +641,7 @@ public class UserServiceTest {
 	public void testIsUsernameAvailableWhenAvailable() {
 		String availableUsername = "mocked";
 		when(mockRepo.findUserByUsername(availableUsername)).thenReturn(null);
-		boolean actualResult = userService.isUsernameAvailable(availableUsername);
+		boolean actualResult = sut.isUsernameAvailable(availableUsername);
 		assertTrue(actualResult);
 	}
 
@@ -655,7 +655,7 @@ public class UserServiceTest {
 				UserRole.ROLE_USER);
 		String unavailableUsername = "mocked";
 		when(mockRepo.findUserByUsername(unavailableUsername)).thenReturn(persistedUser);
-		boolean actualResult = userService.isUsernameAvailable(unavailableUsername);
+		boolean actualResult = sut.isUsernameAvailable(unavailableUsername);
 		assertFalse(actualResult);
 	}
 
@@ -679,7 +679,7 @@ public class UserServiceTest {
 	public void testIsEmailAvailableWhenAvailable() {
 		String availableEmail = "mocked@email.com";
 		when(mockRepo.findUserByEmail(availableEmail)).thenReturn(null);
-		boolean actualResult = userService.isEmailAddressAvailable(availableEmail);
+		boolean actualResult = sut.isEmailAddressAvailable(availableEmail);
 		assertTrue(actualResult);
 	}
 
@@ -693,7 +693,7 @@ public class UserServiceTest {
 				UserRole.ROLE_USER);
 		String unavailableEmail = "mocked@email.com";
 		when(mockRepo.findUserByUsername(unavailableEmail)).thenReturn(persistedUser);
-		boolean actualResult = userService.isUsernameAvailable(unavailableEmail);
+		boolean actualResult = sut.isUsernameAvailable(unavailableEmail);
 		assertFalse(actualResult);
 	}
 
@@ -718,7 +718,7 @@ public class UserServiceTest {
 	public void testValidateFieldsValidUser() {
 		AppUser nullMockedUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", "mocked", "mocked",
 				UserRole.ROLE_USER);
-		boolean actualResult = userService.validateFields(nullMockedUser);
+		boolean actualResult = sut.validateFields(nullMockedUser);
 		assertTrue(actualResult);
 	}
 
@@ -729,7 +729,7 @@ public class UserServiceTest {
 	@Test
 	public void testValidateFieldsNullUser() {
 		AppUser nullMockedUser = null;
-		boolean actualResult = userService.validateFields(nullMockedUser);
+		boolean actualResult = sut.validateFields(nullMockedUser);
 		assertFalse(actualResult);
 	}
 
@@ -741,7 +741,7 @@ public class UserServiceTest {
 	@Test
 	public void testValidateFieldsInvalidFirstName() {
 		AppUser invalidMockedUser = new AppUser(1, "", "mocked", "mocked@email.com", "mocked", "mocked", UserRole.ROLE_USER);
-		boolean actualResult = userService.validateFields(invalidMockedUser);
+		boolean actualResult = sut.validateFields(invalidMockedUser);
 		assertFalse(actualResult);
 	}
 
@@ -754,7 +754,7 @@ public class UserServiceTest {
 	public void testValidateFieldsNullFirstName() {
 		AppUser invalidMockedUser = new AppUser(1, null, "mocked", "mocked@email.com", "mocked", "mocked",
 				UserRole.ROLE_USER);
-		boolean actualResult = userService.validateFields(invalidMockedUser);
+		boolean actualResult = sut.validateFields(invalidMockedUser);
 		assertFalse(actualResult);
 	}
 
@@ -766,7 +766,7 @@ public class UserServiceTest {
 	@Test
 	public void testValidateFieldsInvalidLastName() {
 		AppUser invalidMockedUser = new AppUser(1, "mocked", "", "mocked@email.com", "mocked", "mocked", UserRole.ROLE_USER);
-		boolean actualResult = userService.validateFields(invalidMockedUser);
+		boolean actualResult = sut.validateFields(invalidMockedUser);
 		assertFalse(actualResult);
 	}
 
@@ -779,7 +779,7 @@ public class UserServiceTest {
 	public void testValidateFieldsNullLastName() {
 		AppUser invalidMockedUser = new AppUser(1, "mocked", null, "mocked@email.com", "mocked", "mocked",
 				UserRole.ROLE_USER);
-		boolean actualResult = userService.validateFields(invalidMockedUser);
+		boolean actualResult = sut.validateFields(invalidMockedUser);
 		assertFalse(actualResult);
 	}
 
@@ -791,7 +791,7 @@ public class UserServiceTest {
 	@Test
 	public void testValidateFieldsInvalidEmail() {
 		AppUser invalidMockedUser = new AppUser(1, "mocked", "mocked", "", "mocked", "mocked", UserRole.ROLE_USER);
-		boolean actualResult = userService.validateFields(invalidMockedUser);
+		boolean actualResult = sut.validateFields(invalidMockedUser);
 		assertFalse(actualResult);
 	}
 
@@ -802,7 +802,7 @@ public class UserServiceTest {
 	@Test
 	public void testValidateFieldsNullEmail() {
 		AppUser invalidMockedUser = new AppUser(1, "mocked", "mocked", null, "mocked", "mocked", UserRole.ROLE_USER);
-		boolean actualResult = userService.validateFields(invalidMockedUser);
+		boolean actualResult = sut.validateFields(invalidMockedUser);
 		assertFalse(actualResult);
 	}
 
@@ -814,7 +814,7 @@ public class UserServiceTest {
 	@Test
 	public void testValidateFieldsInvalidUsername() {
 		AppUser invalidMockedUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", "", "mocked", UserRole.ROLE_USER);
-		boolean actualResult = userService.validateFields(invalidMockedUser);
+		boolean actualResult = sut.validateFields(invalidMockedUser);
 		assertFalse(actualResult);
 	}
 
@@ -827,7 +827,7 @@ public class UserServiceTest {
 	public void testValidateFieldsNullUsername() {
 		AppUser invalidMockedUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", null, "mocked",
 				UserRole.ROLE_USER);
-		boolean actualResult = userService.validateFields(invalidMockedUser);
+		boolean actualResult = sut.validateFields(invalidMockedUser);
 		assertFalse(actualResult);
 	}
 
@@ -839,7 +839,7 @@ public class UserServiceTest {
 	@Test
 	public void testValidateFieldsInvalidPassword() {
 		AppUser invalidMockedUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", "mocked", "", UserRole.ROLE_USER);
-		boolean actualResult = userService.validateFields(invalidMockedUser);
+		boolean actualResult = sut.validateFields(invalidMockedUser);
 		assertFalse(actualResult);
 	}
 
@@ -852,7 +852,7 @@ public class UserServiceTest {
 	public void testValidateFieldsNullPassword() {
 		AppUser invalidMockedUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", "mocked", null,
 				UserRole.ROLE_USER);
-		boolean actualResult = userService.validateFields(invalidMockedUser);
+		boolean actualResult = sut.validateFields(invalidMockedUser);
 		assertFalse(actualResult);
 	}
 
@@ -865,7 +865,7 @@ public class UserServiceTest {
 	public void testValidateFieldsInvalidRole() {
 		AppUser invalidMockedUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", "mocked", "mocked",
 				UserRole.valueOf(""));
-		boolean actualResult = userService.validateFields(invalidMockedUser);
+		boolean actualResult = sut.validateFields(invalidMockedUser);
 		assertFalse(actualResult);
 	}
 
@@ -876,7 +876,7 @@ public class UserServiceTest {
 	@Test
 	public void testValidateFieldsNullRole() {
 		AppUser invalidMockedUser = new AppUser(1, "mocked", "mocked", "mocked@email.com", "mocked", "mocked", null);
-		boolean actualResult = userService.validateFields(invalidMockedUser);
+		boolean actualResult = sut.validateFields(invalidMockedUser);
 		assertFalse(actualResult);
 	}
 
@@ -903,7 +903,7 @@ public class UserServiceTest {
 	@Test(expected = BadRequestException.class)
 	public void testLoadUserByUsernameInvalidUsername() {
 		String invalidUsername = "";
-		userService.loadUserByUsername(invalidUsername);
+		sut.loadUserByUsername(invalidUsername);
 		verify(mockRepo, times(0)).findUserByUsername(Mockito.anyString());
 	}
 
@@ -916,7 +916,7 @@ public class UserServiceTest {
 	@Test(expected = BadRequestException.class)
 	public void testLoadUserByUsernameNullUsername() {
 		String nullUsername = null;
-		userService.loadUserByUsername(nullUsername);
+		sut.loadUserByUsername(nullUsername);
 		verify(mockRepo, times(0)).findUserByUsername(Mockito.anyString());
 	}
 
@@ -929,7 +929,7 @@ public class UserServiceTest {
 	public void testLoadUserByUsernameWithUnknownUsername() {
 		String unknownUsername = "unknown";
 		when(mockRepo.findUserByUsername(unknownUsername)).thenReturn(null);
-		userService.loadUserByUsername(unknownUsername);
+		sut.loadUserByUsername(unknownUsername);
 	}
 
 	/**
@@ -949,7 +949,7 @@ public class UserServiceTest {
 		String username = "valid-known";
 		when(mockRepo.findUserByUsername(username)).thenReturn(retrievedUser);
 		when(mockScopeMapper.mapScopesBasedUponRole(retrievedUser.getRole())).thenReturn("fake, list, of, scopes");
-		UserDetails result = userService.loadUserByUsername(username);
+		UserDetails result = sut.loadUserByUsername(username);
 		assertNotNull(result);
 	}
 
