@@ -40,12 +40,12 @@ public class TokenService {
 	 * 
 	 * @return a comma-separated list of granted scopes
 	 */
-	public String extractGrantedScopesFromToken(String token) {
+	public String extractGrantedScopes(String token) {
 		
 		token = removePrefixIfPresent(token);
 		checkForInvalidToken(token);
 		
-		Claims tokenClaims = extractClaimsFromToken(TokenType.ACCESS, token);
+		Claims tokenClaims = extractClaims(TokenType.ACCESS, token);
 		return (String) tokenClaims.get("scopes");
 		
 	}
@@ -56,7 +56,7 @@ public class TokenService {
 	 * @param token
 	 * @return encoded claims found within the provided token
 	 */
-	public Claims extractClaimsFromToken(TokenType type, String token) {
+	public Claims extractClaims(TokenType type, String token) {
 		
 		checkForInvalidToken(token);
 		token = removePrefixIfPresent(token);
@@ -82,7 +82,7 @@ public class TokenService {
 		checkForInvalidToken(refreshToken);
 		refreshToken = removePrefixIfPresent(refreshToken);
 		
-		Claims tokenClaims = extractClaimsFromToken(TokenType.REFRESH, refreshToken);
+		Claims tokenClaims = extractClaims(TokenType.REFRESH, refreshToken);
 		String grantedScopes = (String) tokenClaims.get("scopes");
 		
 		String subject = tokenClaims.getSubject();
@@ -112,7 +112,7 @@ public class TokenService {
 	 * 
 	 * @throws MalformedJwtException
 	 */
-	private void checkForInvalidToken(String token) {
+	public void checkForInvalidToken(String token) {
 		
 		if (token == null || token.isEmpty()) {
 			throw new MalformedJwtException("Invalid access token provided");
@@ -120,7 +120,7 @@ public class TokenService {
 		
 	}
 	
-	private String removePrefixIfPresent(String token) {
+	public String removePrefixIfPresent(String token) {
 		
 		if (token.startsWith("Bearer ")) {
 			token = token.replaceAll("Bearer ", "");

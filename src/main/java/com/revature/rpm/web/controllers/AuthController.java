@@ -42,7 +42,7 @@ public class AuthController {
 	 */
 	@GetMapping(value = "/scopes", produces = "text/plain")
 	public String getGrantedScopes(@RequestHeader("access_token") String token) {
-		return tokenService.extractGrantedScopesFromToken(token);
+		return tokenService.extractGrantedScopes(token);
 	}
 
 	/**
