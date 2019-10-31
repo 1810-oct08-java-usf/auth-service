@@ -20,7 +20,8 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 
 /**
- * Serves as the main for dealing with token-related operations.
+ * This controller contains all authentication- and token-related
+ * front-facing endpoints for the RPM system.
  * 
  */
 @RestController
@@ -35,8 +36,8 @@ public class AuthController {
 	}
 
 	/**
-	 * Serves as a front-facing endpoint for determining the scopes specified
-	 * within a token
+	 * Serves as a front-facing endpoint for determining the scopes specified within
+	 * a token
 	 * 
 	 * @return a comma-separated list of granted scopes
 	 */
@@ -46,17 +47,17 @@ public class AuthController {
 	}
 
 	/**
-	 * Serves as a front-facing endpoint obtaining a new access token using the 
+	 * Serves as a front-facing endpoint obtaining a new access token using the
 	 * provided refresh token.
 	 * 
-	 * @return 
+	 * @return
 	 * 
 	 */
 	@GetMapping(value = "/refresh", produces = "application/json")
 	public UserPrincipal refreshAccessToken(@RequestHeader("refresh_token") String refreshToken) {
 		return tokenService.refreshAccessToken(refreshToken);
 	}
-	
+
 	/**
 	 * This handles any MalformedJwtException thrown in the AuthController.
 	 * 
@@ -74,18 +75,17 @@ public class AuthController {
 		error.setMessage(sige.getMessage());
 		error.setTimestamp(System.currentTimeMillis());
 
-		resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\", " 
-												+ "error=\"invalid_request\", "
-												+ "error_description=\"Invalid token provided\"");
+		resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\", " + "error=\"invalid_request\", "
+				+ "error_description=\"Invalid token provided\"");
 
 		return error;
 
 	}
-	
+
 	/**
 	 * This handles any MalformedJwtException thrown in the AuthController.
 	 * 
-	 * @param mje the thrown exception
+	 * @param mje  the thrown exception
 	 * @param resp a facade of the HTTP response object
 	 * 
 	 * @return This method will return an error of type UserErrorResponse
@@ -99,9 +99,8 @@ public class AuthController {
 		error.setMessage(mje.getMessage());
 		error.setTimestamp(System.currentTimeMillis());
 
-		resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\", " 
-												+ "error=\"invalid_request\", "
-												+ "error_description=\"Invalid token provided\"");
+		resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\", " + "error=\"invalid_request\", "
+				+ "error_description=\"Invalid token provided\"");
 
 		return error;
 
@@ -110,7 +109,7 @@ public class AuthController {
 	/**
 	 * This handles any ExpiredJwtException thrown in the AuthController.
 	 * 
-	 * @param eje the thrown exception
+	 * @param eje  the thrown exception
 	 * @param resp a facade of the HTTP response object
 	 * 
 	 * @return This method will return an error of type UserErrorResponse
@@ -124,9 +123,8 @@ public class AuthController {
 		error.setMessage(eje.getMessage());
 		error.setTimestamp(System.currentTimeMillis());
 
-		resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\", " 
-												+ "error=\"invalid_token\", "
-												+ "error_description=\"Access token expired\"");
+		resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\", " + "error=\"invalid_token\", "
+				+ "error_description=\"Access token expired\"");
 
 		return error;
 
@@ -135,7 +133,7 @@ public class AuthController {
 	/**
 	 * This handles any SecurityException thrown in the AuthController.
 	 * 
-	 * @param se the thrown exception
+	 * @param se   the thrown exception
 	 * @param resp a facade of the HTTP response object
 	 * 
 	 * @return This method will return an error of type UserErrorResponse
@@ -149,9 +147,8 @@ public class AuthController {
 		error.setMessage(se.getMessage());
 		error.setTimestamp(System.currentTimeMillis());
 
-		resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\", " 
-												+ "error=\"invalid_token\", "
-												+ "error_description=\"Token is associated with locked subject\"");
+		resp.setHeader("WWW-Authenticate", "Bearer realm=\"auth-service\", " + "error=\"invalid_token\", "
+				+ "error_description=\"Token is associated with locked subject\"");
 
 		return error;
 

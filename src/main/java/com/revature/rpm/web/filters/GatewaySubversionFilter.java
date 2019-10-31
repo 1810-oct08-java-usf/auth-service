@@ -31,6 +31,7 @@ import com.revature.rpm.exceptions.GatewaySubversionException;
  * Requests to certain Actuator endpoints are permitted since the AWS Elastic
  * Load Balancer requires them to be directly accessibly for resource monitoring
  * purposes.
+ * 
  */
 public class GatewaySubversionFilter extends GenericFilterBean {
 

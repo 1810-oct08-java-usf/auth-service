@@ -24,7 +24,6 @@ import io.jsonwebtoken.ExpiredJwtException;
  * A filter used to intercept all requests and validate the JWT, if present, in
  * the HTTP request header.
  * 
- * @author Wezley Singleton
  */
 public class ResourceAccessFilter extends OncePerRequestFilter {
 	

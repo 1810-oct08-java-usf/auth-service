@@ -6,10 +6,10 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 @SpringBootApplication
 @EnableEurekaClient
-public class RpmAuthServiceApplication {
+public class RpmAuthService {
 
 	public static void main(String[] args) {
-		SpringApplication.run(RpmAuthServiceApplication.class, args);
+		SpringApplication.run(RpmAuthService.class, args);
 	}
 
 }

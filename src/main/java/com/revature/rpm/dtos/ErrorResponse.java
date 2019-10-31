@@ -1,30 +1,27 @@
 package com.revature.rpm.dtos;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * This is a data object for the errors
- * 
- * @author Alonzo Muncy (190107 Java-Spark-USF)
+ * Serves as a data transfer object used for conveying client and server side
+ * errors back to the requester.
  *
  */
-public class ErrorResponse implements Serializable {
+public class ErrorResponse {
 
-	private static final long serialVersionUID = -780898122370684787L;
-	
 	private int status;
 	private String message;
 	private long timestamp;
-	
-	public ErrorResponse() {}
-	
+
+	public ErrorResponse() {
+	}
+
 	public ErrorResponse(int status, long timestamp) {
 		super();
 		this.status = status;
 		this.timestamp = timestamp;
 	}
-	
+
 	public ErrorResponse(int status, String message, long timestamp) {
 		super();
 		this.status = status;
@@ -77,5 +74,5 @@ public class ErrorResponse implements Serializable {
 	public String toString() {
 		return "UserErrorResponse [status=" + status + ", message=" + message + ", timestamp=" + timestamp + "]";
 	}
-	
+
 }

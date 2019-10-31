@@ -16,6 +16,8 @@ import io.jsonwebtoken.MalformedJwtException;
 
 /**
  * Serves as the primary service class for all token-related operations.
+ * Validation is included to ensure requests are proper, otherwise an exception
+ * will be thrown detailing the validation rule that was violated.
  *
  */
 @Service
@@ -24,14 +26,14 @@ public class TokenService {
 	private TokenParser tokenParser;
 	private TokenGenerator tokenGenerator;
 	private UserService userService;
-	
+
 	@Autowired
 	public TokenService(TokenParser parser, TokenGenerator generator, UserService service) {
 		this.tokenParser = parser;
 		this.tokenGenerator = generator;
 		this.userService = service;
 	}
-	
+
 	/**
 	 * Parses and validates the provided access token to provide a simple
 	 * comma-separated list of granted scopes.
@@ -41,15 +43,15 @@ public class TokenService {
 	 * @return a comma-separated list of granted scopes
 	 */
 	public String extractGrantedScopes(String token) {
-		
+
 		token = removePrefixIfPresent(token);
 		checkForInvalidToken(token);
-		
+
 		Claims tokenClaims = extractClaims(TokenType.ACCESS, token);
 		return (String) tokenClaims.get("scopes");
-		
+
 	}
-	
+
 	/**
 	 * Simply parses and validates the provided token for claims.
 	 * 
@@ -57,14 +59,13 @@ public class TokenService {
 	 * @return encoded claims found within the provided token
 	 */
 	public Claims extractClaims(TokenType type, String token) {
-		
+
 		checkForInvalidToken(token);
 		token = removePrefixIfPresent(token);
 		return tokenParser.parseClaims(type, token);
-		
+
 	}
-	
-	
+
 	/**
 	 * Parses and validates the provided refresh token in order to generate a new
 	 * access token, which is included within both the associated response header as
@@ -78,33 +79,33 @@ public class TokenService {
 	public UserPrincipal refreshAccessToken(String refreshToken) {
 
 		UserPrincipal principal = new UserPrincipal();
-		
+
 		checkForInvalidToken(refreshToken);
 		refreshToken = removePrefixIfPresent(refreshToken);
-		
+
 		Claims tokenClaims = extractClaims(TokenType.REFRESH, refreshToken);
 		String grantedScopes = (String) tokenClaims.get("scopes");
-		
+
 		String subject = tokenClaims.getSubject();
 		AppUser refreshSubject = userService.findUserByUsername(subject);
-		
+
 		if (refreshSubject == null || refreshSubject.getRole().equals(UserRole.ROLE_LOCKED)) {
 			throw new SecurityException("Illegal token provided");
 		}
-		
+
 		GenericTokenDetails tokenConfig = new GenericTokenDetails(TokenType.ACCESS, "Revature", subject);
 		String accessToken = tokenGenerator.generateToken(tokenConfig);
-		
+
 		principal.setUsername(subject);
 		principal.setGrantedScopes(grantedScopes);
 		principal.setAccessToken(accessToken);
 		principal.setAccessTokenCreatedAt(tokenConfig.getIat().toString());
 		principal.setAccessTokenExpiresAt(tokenConfig.getExp().toString());
-		
+
 		return principal;
-		
+
 	}
-	
+
 	/**
 	 * Simple check for an obviously invalid token (null or empty string)
 	 * 
@@ -113,20 +114,20 @@ public class TokenService {
 	 * @throws MalformedJwtException
 	 */
 	public void checkForInvalidToken(String token) {
-		
+
 		if (token == null || token.isEmpty()) {
 			throw new MalformedJwtException("Invalid access token provided");
 		}
-		
+
 	}
-	
+
 	public String removePrefixIfPresent(String token) {
-		
+
 		if (token.startsWith("Bearer ")) {
 			token = token.replaceAll("Bearer ", "");
 		}
-		
+
 		return token;
 	}
-	
+
 }

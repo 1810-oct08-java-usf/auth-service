@@ -3,85 +3,90 @@ package com.revature.rpm.tokens;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Serves as a basic configuration object which is used by TokenParser and
+ * TokenGenerator to perform their respective operations.
+ * 
+ */
 public class GenericTokenDetails {
-	
+
 	private TokenType type;
 	private String subject;
 	private String iss;
 	private LocalDateTime iat;
 	private LocalDateTime exp;
 	private String claims;
-	
+
 	public GenericTokenDetails(TokenType type, String iss, String subject) {
 		super();
 		this.type = type;
 		this.iss = iss;
 		this.subject = subject;
 		this.iat = LocalDateTime.now();
-		
+
 		switch (type) {
-		
+
 		case ACCESS:
 			this.exp = this.iat.plusMinutes(30L);
 			break;
-			
-		case REFRESH: 
+
+		case REFRESH:
 			this.exp = this.iat.plusWeeks(1L);
 			break;
-			
+
 		}
-		
+
 	}
 
 	public TokenType getType() {
 		return type;
 	}
-	
+
 	public void setType(TokenType type) {
 		this.type = type;
-		
+
 		switch (type) {
-		
+
 		case ACCESS:
 			this.exp = this.iat.plusMinutes(30L);
 			break;
-			
-		case REFRESH: 
+
+		case REFRESH:
 			this.exp = this.iat.plusWeeks(1L);
 			break;
-			
+
 		}
-		
+
 	}
-	
+
 	public String getSubject() {
 		return subject;
 	}
-	
+
 	public void setSubject(String subject) {
 		this.subject = subject;
 	}
-	
+
 	public String getIss() {
 		return iss;
 	}
-	
+
 	public void setIss(String iss) {
 		this.iss = iss;
 	}
-	
+
 	public LocalDateTime getIat() {
 		return iat;
 	}
-	
+
 	public void setIat(LocalDateTime iat) {
 		this.iat = iat;
 	}
-	
+
 	public LocalDateTime getExp() {
 		return exp;
 	}
-	
+
 	public void setExp(LocalDateTime exp) {
 		this.exp = exp;
 	}

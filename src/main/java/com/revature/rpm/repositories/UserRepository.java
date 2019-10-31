@@ -6,16 +6,17 @@ import org.springframework.stereotype.Repository;
 import com.revature.rpm.entities.AppUser;
 
 /**
- * Class is responsible for storing data into the database
+ * Serves as the primary data access object for retrieving and persisting
+ * AppUser objects.
  * 
- * @author Austin Bark (190422-Java-Spark)
- *
  */
 @Repository
-public interface UserRepository extends JpaRepository<AppUser, Integer>{
-	
+public interface UserRepository extends JpaRepository<AppUser, Integer> {
+
 	AppUser findUserByUsername(String username);
+
 	AppUser findUserByEmail(String email);
+
 	AppUser findUserByUsernameAndPassword(String username, String password);
 
 }

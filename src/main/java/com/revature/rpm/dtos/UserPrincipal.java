@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 /**
  * Acts as a data transfer object containing basic user information which is
  * sent back to the client upon successful user authentication.
+ * 
  */
 public class UserPrincipal {
 

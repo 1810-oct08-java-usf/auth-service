@@ -25,17 +25,12 @@ import com.revature.rpm.exceptions.UserUpdateException;
 import com.revature.rpm.repositories.UserRepository;
 import com.revature.rpm.tokens.ScopeMapper;
 
-/*
- * TODO
- * 
- * - encrypt user passwords prior to persistence (should not break security functionality)
- */
-
 /**
  * This class contains methods that should be accessed by the controller to find
  * and edit users. Validation is included to ensure requests are proper,
  * otherwise an exception will be thrown detailing the validation rule that was
  * violated.
+ * 
  */
 @Service
 public class UserService implements UserDetailsService {

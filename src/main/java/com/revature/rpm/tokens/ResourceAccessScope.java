@@ -1,5 +1,10 @@
 package com.revature.rpm.tokens;
 
+/**
+ * An enumeration that lists the known and accepted resource access scopes for
+ * users of the RPM system.
+ * 
+ */
 public enum ResourceAccessScope {
 
 	GET_ALL_USERS("get_all_users"), GET_USERS_BY_ID("get_users_by_id"), GET_USERS_BY_USERNAME("get_users_by_username"),

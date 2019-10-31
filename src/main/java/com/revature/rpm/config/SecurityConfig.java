@@ -91,8 +91,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				/*
 				 *  Allow unrestricted access to:
 				 *  
-				 *  	- POST requests to /users - for user registration
-				 *  	- GET requests to /users/isAvailable - for username and email availability requests
 				 *  	- GET requests to /actuator/info - for AWS Elastic Load Balancer target group monitoring
 				 *  	- GET requests to /actuator/routes - for AWS Elastic Load Balancer target group monitoring
 				 */

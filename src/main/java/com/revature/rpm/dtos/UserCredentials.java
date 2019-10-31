@@ -3,8 +3,9 @@ package com.revature.rpm.dtos;
 import java.util.Objects;
 
 /**
- * Used to store user credentials recieved from request body of an
+ * Used to store user credentials received from request body of an
  * authentication request.
+ * 
  */
 public class UserCredentials {
 

@@ -30,14 +30,14 @@ import com.revature.rpm.exceptions.UserUpdateException;
 import com.revature.rpm.services.UserService;
 
 /**
- * This controller contains all CRUD functionality for the users and is mapped
- * to handle all requests to /users.
+ * This controller contains all user-related front-facing endpoints for the RPM
+ * system.
  * 
  */
 @RestController
 @RequestMapping("/users")
 public class UserController {
-	
+
 	private UserService userService;
 
 	@Autowired
@@ -65,7 +65,7 @@ public class UserController {
 	 * 
 	 * @return The user with specified id, otherwise an exception will be thrown
 	 *         from the service layer and handled using this controller's exception
-	 *         handler. 
+	 *         handler.
 	 */
 	@ResponseStatus(HttpStatus.OK)
 	@PreAuthorize("hasAuthority('get_users_by_id')")

@@ -24,19 +24,15 @@ import com.revature.rpm.tokens.TokenGenerator;
 import com.revature.rpm.tokens.TokenType;
 
 /**
- * Filter used for authenticating a login request using the provided username
- * and password. Upon successful authentication a JWT will be passed back to the
- * client via a HTTP response header.
+ * Filter used for authenticating a login request using the provided user
+ * credentials.
+ * 
  */
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-	/**
-	 * Spring Security's AuthenticationManager which is used to validate the user
-	 * credentials
-	 */
 	private AuthenticationManager authManager;
 	private TokenGenerator tokenGenerator;
-	
+
 	/**
 	 * Constructor for the JwtUsernameAndPasswordAuthenticationFilter that
 	 * instantiates the AuthenticationManager and the JwtConfig fields. <br>
@@ -76,7 +72,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	 */
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse resp) {
-		
+
 		logger.info("An authentication request was received");
 
 		Authentication auth = null;
@@ -84,17 +80,17 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		try {
 
 			UserCredentials creds = new ObjectMapper().readValue(req.getInputStream(), UserCredentials.class);
-			
+
 			UsernamePasswordAuthenticationToken authGrant = new UsernamePasswordAuthenticationToken(creds.getUsername(),
 					creds.getPassword(), Collections.emptyList());
 
 			auth = authManager.authenticate(authGrant);
 
 		} catch (AuthenticationException ae) {
-			
+
 			logger.warn("A failed authentication attempt was made");
 			throw ae;
-			
+
 		} catch (IOException | JsonParseException ioe) {
 			logger.error("An error occurred while attempting to parse credentials");
 		}
@@ -123,29 +119,30 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	@Override
 	protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse resp, FilterChain chain,
 			Authentication auth) throws IOException, ServletException {
-		
+
 		logger.info("Authentication successful, generating resource access token");
-		
+
 		User authUser = (User) auth.getPrincipal();
 		UserPrincipal principal = new UserPrincipal();
 		principal.setGrantedScopes(authUser.getAuthorities());
-		
-		GenericTokenDetails tokenConfig = new GenericTokenDetails(TokenType.REFRESH, "Revature", authUser.getUsername());
+
+		GenericTokenDetails tokenConfig = new GenericTokenDetails(TokenType.REFRESH, "Revature",
+				authUser.getUsername());
 		tokenConfig.setClaims(principal.getGrantedScopes());
-		
+
 		String refreshToken = tokenGenerator.generateToken(tokenConfig);
 
 		tokenConfig.setType(TokenType.ACCESS);
 		String accessToken = tokenGenerator.generateToken(tokenConfig);
-		
+
 		principal.setUsername(authUser.getUsername());
 		principal.setRefreshToken(refreshToken);
 		principal.setAccessToken(accessToken);
 		principal.setAccessTokenCreatedAt(tokenConfig.getIat().toString());
 		principal.setAccessTokenExpiresAt(tokenConfig.getExp().toString());
-		
+
 		logger.info("Attaching token to response Authorization header");
-		
+
 		resp.setContentType("application/json");
 		resp.addHeader("Authorization", "Bearer " + accessToken);
 		resp.getWriter().write(new ObjectMapper().writeValueAsString(principal));
