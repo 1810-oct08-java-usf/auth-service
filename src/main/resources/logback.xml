@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<!-- Local variable that defines a directory to store logs. -->
+	<property name="LOG_PATH" value="logs" />
+	<property name="OUTPUT_PATTERN" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+	
+	<!-- 
+		Appenders are the basic unit of loggers. They allow for custom patterns, encoders, rolling policies 
+		and more to be bound to a name and a class. The former is used to reference it, while the latter defines 
+		the underlying behavior. For example, ConsoleAppender denotes that the will print all output to the console.
+	 -->
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- 
+			Encoders are by default assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder 
+			Patterns allow us to create tailored strings for log messages.
+		-->
+		<encoder>
+			<pattern>${OUTPUT_PATTERN}</pattern>
+		</encoder>
+	</appender>
+	
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH:-.}/AuthService.log</file>
+		<encoder>
+			<pattern>${OUTPUT_PATTERN}</pattern>
+		</encoder>
+		<!-- 
+			Defines when the log file will be overwritten (rolled over).
+			fileNamePattern - Creates an archive file with the given name. It requires 
+				%d, which can be configured via JavaSimpleDateFormat %d{}. %i is also needed, 
+				as it specifies the index for logback. For example, removing -dd from the format string 
+				%d{yyyy-MM-dd}, the logging behavior will be altered to archive on a monthly basis rather
+			 	than a daily one. 
+			maxFileSize - The maximum file size permitted for an individual file before it is archived.
+			maxHistory - Defines how long to keep archived files based on age. This is depended on the
+				SimpleDateFormat. For example, with a maxHistory value of 60 and a format string of 
+				%d{yyyy-MM-dd}, archived files will be kept for a maximum of 60 days. Changing the format
+				string to %d{yyyy-MM} would indicate that files should be kept for 60 months!
+			totalSizeCap - The maximum file size allotted for all log files combined. If this number 
+				is reached, the oldest file will be automatically purged.
+		-->
+		<rollingPolicy
+            class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/archived/AuthService-%d{yyyy-MM-dd}.%i.zip</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>60</maxHistory>
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+	</appender>
+
+	<!-- 
+		logger allows specific packages to be targeted by provided them in the name property. This allows for 
+		custom logging levels based on the package as well as custom appenders for more granule control.
+		At the time of this writing (2019-11-04 ISO), it does not seem like files can be reliably targeted.
+		Since individual loggers are not as useful at this time, the logger below will be commented out, but should 
+		serve as an example for future batches.
+	 -->
+	 <!-- 
+	<logger name="com.revature.rpm.web.controllers" level="debug">
+		<appender-ref ref="FILE" />
+  	</logger>
+  	-->
+	
+	<root level="info">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</root>
+
+</configuration>
