@@ -113,5 +113,5 @@ target/
 
 .vscode/
 
-# hook-deps
-.hook-deps/
+# Logs directory
+[Ll]ogs/
