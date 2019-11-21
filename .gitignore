@@ -1,3 +1,12 @@
+# repos
+project-service
+auth-service
+eureka-service
+config-service
+zuul-service
+
+/.metadata/
+
 # Compiled class file
 *.class 
 
@@ -95,14 +104,14 @@ hibernate.cfg.xml
 # sonarlint modules
 .sonarlint
 
-# target folder
-target/
-
 # config files (bootstrap.yml will stay on repo, but no need to update it)
 bootstrap.yml
 application.yml
 
-# .attach files
-.attach*
-@
-# Attach files
+# Target Directory
+target/
+
+.vscode/
+
+# Logs directory
+[Ll]ogs/

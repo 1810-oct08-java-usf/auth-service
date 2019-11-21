@@ -18,8 +18,9 @@ security:
 #Configuration settings that used when the local profile is active
 spring:
   profiles: local
-  application:    name: auth-service
+  application:
+    name: auth-service
   cloud:
     config:
       uri:
-      - http://localhost:8888
+      - http://config-service.vmmxembj3j.us-east-2.elasticbeanstalk.com/
